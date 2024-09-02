@@ -623,7 +623,7 @@
 
 <hr>
 <blockquote>
-<p>能用的gadget都沒有，我們可以使用 <code>deregister_tm_clones</code> 這個 function 有個神奇的東西 (如下圖)<br>這邊就會直接幫我們把rax設為0x404040（也就是<a class="link"   href="mailto:&#x73;&#116;&#x64;&#111;&#x75;&#116;&#x40;&#x47;&#76;&#73;&#x42;&#67;&#95;&#50;&#x2e;&#50;&#x2e;&#53;" >&#x73;&#116;&#x64;&#111;&#x75;&#116;&#x40;&#x47;&#76;&#73;&#x42;&#67;&#95;&#50;&#x2e;&#50;&#x2e;&#53; <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>，call 完這個 function 後，我們只需要 call 回 main 中控制 printf 的 <code>mov rdi,rax</code> 就可以 leak 出 libc base，後面一樣用 libc 堆 rop chain 就可以了。</p>
+<p>能用的gadget都沒有，我們可以使用 <code>deregister_tm_clones</code> 這個 function 有個神奇的東西 (如下圖)<br>這邊就會直接幫我們把rax設為0x404040（也就是<a class="link"   href="mailto:&#x73;&#x74;&#x64;&#111;&#x75;&#116;&#x40;&#71;&#76;&#x49;&#x42;&#67;&#95;&#x32;&#46;&#50;&#46;&#x35;" >&#x73;&#x74;&#x64;&#111;&#x75;&#116;&#x40;&#71;&#76;&#x49;&#x42;&#67;&#95;&#x32;&#46;&#50;&#46;&#x35; <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>，call 完這個 function 後，我們只需要 call 回 main 中控制 printf 的 <code>mov rdi,rax</code> 就可以 leak 出 libc base，後面一樣用 libc 堆 rop chain 就可以了。</p>
 </blockquote>
 <p><img  
                      lazyload
