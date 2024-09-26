@@ -617,7 +617,7 @@
 
 
         <div class="article-content markdown-body px-2 sm:px-6 md:px-8 pb-8">
-            <h2 id="DEF-Functions"><a href="#DEF-Functions" class="headerlink" title="DEF Functions"></a>DEF Functions</h2><ol>
+            <h2 id="INTRO"><a href="#INTRO" class="headerlink" title="INTRO"></a>INTRO</h2><ol>
 <li><p>共享記憶體的解決方案 (Share memory Solution)<br> 使用一個共享的Buffer（bounded buffer），這個Buffer有固定大小，生產者將數據放入Buffer，消費者從中取出數據。為了保證生產者和消費者不會同時訪問Buffer，使用互斥鎖 (mutex) 和兩個條件變量 (condition variables)，一個用於通知Buffer未滿 (not full)，另一個用於通知Buffer非空 (not empty)。</p>
 </li>
 <li><p>生產者 (Producer)<br> 生產者的工作是將數據放入Buffer中，當Buffer滿時，它會等待消費者取走一些數據以騰出空間。</p>
@@ -630,6 +630,11 @@
 <li><code>prod_thread, cons_thread</code> 保存新建 Thread ID , 創建生產者跟消費者 Thread</li>
 <li>等待 Thread 完成</li>
 <li>釋放它們佔用的資源 (destory)</li>
+</ol>
+</li>
+<li><p>LIB Function (pthread.h)</p>
+<ol>
+<li>pThread_t: <code>typedef __darwin_pthread_t pthread_t;</code><br><a class="link"   target="_blank" rel="noopener" href="https://www.ibm.com/docs/zh-tw/aix/7.3?topic=p-pthread-mutex-lock-pthread-mutex-trylock-pthread-mutex-unlock-subroutine" > <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></li>
 </ol>
 </li>
 </ol>
@@ -743,7 +748,7 @@
     <div class="post-toc">
         <div class="toc-title">On this page</div>
         <div class="page-title">OS Bounded Buffer</div>
-        <ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#DEF-Functions"><span class="nav-text">DEF Functions</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#IMPL"><span class="nav-text">IMPL</span></a></li></ol></li></ol>
+        <ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#INTRO"><span class="nav-text">INTRO</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#IMPL"><span class="nav-text">IMPL</span></a></li></ol></li></ol>
 
     </div>
 </div>

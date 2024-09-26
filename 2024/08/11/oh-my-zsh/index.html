@@ -619,13 +619,13 @@
 
 
         <div class="article-content markdown-body px-2 sm:px-6 md:px-8 pb-8">
-            <h2 id="oh-my-zsh"><a href="#oh-my-zsh" class="headerlink" title="oh-my-zsh"></a>oh-my-zsh</h2><p>oh-my-zsh 就是一個可以讓你的zsh變好看的東東，p10k是他的一個theme<br>這篇文章主要講我以為裝完oh-my-zsh後把python-env搞爛，然後找方法變回來的過程</p>
+            <h2 id="oh-my-zsh"><a href="#oh-my-zsh" class="headerlink" title="oh-my-zsh"></a>oh-my-zsh</h2><p>oh-my-zsh 就是一個可以讓你的 Zsh 變好看的東東，p10k 是他的一個 Theme<br>這篇文章主要講我以為裝完 oh-my-zsh 後把 python-env 搞爛，然後找方法變回來的過程。</p>
 <p>首先看了<a class="link"   target="_blank" rel="noopener" href="https://stackoverflow.com/questions/38928717/virtualenv-name-not-show-in-zsh-prompt" >這篇 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>，</p>
-<p>試了一下最後重新 <code>python -m venv .venv</code> 就可以了，但還是沒有<code>(.venv)</code>的prompt</p>
+<p>試了一下重新 <code>python -m venv .venv</code> 就可以了，但還是沒有 <code>(.venv)</code> 的prompt</p>
 <p>google一下，應該跟這個資料夾有關 <code>.oh-my-zsh/plugins/virtualenv</code>，註解掉裡面的 <code>export VIRTUAL_ENV_DISABLE_PROMPT=1</code></p>
 <div class="highlight-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">~/.zshrc </span><br><span class="line">plugins=(virtualenv)</span><br><span class="line"><span class="built_in">source</span> ~/.zshrc</span><br></pre></td></tr></table></figure></div>
 
-<p>還是沒用，但輸入<code>virtualenv_prompt_info</code>會跳出<code>[.venv]</code>所以開始找把這個函數嵌入prompt的方法</p>
+<p>還是沒用，但輸入 <code>virtualenv_prompt_info</code> 會跳出 <code>[.venv]</code> 所以開始找把這個函數嵌入prompt的方法</p>
 <p>然後發現是我plugins寫錯了 正確寫法是<code>plugins = (git virtualenv)</code> 把兩個各寫一個plugins，然後就變成這樣了</p>
 <p><img  
                      lazyload
@@ -633,8 +633,8 @@
                      data-src="/images/zsh-bug-1.png"
                       alt="image"
                 ></p>
-<p>有點破爛啊<br>解決方法 -&gt; 修改 .p10k.zsh</p>
-<h2 id="p10k-zsh"><a href="#p10k-zsh" class="headerlink" title="p10k.zsh"></a>p10k.zsh</h2><div class="highlight-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">typeset</span> -g POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(</span><br><span class="line">  <span class="comment"># =========================[ Line #1 ]=========================</span></span><br><span class="line">  os_icon               <span class="comment"># os identifier</span></span><br><span class="line">  <span class="built_in">dir</span>                     <span class="comment"># current directory</span></span><br><span class="line">  vcs                     <span class="comment"># git status</span></span><br><span class="line">  <span class="comment"># =========================[ Line #2 ]=========================</span></span><br><span class="line">  newline                 <span class="comment"># \n</span></span><br><span class="line">  <span class="comment"># prompt_char           # prompt symbol</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure></div>
+<p>有點破爛啊 (<del>後來發現是把 .bashrc 的 Theme 改壞了</del>)</p>
+<h2 id="修改-p10k-zsh"><a href="#修改-p10k-zsh" class="headerlink" title="修改 .p10k.zsh"></a>修改 .p10k.zsh</h2><div class="highlight-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">typeset</span> -g POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(</span><br><span class="line">  <span class="comment"># =========================[ Line #1 ]=========================</span></span><br><span class="line">  os_icon               <span class="comment"># os identifier</span></span><br><span class="line">  <span class="built_in">dir</span>                     <span class="comment"># current directory</span></span><br><span class="line">  vcs                     <span class="comment"># git status</span></span><br><span class="line">  <span class="comment"># =========================[ Line #2 ]=========================</span></span><br><span class="line">  newline                 <span class="comment"># \n</span></span><br><span class="line">  <span class="comment"># prompt_char           # prompt symbol</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure></div>
 
 <p>然後發現本來就有pyenv的資訊了，就寫在後面的小框框 :&gt;<br>發現時間 4:00 AM，有時候都覺得我根本沒腦</p>
 <p>三小時學會改zsh :&gt;&gt;&gt;</p>
@@ -763,7 +763,7 @@
     <div class="post-toc">
         <div class="toc-title">On this page</div>
         <div class="page-title">oh-my-zsh p10k</div>
-        <ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#oh-my-zsh"><span class="nav-text">oh-my-zsh</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#p10k-zsh"><span class="nav-text">p10k.zsh</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#REF"><span class="nav-text">REF</span></a></li></ol>
+        <ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#oh-my-zsh"><span class="nav-text">oh-my-zsh</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%AE%E6%94%B9-p10k-zsh"><span class="nav-text">修改 .p10k.zsh</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#REF"><span class="nav-text">REF</span></a></li></ol>
 
     </div>
 </div>
