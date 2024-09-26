@@ -18,12 +18,12 @@
     <meta name="googlebot" content="index,follow">
     <meta name="revisit-after" content="1 days">
     
-        <meta name="description" content="DEF Functions 共享記憶體的解決方案 (Share memory Solution) 使用一個共享的Buffer（bounded buffer），這個Buffer有固定大小，生產者將數據放入Buffer，消費者從中取出數據。為了保證生產者和消費者不會同時訪問Buffer，使用互斥鎖 (mutex) 和兩個條件變量 (condition variables)，一個用於通知Buffer未滿">
+        <meta name="description" content="Simulation Producer and Consumer">
 <meta property="og:type" content="article">
 <meta property="og:title" content="OS Bounded Buffer">
 <meta property="og:url" content="http://chihhhs.github.io/2024/09/26/os-bbuff/index.html">
 <meta property="og:site_name" content="Chihhh&#39;s Blog">
-<meta property="og:description" content="DEF Functions 共享記憶體的解決方案 (Share memory Solution) 使用一個共享的Buffer（bounded buffer），這個Buffer有固定大小，生產者將數據放入Buffer，消費者從中取出數據。為了保證生產者和消費者不會同時訪問Buffer，使用互斥鎖 (mutex) 和兩個條件變量 (condition variables)，一個用於通知Buffer未滿">
+<meta property="og:description" content="Simulation Producer and Consumer">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2024-09-26T05:57:36.000Z">
 <meta property="article:modified_time" content="2024-09-26T05:57:36.000Z">
@@ -516,7 +516,7 @@
 
         <div class="statistics flex justify-around my-2.5">
     <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/tags">
-        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">8</div>
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">9</div>
         <div class="label text-third-text-color text-sm">Tags</div>
     </a>
     <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/categories">
@@ -524,7 +524,7 @@
         <div class="label text-third-text-color text-sm">Categories</div>
     </a>
     <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/archives">
-        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">19</div>
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">20</div>
         <div class="label text-third-text-color text-sm">Posts</div>
     </a>
 </div>
@@ -627,7 +627,7 @@
 <li><p>Main Funtion</p>
 <ol>
 <li>初始化 mutex</li>
-<li><code>pthread_t prod_thread, cons_thread;</code> 保存新建 Thread ID , 創建生產者跟消費者 Thread</li>
+<li><code>prod_thread, cons_thread</code> 保存新建 Thread ID , 創建生產者跟消費者 Thread</li>
 <li>等待 Thread 完成</li>
 <li>釋放它們佔用的資源 (destory)</li>
 </ol>
@@ -776,7 +776,7 @@
                 
                 <p class="post-count space-x-0.5">
                     <span>
-                        19 posts in total
+                        20 posts in total
                     </span>
                     
                 </p>

